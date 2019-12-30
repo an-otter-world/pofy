@@ -18,6 +18,7 @@ class ListField(BaseField):
         self._item_field = item_field
 
     def deserialize(self, node):
+        """See pyyo.BaseField.deserialize for usage."""
         if not isinstance(node, SequenceNode):
             parse_error(node, _('Expected a sequence'))
 

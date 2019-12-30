@@ -1,5 +1,6 @@
 """YAML python object deserializer."""
 
+from .dict_field import DictField
 from .int_field import IntField
 from .list_field import ListField
 from .parse_error import ParseError

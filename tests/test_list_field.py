@@ -1,6 +1,4 @@
 """List field tests."""
-from io import StringIO
-
 from pyyo import ListField
 from pyyo import StringField
 from pyyo import YamlObject
