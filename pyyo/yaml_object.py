@@ -2,9 +2,9 @@
 from gettext import gettext as _
 from inspect import getmembers
 from io import StringIO
-from yaml import MappingEndEvent
-from yaml import MappingStartEvent
-from yaml import parse
+from yaml import MappingNode
+from yaml import Node
+from yaml import compose
 
 from .base_field import BaseField
 from .parse_error import parse_error
@@ -15,31 +15,40 @@ class YamlObject:
     def __init__(self, source):
         """Initialize YamlObject.
 
+        source can be a string, a stream or directly a yaml.Node. If a string
+        or a stream is given, it will be parsed as a YAML document.
+
         Args:
-            source (str, stream) : Either a string or a stream to parse to
-                                   construct this object.
+            source (str, stream, yaml.Node) : Either a string, a stream to
+                                              or a yaml.Node used to
         """
-        if isinstance(source, str):
-            source = StringIO(source)
+        yaml_node = YamlObject.__load_yaml(source)
+        self.__load(yaml_node)
 
-        self._load(source)
+    @staticmethod
+    def __load_yaml(source):
+        if source is Node:
+            return source
 
-    def _load(self, source):
+        if source is str:
+            return compose(StringIO(source))
+
+        return compose(source)
+
+    def __load(self, node):
         fields = dict(self._get_fields())
-        events = iter(parse(source))
 
-        while not isinstance(next(events), MappingStartEvent):
-            pass
+        if not isinstance(node, MappingNode):
+            parse_error(node, _('Expected a mapping.'))
 
-        event = next(events)
-        while not isinstance(event, MappingEndEvent):
-            field_name = event.value
+        for name_node, value_node in node.value:
+            field_name = name_node.value
             if not field_name in fields:
-                parse_error(event, _('Unknown field {}'), field_name)
+                parse_error(name_node, _('Unknown field {}'), field_name)
+
             field = fields[field_name]
-            field_value = field.deserialize(events)
+            field_value = field.deserialize(value_node)
             setattr(self, field_name, field_value)
-            event = next(events)
 
     @classmethod
     def _get_fields(cls):

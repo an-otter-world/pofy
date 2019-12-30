@@ -1,7 +1,7 @@
 """Base field class & utilities."""
 from abc import abstractmethod
 from gettext import gettext as _
-from yaml import ScalarEvent
+from yaml import ScalarNode
 
 from .parse_error import parse_error
 
@@ -9,11 +9,11 @@ class BaseField:
     """Base class for YAML object fields."""
 
     @abstractmethod
-    def deserialize(self, events):
+    def deserialize(self, node):
         """Deserialize this field.
 
         Args:
-            events (iterator) : YAML events iterator.
+            node (yaml.Node) : YAML node containing field value.
 
         Return:
             (object) : Deserialized field value.
@@ -23,13 +23,12 @@ class BaseField:
 class ScalarField(BaseField):
     """Base class for scalar value fields."""
 
-    def deserialize(self, events):
+    def deserialize(self, node):
         """See BaseField.deserialize method documentation."""
-        event = next(events)
-        if not isinstance(event, ScalarEvent):
-            parse_error(event, _('Exected scalar value.'))
+        if not isinstance(node, ScalarNode):
+            parse_error(node, _('Exected scalar value.'))
 
-        return self._convert(event.value)
+        return self._convert(node.value)
 
     @abstractmethod
     def _convert(self, value):
