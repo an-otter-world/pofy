@@ -1,5 +1,8 @@
 """String field class & utilities."""
-from .base_field import BaseField
+from .base_field import ScalarField
 
-class StringField(BaseField):
+class StringField(ScalarField):
     """String YAML object field."""
+
+    def _convert(self, value):
+        return value

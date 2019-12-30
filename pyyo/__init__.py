@@ -1,5 +1,5 @@
 """YAML python object deserializer."""
 
-from .number_field import NumberField
+from .int_field import IntField
 from .string_field import StringField
 from .yaml_object import YamlObject

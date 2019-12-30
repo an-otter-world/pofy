@@ -1,16 +1,15 @@
 """String field tests."""
 from io import StringIO
 
-from pyyo import NumberField
+from pyyo import IntField
 from pyyo import YamlObject
 
-def test_number_field():
+def test_int():
     """Test number field deserialization works."""
     class _Test(YamlObject):
-        test_field = NumberField()
+        test_field = IntField()
 
     stream = StringIO('test_field: 10')
 
     test = _Test(stream)
     assert test.test_field == 10
-
