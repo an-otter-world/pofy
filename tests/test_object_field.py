@@ -1,7 +1,7 @@
 """Object field tests."""
 from pyyo import ObjectField
 from pyyo import StringField
-from pyyo import deserialize
+from pyyo import load
 
 class _SubObject:
     class Meta:
@@ -24,10 +24,10 @@ class _Test:
 
 def test_object_field():
     """Test object field deserialization works."""
-    test = deserialize((
+    test = load(_Test, (
         'sub_object:\n' +
         '  string_field: field_value\n'
-    ), _Test)
+    ))
     assert isinstance(test.sub_object, _SubObject)
     #pylint: disable=no-member
     assert test.sub_object.string_field == 'field_value'

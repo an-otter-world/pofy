@@ -1,7 +1,7 @@
 """List field tests."""
 from pyyo import DictField
 from pyyo import StringField
-from pyyo import deserialize
+from pyyo import load
 
 class _Test:
     class Meta:
@@ -10,9 +10,9 @@ class _Test:
 
 def test_dict_field():
     """Test dict field deserialization works."""
-    test = deserialize((
+    test = load(_Test, (
         'string_dict:\n' +
         '  key_1: value_1\n' +
         '  key_2: value_2'
-    ), _Test)
+    ))
     assert test.string_dict == {'key_1': 'value_1', 'key_2': 'value_2'}

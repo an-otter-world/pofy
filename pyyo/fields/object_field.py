@@ -4,6 +4,7 @@ from gettext import gettext as _
 from yaml import MappingNode
 
 from pyyo.errors import parse_error
+from pyyo.loader import load
 
 from .base_field import BaseField
 
@@ -23,5 +24,4 @@ class ObjectField(BaseField):
         if not isinstance(node, MappingNode):
             parse_error(node, _('Expected a mapping'))
 
-        from pyyo.deserializer import deserialize
-        return deserialize(node, self._object_class)
+        return load(self._object_class, node)

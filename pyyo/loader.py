@@ -11,7 +11,7 @@ from yaml import compose
 from .fields.base_field import BaseField
 from .errors import parse_error
 
-def deserialize(source, object_class):
+def load(object_class, source):
     """Deserializes a YAML document into an object."""
     node = __load_yaml(source)
     fields = dict(__get_fields(object_class))
