@@ -1,5 +1,4 @@
- * Put fields in a Meta subclass to avoid linter getting annoyed by shadowed
-   fields.
+ * Avoid having to use YAMLObject as base class for deserializable objects.
  * Add a default value for fields.
  * Add a required flag for fields.
  * Add a tag to load an object / sequence from another file.

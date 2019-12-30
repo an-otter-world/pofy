@@ -1,6 +1,7 @@
 """Base deserialilable YAML object class & utilities."""
 from gettext import gettext as _
 from inspect import getmembers
+from inspect import isclass
 from io import StringIO
 from yaml import MappingNode
 from yaml import Node
@@ -52,8 +53,12 @@ class YamlObject:
 
     @classmethod
     def _get_fields(cls):
+        def _is_meta_class(member):
+            return isclass(member) and member.__name__ == 'Meta'
+
         def _is_field(member):
             return isinstance(member, BaseField)
 
-        for name, field in getmembers(cls, _is_field):
-            yield (name, field)
+        for _, metaclass in getmembers(cls, _is_meta_class):
+            for name, field in getmembers(metaclass, _is_field):
+                yield (name, field)

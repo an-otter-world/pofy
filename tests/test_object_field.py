@@ -4,16 +4,23 @@ from pyyo import StringField
 from pyyo import YamlObject
 
 class _SubObject(YamlObject):
-    string_field = StringField()
+    class Meta:
+        """Yaml Fields."""
+        string_field = StringField()
 
 class _SubObjectChild(_SubObject):
-    child_string_field = StringField()
+    class Meta:
+        """Yaml Fields."""
+        child_string_field = StringField()
 
 class _OtherSuboject(YamlObject):
-    string_field = StringField()
+    class Meta:
+        string_field = StringField()
 
 class _Test(YamlObject):
-    sub_object = ObjectField(_SubObject)
+    class Meta:
+        """Yaml Fields."""
+        sub_object = ObjectField(_SubObject)
 
 def test_object_field():
     """Test object field deserialization works."""

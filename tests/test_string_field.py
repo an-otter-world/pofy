@@ -6,7 +6,9 @@ from pyyo import StringField
 from pyyo import YamlObject
 
 class _Test(YamlObject):
-    test_field = StringField()
+    class Meta:
+        """Yaml Fields."""
+        test_field = StringField()
 
 def test_string_field():
     """Test string field deserialization works."""
