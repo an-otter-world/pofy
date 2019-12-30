@@ -1,4 +1,4 @@
-"""Parsing error class & utilities."""
+"""Pyyo common method & utilities."""
 
 class ParseError(Exception):
     """Exception representing a parsing error."""

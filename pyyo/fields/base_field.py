@@ -3,7 +3,7 @@ from abc import abstractmethod
 from gettext import gettext as _
 from yaml import ScalarNode
 
-from .parse_error import parse_error
+from pyyo.errors import parse_error
 
 class BaseField:
     """Base class for YAML object fields."""

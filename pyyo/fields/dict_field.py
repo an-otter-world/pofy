@@ -4,7 +4,7 @@ from gettext import gettext as _
 from yaml import MappingNode
 from yaml import ScalarNode
 
-from .parse_error import parse_error
+from pyyo.errors import parse_error
 from .base_field import BaseField
 
 class DictField(BaseField):

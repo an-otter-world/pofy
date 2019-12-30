@@ -6,3 +6,4 @@
  * Add LICENSE & README.
  * Start documentation.
  * Finish covering all code.
+ * Raise all errors at once when finished deserializing ?
