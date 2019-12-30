@@ -6,8 +6,8 @@ from pyyo import YamlObject
 class _Test(YamlObject):
     string_dict = DictField(StringField())
 
-def test_int():
-    """Test list field deserialization works."""
+def test_dict_field():
+    """Test dict field deserialization works."""
     test = _Test((
         'string_dict:\n' +
         '  key_1: value_1\n' +

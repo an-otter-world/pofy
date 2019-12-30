@@ -27,7 +27,7 @@ class YamlObject:
 
     @staticmethod
     def __load_yaml(source):
-        if source is Node:
+        if isinstance(source, Node):
             return source
 
         if source is str:
