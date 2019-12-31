@@ -9,7 +9,7 @@ from pyyo import StringField
 class SubObject:
     """Test class for object field of YamlObject."""
 
-    class Meta:
+    class Schema:
         """Pyyo fields."""
 
         test_field = StringField()
@@ -18,7 +18,7 @@ class SubObject:
 class SubObjectChild(SubObject):
     """Test class for object field of YamlObject, subclassing another class."""
 
-    class Meta:
+    class Schema:
         """Pyyo fields."""
 
         child_field = StringField()
@@ -27,7 +27,7 @@ class SubObjectChild(SubObject):
 class YamlObject:
     """Test class for serialization tests."""
 
-    class Meta:
+    class Schema:
         """Pyyo fields."""
 
         dict_field = DictField(StringField())
@@ -48,7 +48,7 @@ class YamlObject:
 class RequiredFieldObject:
     """Stub with a required field."""
 
-    class Meta:
+    class Schema:
         """Pyyo fields."""
 
         required = StringField(required=True)

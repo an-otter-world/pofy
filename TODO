@@ -4,5 +4,4 @@
  * Raise all errors at once when finished deserializing ?
  * Rename ParseError to PyyoError.
  * Add missing type hints.
- * Rename 'Meta' to 'Schema'
  

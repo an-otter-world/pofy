@@ -60,14 +60,14 @@ def load_internal(object_class: Type, node: Node, context: LoadingContext):
 
 
 def _get_fields(cls):
-    def _is_meta_class(member):
-        return isclass(member) and member.__name__ == 'Meta'
+    def _is_schema_class(member):
+        return isclass(member) and member.__name__ == 'Schema'
 
     def _is_field(member):
         return isinstance(member, BaseField)
 
-    for __, metaclass in getmembers(cls, _is_meta_class):
-        for name, field in getmembers(metaclass, _is_field):
+    for __, schemaclass in getmembers(cls, _is_schema_class):
+        for name, field in getmembers(schemaclass, _is_field):
             yield (name, field)
 
 
