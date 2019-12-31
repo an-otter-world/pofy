@@ -35,6 +35,7 @@ class YamlObject:
         list_field = ListField(StringField())
         object_field = ObjectField(object_class=SubObject)
         string_field = StringField()
+        object_list_field = ListField(ObjectField(object_class=SubObject))
 
     def __init__(self):
         """Initialize YamlObject."""
@@ -43,6 +44,7 @@ class YamlObject:
         self.list_field = []
         self.object_field = None
         self.string_field = ''
+        self.object_list_field = []
 
 
 class RequiredFieldObject:

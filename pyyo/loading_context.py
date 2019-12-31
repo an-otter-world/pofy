@@ -1,5 +1,4 @@
 """Loading context class & utilities."""
-
 from typing import AnyStr
 from typing import List
 from typing import Union
