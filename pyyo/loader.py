@@ -59,12 +59,18 @@ def load_internal(object_class: Type, node: Node, context: LoadingContext):
     return result
 
 
-def _get_fields(cls):
-    def _is_schema_class(member):
-        return isclass(member) and member.__name__ == 'Schema'
+def _is_schema_class(member):
+    return isclass(member) and member.__name__ == 'Schema'
 
-    def _is_field(member):
-        return isinstance(member, BaseField)
+
+def _is_field(member):
+    return isinstance(member, BaseField)
+
+
+def _get_fields(cls):
+    for base in cls.__bases__:
+        for name, field in _get_fields(base):
+            yield (name, field)
 
     for __, schemaclass in getmembers(cls, _is_schema_class):
         for name, field in getmembers(schemaclass, _is_field):

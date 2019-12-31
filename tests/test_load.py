@@ -8,8 +8,9 @@ from pyyo import load
 from pyyo import ParseError
 from pyyo import Resolver
 
-from tests.fixtures import YamlObject
 from tests.fixtures import RequiredFieldObject
+from tests.fixtures import SubObjectChild
+from tests.fixtures import YamlObject
 
 
 def test_unknown_field_raise_error():
@@ -44,3 +45,14 @@ def test_resolve():
         resolvers=[_DummyResolver()]
     )
     assert test.object_field.test_field == 'test_value'
+
+
+def test_loading_subclass_works():
+    """Test loading a subclass loads parent fields."""
+    test = load(
+        SubObjectChild,
+        'test_field: parent_value\n' +
+        'child_field: child_value',
+    )
+    assert test.test_field == 'parent_value'
+    assert test.child_field == 'child_value'
