@@ -6,8 +6,8 @@ from pyyo import ObjectField
 from pyyo import StringField
 
 
-class TestSubObject:
-    """Test class for object field of TestObject."""
+class SubObject:
+    """Test class for object field of YamlObject."""
 
     class Meta:
         """Pyyo fields."""
@@ -15,8 +15,8 @@ class TestSubObject:
         test_field = StringField()
 
 
-class TestSubObjectChild(TestSubObject):
-    """Test class for object field of TestObject, subclassing another class."""
+class SubObjectChild(SubObject):
+    """Test class for object field of YamlObject, subclassing another class."""
 
     class Meta:
         """Pyyo fields."""
@@ -24,7 +24,7 @@ class TestSubObjectChild(TestSubObject):
         child_field = StringField()
 
 
-class TestObject:
+class YamlObject:
     """Test class for serialization tests."""
 
     class Meta:
@@ -33,11 +33,11 @@ class TestObject:
         dict_field = DictField(StringField())
         int_field = IntField()
         list_field = ListField(StringField())
-        object_field = ObjectField(TestSubObject)
+        object_field = ObjectField(SubObject)
         string_field = StringField()
 
     def __init__(self):
-        """Initialize TestObject."""
+        """Initialize YamlObject."""
         self.dict_field = {}
         self.int_field = 0
         self.list_field = []

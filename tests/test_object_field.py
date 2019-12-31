@@ -1,15 +1,15 @@
 """Object field tests."""
 from pyyo import load
 
-from .fixtures import TestObject
-from .fixtures import TestSubObject
+from .fixtures import YamlObject
+from .fixtures import SubObject
 
 
 def test_object_field():
     """Test object field deserialization works."""
-    test = load(TestObject, (
+    test = load(YamlObject, (
         'object_field:\n' +
-        '  string_field: field_value\n'
+        '  test_field: field_value\n'
     ))
-    assert isinstance(test.sub_object, TestSubObject)
-    assert test.sub_object.string_field == 'field_value'
+    assert isinstance(test.object_field, SubObject)
+    assert test.object_field.test_field == 'field_value'
