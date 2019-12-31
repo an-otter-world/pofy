@@ -47,5 +47,8 @@ class LoadingContext:
             if result is not None:
                 break
 
-        assert result is None or isinstance(result, (MappingNode, SequenceNode))
+        assert (
+            result is None or
+            isinstance(result, (MappingNode, SequenceNode))
+        )
         return result
