@@ -5,9 +5,10 @@ from inspect import getmembers
 from inspect import isclass
 from io import StringIO
 from typing import AnyStr
+from typing import Callable
 from typing import IO
-from typing import Type
 from typing import List
+from typing import Type
 from typing import Union
 
 from yaml import compose
@@ -25,6 +26,7 @@ def load(
     source: Union[str, IO[str]],
     resolve_roots: List[AnyStr] = None,
     resolvers: List[Resolver] = None,
+    error_handler: Callable = None,
     raise_on_error: bool = True
 ) -> object:
     """Deserialize a YAML document into an object.
@@ -36,6 +38,8 @@ def load(
                        (will instanciate a pyyo.FileSystemResolver for each
                        path if this parameter is not none.)
         resolvers : Custom pyyo.Resolvers to use when resolving includes.
+        error_handler : Called with arguments (node, error_message) when an
+                        error occurs.
         raise_on_error: If true, raises an error at the end of deserialization
                         if errors occured.
 
@@ -49,8 +53,12 @@ def load(
         file_system_resolvers = [FileSystemResolver(it) for it in resolve_roots]
         all_resolvers.extend(file_system_resolvers)
 
-    with LoadingContext(raise_on_error, all_resolvers) as context:
-        return load_internal(cls, node, context)
+    context = LoadingContext(
+        error_handler=error_handler,
+        raise_on_error=raise_on_error,
+        resolvers=all_resolvers
+    )
+    return load_internal(cls, node, context)
 
 
 def load_internal(object_class: Type, node: Node, context: LoadingContext):

@@ -11,6 +11,7 @@ pylint:
   disable:
     - too-few-public-methods
     - line-too-long
+    - too-many-arguments
 
 mccabe:
   run: true

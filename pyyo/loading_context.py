@@ -1,5 +1,6 @@
 """Loading context class & utilities."""
 from typing import AnyStr
+from typing import Callable
 from typing import List
 from typing import Union
 
@@ -13,25 +14,17 @@ from .resolvers import Resolver
 class LoadingContext:
     """Context aggregating resolve & error reporting functions."""
 
-    def __init__(self, raise_on_error: bool, resolvers: List[Resolver]):
+    def __init__(
+        self,
+        error_handler: Callable,
+        raise_on_error: bool,
+        resolvers: List[Resolver]
+    ):
         """Initialize context."""
+        self._error_handler = error_handler
+        self._errors = []
         self._raise_on_error = raise_on_error
         self._resolvers = resolvers
-        self._errors = []
-
-    def __enter__(self):
-        """Enters the context."""
-        return self
-
-    def __exit__(self, exception_type, exception_value, traceback):
-        """Raise an exception if an error occurred during deserialization."""
-        if exception_type is not None:
-            return False
-
-        if self._raise_on_error and len(self._errors) != 0:
-            raise PyyoError(self._errors)
-
-        return False
 
     def error(self, node: Node, message_format: str, *args, **kwargs):
         """Register an error in the current loading context.
@@ -46,7 +39,11 @@ class LoadingContext:
 
         """
         message = message_format.format(*args, **kwargs)
-        self._errors.append((node, message))
+        if self._error_handler is not None:
+            self._error_handler(node, message)
+
+        if self._raise_on_error:
+            raise PyyoError(node, message)
 
     def resolve(self, location: AnyStr) -> Union[MappingNode, SequenceNode]:
         """Resolve given location using registered resolvers.
@@ -71,7 +68,7 @@ class LoadingContext:
 class PyyoError(Exception):
     """Exception raised when errors occurs during object loading."""
 
-    def __init__(self, errors):
+    def __init__(self, node, message):
         """Initialize the error.
 
         Arg:
@@ -80,4 +77,5 @@ class PyyoError(Exception):
 
         """
         super().__init__()
-        self.errors = errors
+        self.node = node
+        self.message = message
