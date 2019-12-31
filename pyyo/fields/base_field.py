@@ -10,6 +10,18 @@ from pyyo.errors import parse_error
 class BaseField:
     """Base class for YAML object fields."""
 
+    def __init__(self, required=False):
+        """Initialize the field.
+
+        Args:
+        ----
+            required (bool) : If it's true and the field is not defined in
+                              yaml, a ParseError will be raised when
+                              parsing.
+
+        """
+        self.required = required
+
     @abstractmethod
     def deserialize(self, node: Node):
         """Deserialize this field.

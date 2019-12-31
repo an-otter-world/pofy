@@ -12,13 +12,16 @@ from .base_field import BaseField
 class DictField(BaseField):
     """Dict YAML object field."""
 
-    def __init__(self, item_field):
+    def __init__(self, item_field: BaseField, *args, **kwargs):
         """Initialize dict field.
 
         Arg:
             item_field (pyyo.BaseField) : Field used to deserialize dictionnary
                                           entry values.
+            *args, **kwargs (list, dict) : Arguments forwarded to BaseField.
+
         """
+        super().__init__(*args, **kwargs)
         self._item_field = item_field
 
     def deserialize(self, node):

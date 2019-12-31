@@ -25,14 +25,20 @@ def load(object_class: Type, source: Union[str, IO[str], Node]) -> object:
         parse_error(node, _('Expected a mapping.'))
 
     result = object_class()
+    set_fields = set()
     for name_node, value_node in node.value:
         field_name = name_node.value
+        set_fields.add(field_name)
         if field_name not in fields:
             parse_error(name_node, _('Unknown field {}'), field_name)
 
         field = fields[field_name]
         field_value = field.deserialize(value_node)
         setattr(result, field_name, field_value)
+
+    for name, field in fields.items():
+        if field.required and name not in set_fields:
+            parse_error(node, _('Missing required field {}'), name)
 
     return result
 

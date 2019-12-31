@@ -33,7 +33,7 @@ class YamlObject:
         dict_field = DictField(StringField())
         int_field = IntField()
         list_field = ListField(StringField())
-        object_field = ObjectField(SubObject)
+        object_field = ObjectField(object_class=SubObject)
         string_field = StringField()
 
     def __init__(self):
@@ -43,3 +43,13 @@ class YamlObject:
         self.list_field = []
         self.object_field = None
         self.string_field = ''
+
+
+class RequiredFieldObject:
+    """Stub with a required field."""
+
+    class Meta:
+        """Pyyo fields."""
+
+        required = StringField(required=True)
+        not_required = StringField(required=True)

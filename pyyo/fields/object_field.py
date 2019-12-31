@@ -1,5 +1,6 @@
 """List field class & utilities."""
 from gettext import gettext as _
+from typing import Type
 
 from yaml import MappingNode
 
@@ -12,12 +13,15 @@ from .base_field import BaseField
 class ObjectField(BaseField):
     """Dict YAML object field."""
 
-    def __init__(self, object_class=object):
+    def __init__(self, *args, object_class: Type = object, **kwargs):
         """Initialize object field.
 
         Arg:
             object_class (class) : The class of the object to create.
+            *args, **kwargs (list, dict) : Arguments forwarded to BaseField.
+
         """
+        super().__init__(*args, **kwargs)
         self._object_class = object_class
 
     def deserialize(self, node):
