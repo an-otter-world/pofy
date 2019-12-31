@@ -1,7 +1,7 @@
  * Raise all errors at once when finished deserializing ?
  * Rename ParseError to PyyoError.
  * Differentiate empty sequence / node not resolved cases in resolvers
- * Add a parameter to configure default file system resolvers when calling load.
  * Better handle errors when custom type is defined through !type tag.
+ * Add custom validation system.
  * Add missing type hints.
  * Finish covering all code.

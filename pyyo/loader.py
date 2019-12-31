@@ -3,7 +3,9 @@
 from gettext import gettext as _
 from inspect import getmembers
 from inspect import isclass
+from pathlib import Path
 from io import StringIO
+from typing import AnyStr
 from typing import IO
 from typing import Type
 from typing import List
@@ -14,19 +16,39 @@ from yaml import MappingNode
 from yaml import Node
 
 from .errors import parse_error
-from .loading_context import LoadingContext
 from .fields.base_field import BaseField
+from .loading_context import LoadingContext
+from .resolvers import FileSystemResolver
 from .resolvers import Resolver
 
 
 def load(
     cls: Type,
-    source: Union[str, IO[str], Node],
+    source: Union[str, IO[str]],
+    resolve_roots: List[AnyStr] = None,
     resolvers: List[Resolver] = None
 ) -> object:
-    """Deserialize a YAML document into an object."""
+    """Deserialize a YAML document into an object.
+    
+    Args:
+        cls : Class of the object to create.
+        source : Either a string containing YAML, or a stream to a YAML source.
+        resolve_roots: Base filesystem paths used to resolve !include tags.
+                       (will instanciate a pyyo.FileSystemResolver for each
+                       path if this parameter is not none.)
+        resolvers : Custom pyyo.Resolvers to use when resolving includes.
+
+    """
     node = _load_yaml(source)
-    context = LoadingContext(resolvers)
+    all_resolvers = []
+    if resolvers is not None:
+        all_resolvers.extend(resolvers)
+
+    if resolve_roots is not None:
+        file_system_resolvers = [FileSystemResolver(it) for it in resolve_roots]
+        all_resolvers.extend(file_system_resolvers)
+
+    context = LoadingContext(all_resolvers)
     return load_internal(cls, node, context)
 
 

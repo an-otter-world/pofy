@@ -10,6 +10,7 @@ pylint:
   run: true
   disable:
     - too-few-public-methods
+    - line-too-long
 
 mccabe:
   run: true
