@@ -5,7 +5,7 @@ from typing import Type
 from yaml import MappingNode
 
 from pyyo.errors import parse_error
-from pyyo.loader import load
+from pyyo.loader import load_internal
 
 from .base_field import BaseField
 
@@ -24,9 +24,9 @@ class ObjectField(BaseField):
         super().__init__(*args, **kwargs)
         self._object_class = object_class
 
-    def deserialize(self, node):
-        """See pyyo.BaseField.deserialize for usage."""
+    def _load(self, node, context):
+        """See pyyo.BaseField.load for usage."""
         if not isinstance(node, MappingNode):
             parse_error(node, _('Expected a mapping'))
 
-        return load(self._object_class, node)
+        return load_internal(self._object_class, node, context)

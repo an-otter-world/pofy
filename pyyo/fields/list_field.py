@@ -14,16 +14,15 @@ class ListField(BaseField):
         """Initialize list field.
 
         Arg:
-            item_field (pyyo.BaseField) : Field used to deserialize list items.
+            item_field (pyyo.BaseField) : Field used to load list items.
             *args, **kwargs (list, dict) : Arguments forwarded to BaseField.
 
         """
         super().__init__(*args, **kwargs)
         self._item_field = item_field
 
-    def deserialize(self, node):
-        """See pyyo.BaseField.deserialize for usage."""
+    def _load(self, node, context):
         if not isinstance(node, SequenceNode):
             parse_error(node, _('Expected a sequence'))
 
-        return [self._item_field.deserialize(it) for it in node.value]
+        return [self._item_field.load(it, context) for it in node.value]

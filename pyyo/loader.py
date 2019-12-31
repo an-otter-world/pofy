@@ -6,6 +6,7 @@ from inspect import isclass
 from io import StringIO
 from typing import IO
 from typing import Type
+from typing import List
 from typing import Union
 
 from yaml import compose
@@ -13,12 +14,27 @@ from yaml import MappingNode
 from yaml import Node
 
 from .errors import parse_error
+from .loading_context import LoadingContext
 from .fields.base_field import BaseField
+from .resolvers import Resolver
 
 
-def load(object_class: Type, source: Union[str, IO[str], Node]) -> object:
+def load(
+    cls: Type,
+    source: Union[str, IO[str], Node],
+    resolvers: List[Resolver] = None
+) -> object:
     """Deserialize a YAML document into an object."""
     node = _load_yaml(source)
+    context = LoadingContext(resolvers)
+    return load_internal(cls, node, context)
+
+
+def load_internal(object_class: Type, node: Node, context: LoadingContext):
+    """Load given node.
+
+    This function is meant to be used internaly, by ObjectField and load.
+    """
     fields = dict(_get_fields(object_class))
 
     if not isinstance(node, MappingNode):
@@ -33,7 +49,7 @@ def load(object_class: Type, source: Union[str, IO[str], Node]) -> object:
             parse_error(name_node, _('Unknown field {}'), field_name)
 
         field = fields[field_name]
-        field_value = field.deserialize(value_node)
+        field_value = field.load(value_node, context)
         setattr(result, field_name, field_value)
 
     for name, field in fields.items():
