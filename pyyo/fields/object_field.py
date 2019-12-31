@@ -29,4 +29,15 @@ class ObjectField(BaseField):
         if not isinstance(node, MappingNode):
             parse_error(node, _('Expected a mapping'))
 
-        return load_internal(self._object_class, node, context)
+        object_class = self._object_class
+        tag = node.tag
+        if tag.startswith('!type'):
+            if ':' not in tag:
+                parse_error(node, _('Bad type format'))
+            full_name = tag.split(':')[1].split('.')
+            type_module = '.'.join(full_name[:-1])
+            type_name = full_name[-1]
+            module = __import__(type_module, fromlist=type_name)
+            object_class = getattr(module, type_name)
+
+        return load_internal(object_class, node, context)

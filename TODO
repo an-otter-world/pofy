@@ -5,3 +5,4 @@
  * Add missing type hints.
  * Differentiate empty sequence / node not resolved cases in resolvers
  * Add a parameter to configure default file system resolvers when calling load.
+ * Better handle errors when custom type is defined through !type tag.
