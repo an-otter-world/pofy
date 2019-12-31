@@ -2,7 +2,7 @@
 from pytest import raises
 
 from pyyo import load
-from pyyo import ParseError
+from pyyo import PyyoError
 
 from .fixtures import YamlObject
 
@@ -15,5 +15,5 @@ def test_string_field():
 
 def test_bad_value_raises():
     """Test not-scalar field raise an error."""
-    with raises(ParseError):
+    with raises(PyyoError):
         load(YamlObject, 'string_field: ["a", "list"]')

@@ -1,6 +1,6 @@
 """YAML python object deserializer."""
 
-from .errors import ParseError
+from .loading_context import PyyoError
 from .fields.base_field import BaseField
 from .loader import load
 from .fields.dict_field import DictField

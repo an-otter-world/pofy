@@ -3,7 +3,6 @@
 from gettext import gettext as _
 from inspect import getmembers
 from inspect import isclass
-from pathlib import Path
 from io import StringIO
 from typing import AnyStr
 from typing import IO
@@ -15,7 +14,6 @@ from yaml import compose
 from yaml import MappingNode
 from yaml import Node
 
-from .errors import parse_error
 from .fields.base_field import BaseField
 from .loading_context import LoadingContext
 from .resolvers import FileSystemResolver
@@ -26,10 +24,11 @@ def load(
     cls: Type,
     source: Union[str, IO[str]],
     resolve_roots: List[AnyStr] = None,
-    resolvers: List[Resolver] = None
+    resolvers: List[Resolver] = None,
+    raise_on_error: bool = True
 ) -> object:
     """Deserialize a YAML document into an object.
-    
+
     Args:
         cls : Class of the object to create.
         source : Either a string containing YAML, or a stream to a YAML source.
@@ -37,6 +36,8 @@ def load(
                        (will instanciate a pyyo.FileSystemResolver for each
                        path if this parameter is not none.)
         resolvers : Custom pyyo.Resolvers to use when resolving includes.
+        raise_on_error: If true, raises an error at the end of deserialization
+                        if errors occured.
 
     """
     node = _load_yaml(source)
@@ -48,8 +49,8 @@ def load(
         file_system_resolvers = [FileSystemResolver(it) for it in resolve_roots]
         all_resolvers.extend(file_system_resolvers)
 
-    context = LoadingContext(all_resolvers)
-    return load_internal(cls, node, context)
+    with LoadingContext(raise_on_error, all_resolvers) as context:
+        return load_internal(cls, node, context)
 
 
 def load_internal(object_class: Type, node: Node, context: LoadingContext):
@@ -60,7 +61,8 @@ def load_internal(object_class: Type, node: Node, context: LoadingContext):
     fields = dict(_get_fields(object_class))
 
     if not isinstance(node, MappingNode):
-        parse_error(node, _('Expected a mapping.'))
+        context.error(node, _('Expected a mapping.'))
+        return None
 
     result = object_class()
     set_fields = set()
@@ -68,7 +70,8 @@ def load_internal(object_class: Type, node: Node, context: LoadingContext):
         field_name = name_node.value
         set_fields.add(field_name)
         if field_name not in fields:
-            parse_error(name_node, _('Unknown field {}'), field_name)
+            context.error(name_node, _('Unknown field {}'), field_name)
+            continue
 
         field = fields[field_name]
         field_value = field.load(value_node, context)
@@ -76,7 +79,7 @@ def load_internal(object_class: Type, node: Node, context: LoadingContext):
 
     for name, field in fields.items():
         if field.required and name not in set_fields:
-            parse_error(node, _('Missing required field {}'), name)
+            context.error(node, _('Missing required field {}'), name)
 
     return result
 

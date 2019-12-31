@@ -3,7 +3,6 @@ from gettext import gettext as _
 
 from yaml import SequenceNode
 
-from pyyo.errors import parse_error
 from .base_field import BaseField
 
 
@@ -23,6 +22,7 @@ class ListField(BaseField):
 
     def _load(self, node, context):
         if not isinstance(node, SequenceNode):
-            parse_error(node, _('Expected a sequence'))
+            context.error(node, _('Expected a sequence'))
+            return None
 
         return [self._item_field.load(it, context) for it in node.value]

@@ -13,10 +13,25 @@ from .resolvers import Resolver
 class LoadingContext:
     """Context aggregating resolve & error reporting functions."""
 
-    def __init__(self, resolvers: List[Resolver]):
+    def __init__(self, raise_on_error: bool, resolvers: List[Resolver]):
         """Initialize context."""
+        self._raise_on_error = raise_on_error
         self._resolvers = resolvers
         self._errors = []
+
+    def __enter__(self):
+        """Enters the context."""
+        return self
+
+    def __exit__(self, exception_type, exception_value, traceback):
+        """Raise an exception if an error occurred during deserialization."""
+        if exception_type is not None:
+            return False
+
+        if self._raise_on_error and len(self._errors) != 0:
+            raise PyyoError(self._errors)
+
+        return False
 
     def error(self, node: Node, message_format: str, *args, **kwargs):
         """Register an error in the current loading context.
@@ -31,7 +46,7 @@ class LoadingContext:
 
         """
         message = message_format.format(*args, **kwargs)
-        self._errors.append(node, message)
+        self._errors.append((node, message))
 
     def resolve(self, location: AnyStr) -> Union[MappingNode, SequenceNode]:
         """Resolve given location using registered resolvers.
@@ -51,3 +66,18 @@ class LoadingContext:
             isinstance(result, (MappingNode, SequenceNode))
         )
         return result
+
+
+class PyyoError(Exception):
+    """Exception raised when errors occurs during object loading."""
+
+    def __init__(self, errors):
+        """Initialize the error.
+
+        Arg:
+            node : The node on which the error occured.
+            message : The error description message.
+
+        """
+        super().__init__()
+        self.errors = errors

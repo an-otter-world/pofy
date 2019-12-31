@@ -5,7 +5,7 @@ from pytest import raises
 from yaml import compose
 
 from pyyo import load
-from pyyo import ParseError
+from pyyo import PyyoError
 from pyyo import Resolver
 
 from tests.fixtures import RequiredFieldObject
@@ -15,13 +15,13 @@ from tests.fixtures import YamlObject
 
 def test_unknown_field_raise_error():
     """Test an undeclared field in YAML raises an error."""
-    with raises(ParseError):
+    with raises(PyyoError):
         load(YamlObject, 'uknown_field: 10')
 
 
 def test_unset_required_field_raise_error():
     """Test an unset required field in YAML raise an error."""
-    with raises(ParseError):
+    with raises(PyyoError):
         load(RequiredFieldObject, 'not_required: some_value')
 
     test = load(RequiredFieldObject, (

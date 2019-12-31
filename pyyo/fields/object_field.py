@@ -4,7 +4,6 @@ from typing import Type
 
 from yaml import MappingNode
 
-from pyyo.errors import parse_error
 from pyyo.loader import load_internal
 
 from .base_field import BaseField
@@ -27,13 +26,15 @@ class ObjectField(BaseField):
     def _load(self, node, context):
         """See pyyo.BaseField.load for usage."""
         if not isinstance(node, MappingNode):
-            parse_error(node, _('Expected a mapping'))
+            context.error(node, _('Expected a mapping'))
+            return None
 
         object_class = self._object_class
         tag = node.tag
         if tag.startswith('!type'):
             if ':' not in tag:
-                parse_error(node, _('Bad type format'))
+                context.error(node, _('Bad type format'))
+                return None
             full_name = tag.split(':')[1].split('.')
             type_module = '.'.join(full_name[:-1])
             type_name = full_name[-1]

@@ -4,7 +4,6 @@ from gettext import gettext as _
 from yaml import Node
 from yaml import ScalarNode
 
-from pyyo.errors import parse_error
 from pyyo.loading_context import LoadingContext
 
 
@@ -17,8 +16,9 @@ class BaseField:
         Args:
         ----
             required (bool) : If it's true and the field is not defined in
-                              yaml, a ParseError will be raised when
-                              parsing.
+                              yaml, it will create an error that will
+                              eventually be raised at the end of
+                              deserialization.
 
         """
         self.required = required
@@ -66,7 +66,8 @@ class ScalarField(BaseField):
 
     def _load(self, node, context):
         if not isinstance(node, ScalarNode):
-            parse_error(node, _('Exected scalar value.'))
+            context.error(node, _('Exected scalar value.'))
+            return None
 
         return self._convert(node.value)
 
