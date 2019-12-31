@@ -1,8 +1,5 @@
- * Add a required flag for fields.
  * Add a tag to load an object / sequence from another file.
  * Add a tag to specify object type.
- * Add LICENSE & README.
- * Start documentation.
  * Finish covering all code.
  * Raise all errors at once when finished deserializing ?
  * Rename ParseError to PyyoError.
