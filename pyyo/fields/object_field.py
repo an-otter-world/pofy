@@ -29,16 +29,34 @@ class ObjectField(BaseField):
             context.error(node, _('Expected a mapping'))
             return None
 
-        object_class = self._object_class
-        tag = node.tag
-        if tag.startswith('!type'):
-            if ':' not in tag:
-                context.error(node, _('Bad type format'))
-                return None
-            full_name = tag.split(':')[1].split('.')
-            type_module = '.'.join(full_name[:-1])
-            type_name = full_name[-1]
-            module = __import__(type_module, fromlist=type_name)
-            object_class = getattr(module, type_name)
+        object_class = self._resolve_type(node, context)
+        if object_class is None:
+            return None
 
         return load_internal(object_class, node, context)
+
+    def _resolve_type(self, node, context):
+        tag = node.tag
+        if not tag.startswith('!type'):
+            return self._object_class
+
+        if ':' not in tag:
+            context.error(node, _('Bad type tag format : {}'), tag)
+            return None
+
+        full_name = tag.split(':')
+        if len(full_name) != 2:
+            context.error(node, _('Bad type tag format : {}'), tag)
+            return None
+
+        full_name = full_name[1].split('.')
+
+        if len(full_name) < 2:
+            context.error(node, _('Bad type tag format : {}'), tag)
+            return None
+
+        type_module = '.'.join(full_name[:-1])
+        type_name = full_name[-1]
+        module = __import__(type_module, fromlist=type_name)
+
+        return getattr(module, type_name)
