@@ -4,16 +4,15 @@ from gettext import gettext as _
 from inspect import getmembers
 from inspect import isclass
 from io import StringIO
-from typing import IO
 from typing import Type
 from typing import Union
-
-from yaml import compose
+from typing import IO
 from yaml import MappingNode
 from yaml import Node
+from yaml import compose
 
-from .errors import parse_error
 from .fields.base_field import BaseField
+from .errors import parse_error
 
 
 def load(object_class: Type, source: Union[str, IO[str], Node]) -> object:

@@ -1,16 +1,12 @@
 """List field tests."""
-from pyyo import DictField
-from pyyo import StringField
 from pyyo import load
 
-class _Test:
-    class Meta:
-        """Yaml Fields."""
-        string_dict = DictField(StringField())
+from .fixtures import TestObject
+
 
 def test_dict_field():
     """Test dict field deserialization works."""
-    test = load(_Test, (
+    test = load(TestObject, (
         'string_dict:\n' +
         '  key_1: value_1\n' +
         '  key_2: value_2'

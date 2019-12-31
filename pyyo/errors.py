@@ -1,5 +1,6 @@
 """Pyyo common method & utilities."""
 
+
 class ParseError(Exception):
     """Exception representing a parsing error."""
 
@@ -14,6 +15,7 @@ class ParseError(Exception):
         super().__init__()
         self._node = node
         self._message = message
+
 
 def parse_error(node, message_format, *args, **kwargs):
     """Raise a parse error.

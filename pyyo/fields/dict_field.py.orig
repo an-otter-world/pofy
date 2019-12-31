@@ -5,7 +5,6 @@ from yaml import MappingNode
 from yaml import ScalarNode
 
 from pyyo.errors import parse_error
-
 from .base_field import BaseField
 
 

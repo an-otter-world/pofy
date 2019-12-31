@@ -1,6 +1,5 @@
-pydocstyle
-pylint
+prospector
+pyroma
 pytest
-pytest-asyncio
 pytest-cov
 pytest-datadir

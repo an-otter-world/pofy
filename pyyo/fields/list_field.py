@@ -6,6 +6,7 @@ from yaml import SequenceNode
 from pyyo.errors import parse_error
 from .base_field import BaseField
 
+
 class ListField(BaseField):
     """String YAML object field."""
 

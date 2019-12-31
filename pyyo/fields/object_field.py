@@ -8,6 +8,7 @@ from pyyo.loader import load
 
 from .base_field import BaseField
 
+
 class ObjectField(BaseField):
     """Dict YAML object field."""
 
