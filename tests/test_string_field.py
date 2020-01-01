@@ -1,6 +1,4 @@
 """String field tests."""
-from pytest import raises
-
 from pyyo import load
 from pyyo import ErrorCode
 
