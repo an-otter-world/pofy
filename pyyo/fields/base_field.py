@@ -69,7 +69,7 @@ class ScalarField(BaseField):
 
     def _load(self, node, context):
         if not isinstance(node, ScalarNode):
-            context.error(node, _('Expected scalar value'))
+            context.error(node, _('Expected a scalar value'))
             return None
 
         return self._convert(node.value)
