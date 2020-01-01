@@ -28,8 +28,7 @@ def load(
     source: Union[str, IO[str]],
     resolve_roots: List[AnyStr] = None,
     resolvers: List[Resolver] = None,
-    error_handler: Callable = None,
-    raise_on_error: bool = True
+    error_handler: Callable = None
 ) -> object:
     """Deserialize a YAML document into an object.
 
@@ -41,8 +40,8 @@ def load(
                        path if this parameter is not none.)
         resolvers : Custom pyyo.Resolvers to use when resolving includes.
         error_handler : Called with arguments (node, error_message) when an
-                        error occurs.
-        raise_on_error: If true, a PyyoError will be raised if an error occured.
+                        error occurs. If it's not specified, a PyyoError will
+                        be raised when an error occurs.
 
     """
     node = _load_yaml(source)
@@ -56,7 +55,6 @@ def load(
 
     context = LoadingContext(
         error_handler=error_handler,
-        raise_on_error=raise_on_error,
         resolvers=all_resolvers
     )
     return load_internal(cls, node, context)

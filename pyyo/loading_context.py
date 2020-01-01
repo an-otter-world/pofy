@@ -19,13 +19,11 @@ class LoadingContext:
     def __init__(
         self,
         error_handler: Callable,
-        raise_on_error: bool,
         resolvers: List[Resolver]
     ):
         """Initialize context."""
         self._error_handler = error_handler
         self._errors = []
-        self._raise_on_error = raise_on_error
         self._resolvers = resolvers
 
     def error(
@@ -50,9 +48,8 @@ class LoadingContext:
         """
         message = message_format.format(*args, **kwargs)
         if self._error_handler is not None:
-            self._error_handler(node, message)
-
-        if self._raise_on_error:
+            self._error_handler(node, code, message)
+        else:
             raise PyyoError(node, code, message)
 
     def resolve(self, location: AnyStr) -> Union[MappingNode, SequenceNode]:
