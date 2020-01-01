@@ -2,9 +2,10 @@
 from pytest import raises
 
 from pyyo import load
-from pyyo import PyyoError
+from pyyo import ErrorCode
 
 from .fixtures import YamlObject
+from .fixtures import expect_load_error
 
 
 def test_string_field():
@@ -15,5 +16,8 @@ def test_string_field():
 
 def test_bad_value_raises():
     """Test not-scalar node for a string field raise an error."""
-    with raises(PyyoError):
-        load(YamlObject, 'string_field: ["a", "list"]')
+    expect_load_error(
+        ErrorCode.UNEXPECTED_NODE_TYPE,
+        YamlObject,
+        'string_field: ["a", "list"]'
+    )
