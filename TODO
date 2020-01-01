@@ -1,6 +1,0 @@
- * Make two resolvers: glob and file. Use a syntax in the form !include:file or
-   !include:glob to differentiate them. Glob will only return a sequence, while
-   file return a mapping.
- * Add custom validation system.
- * Add boolean field & float field
- * Finish covering all code.
