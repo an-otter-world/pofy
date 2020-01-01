@@ -12,6 +12,7 @@ class ErrorCode(Enum):
     FIELD_NOT_DECLARED = 2
     MISSING_REQUIRED_FIELD = 3
     UNEXPECTED_NODE_TYPE = 4
+    INCLUDE_NOT_FOUND = 5
 
 
 class PyyoError(Exception):

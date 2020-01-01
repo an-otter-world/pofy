@@ -48,6 +48,11 @@ class BaseField:
             location = node.value
             node = context.resolve(location)
             if node is None:
+                context.error(
+                    node,
+                    ErrorCode.INCLUDE_NOT_FOUND,
+                    _("Can't resolve include {}"), location
+                )
                 return None
 
         return self._load(node, context)

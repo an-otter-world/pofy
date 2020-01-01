@@ -1,6 +1,7 @@
 """Test fixtures & dummy classes."""
 from typing import AnyStr
 from typing import IO
+from typing import List
 from typing import Type
 from typing import Union
 
@@ -9,6 +10,7 @@ from pyyo import ErrorCode
 from pyyo import IntField
 from pyyo import ListField
 from pyyo import ObjectField
+from pyyo import Resolver
 from pyyo import StringField
 from pyyo import load
 
@@ -67,7 +69,8 @@ class RequiredFieldObject:
 def expect_load_error(
     expected_error: ErrorCode,
     object_class: Type,
-    source: Union[AnyStr, IO[str]]
+    source: Union[AnyStr, IO[str]],
+    resolvers: List[Resolver] = None
 ):
     """Load the given object, expecting an error to be raised."""
     error_raised = False
@@ -77,4 +80,9 @@ def expect_load_error(
         error_raised = True
         assert error == expected_error
 
-    load(object_class, source, error_handler=_on_error)
+    load(
+        object_class,
+        source,
+        error_handler=_on_error,
+        resolvers=resolvers
+    )
