@@ -1,5 +1,4 @@
  * Differentiate empty sequence / node not resolved cases in resolvers
- * Better handle errors when custom type is defined through !type tag.
  * Add custom validation system.
  * Add missing type hints.
  * Finish covering all code.
