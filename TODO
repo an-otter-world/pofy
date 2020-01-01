@@ -1,3 +1,4 @@
  * Differentiate empty sequence / node not resolved cases in resolvers
  * Add custom validation system.
  * Finish covering all code.
+ * Add error codes.
