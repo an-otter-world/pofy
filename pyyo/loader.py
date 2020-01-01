@@ -3,7 +3,6 @@
 from gettext import gettext as _
 from inspect import getmembers
 from inspect import isclass
-from io import StringIO
 from typing import AnyStr
 from typing import Callable
 from typing import IO

@@ -41,6 +41,25 @@ def test_type_tag():
     assert test.object_field.child_field == 'child_value'
 
 
+def test_bad_type_raise_error():
+    """Test a type tag not existing or not pointing to a type raises error."""
+    expect_load_error(
+        ErrorCode.TYPE_RESOLVE_ERROR,
+        YamlObject,
+        'object_field: !type:tests.fixtures.IDontExist\n' +
+        '  test_field: test_value\n' +
+        '  child_field: child_value\n'
+    )
+
+    expect_load_error(
+        ErrorCode.TYPE_RESOLVE_ERROR,
+        YamlObject,
+        'object_field: !type:tests.fixtures.expect_load_error\n' +
+        '  test_field: test_value\n' +
+        '  child_field: child_value\n'
+    )
+
+
 def test_bad_formatted_type_tag():
     """Test an error is raised for badly formatted type tags."""
     expect_load_error(

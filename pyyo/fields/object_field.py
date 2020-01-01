@@ -1,5 +1,7 @@
 """Object field class & utilities."""
 from gettext import gettext as _
+from inspect import isclass
+from typing import AnyStr
 from typing import Type
 
 from yaml import MappingNode
@@ -66,7 +68,8 @@ class ObjectField(BaseField):
             )
             return None
 
-        full_name = full_name[1].split('.')
+        full_name_str = full_name[1]
+        full_name = full_name_str.split('.')
 
         if len(full_name) < 2:
             context.error(
@@ -76,8 +79,36 @@ class ObjectField(BaseField):
             )
             return None
 
-        type_module = '.'.join(full_name[:-1])
+        module_name = '.'.join(full_name[:-1])
         type_name = full_name[-1]
-        module = __import__(type_module, fromlist=type_name)
+        return _get_type(node, module_name, type_name, context)
 
-        return getattr(module, type_name)
+
+def _get_type(
+    node: Node,
+    module_name: AnyStr,
+    type_name: AnyStr,
+    context: LoadingContext
+):
+    full_name = '{}.{}'.format(module_name, type_name)
+    module = __import__(module_name, fromlist=type_name)
+
+    if not hasattr(module, type_name):
+        context.error(
+            node,
+            ErrorCode.TYPE_RESOLVE_ERROR,
+            _('Can\'t find python type {}'), full_name
+        )
+        return None
+
+    resolved_type = getattr(module, type_name)
+
+    if not isclass(resolved_type):
+        context.error(
+            node,
+            ErrorCode.TYPE_RESOLVE_ERROR,
+            _('Python type {} is not a class'), full_name
+        )
+        return None
+
+    return resolved_type
