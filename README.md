@@ -1,8 +1,8 @@
 # Pyyo (Python yaml objects)
 
-[![Coverage Status](https://coveralls.io/repos/github/an-otter-world/pyyo/badge.svg)](https://coveralls.io/github/an-otter-world/pyyo)
-
+[![WTFPL license](https://img.shields.io/badge/License-WTFPL-blue.svg)](https://raw.githubusercontent.com/an-otter-world/pyyo/master/COPYING)
 [![Actions Status](https://github.com/an-otter-world/pyyo/workflows/Main/badge.svg)](https://github.com/an-otter-world/pyyo/actions)
+[![Coverage Status](https://coveralls.io/repos/github/an-otter-world/pyyo/badge.svg)](https://coveralls.io/github/an-otter-world/pyyo)
 
 ## Overview
 
