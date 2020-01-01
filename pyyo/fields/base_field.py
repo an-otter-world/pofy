@@ -37,10 +37,15 @@ class BaseField:
         """
         if node.tag == '!include':
             if not isinstance(node, ScalarNode):
-                context.error(node, _('Expected a string after include tag'))
-            else:
-                location = node.value
-                node = context.resolve(location)
+                message = _('!include tag must be placed on a scalar node')
+                context.error(node, message)
+                return None
+
+            location = node.value
+            node = context.resolve(location)
+            if node is None:
+                return None
+
         return self._load(node, context)
 
     @abstractmethod
