@@ -44,7 +44,7 @@ def load(
                         be raised when an error occurs.
 
     """
-    node = _load_yaml(source)
+    node = compose(source)
     all_resolvers = []
     if resolvers is not None:
         all_resolvers.extend(resolvers)
@@ -119,13 +119,3 @@ def _get_fields(cls):
     for __, schemaclass in getmembers(cls, _is_schema_class):
         for name, field in getmembers(schemaclass, _is_field):
             yield (name, field)
-
-
-def _load_yaml(source):
-    if isinstance(source, Node):
-        return source
-
-    if source is str:
-        return compose(StringIO(source))
-
-    return compose(source)
