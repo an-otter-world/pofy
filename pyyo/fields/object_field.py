@@ -5,10 +5,14 @@ from typing import Type
 from yaml import MappingNode
 from yaml import Node
 
+from pyyo.errors import ErrorCode
 from pyyo.loader import load_internal
 from pyyo.loading_context import LoadingContext
 
 from .base_field import BaseField
+
+_TYPE_FORMAT_MSG = _("""\
+Type tag should be in the form !type:path.to.Type, got {}""")
 
 
 class ObjectField(BaseField):
@@ -27,7 +31,11 @@ class ObjectField(BaseField):
 
     def _load(self, node, context):
         if not isinstance(node, MappingNode):
-            context.error(node, _('Expected a mapping'))
+            context.error(
+                node,
+                ErrorCode.UNEXPECTED_NODE_TYPE,
+                _('Mapping expected')
+            )
             return None
 
         object_class = self._resolve_type(node, context)
@@ -42,18 +50,30 @@ class ObjectField(BaseField):
             return self._object_class
 
         if ':' not in tag:
-            context.error(node, _('Bad type tag format : {}'), tag)
+            context.error(
+                node,
+                ErrorCode.BAD_TYPE_TAG_FORMAT,
+                _TYPE_FORMAT_MSG, tag
+            )
             return None
 
         full_name = tag.split(':')
         if len(full_name) != 2:
-            context.error(node, _('Bad type tag format : {}'), tag)
+            context.error(
+                node,
+                ErrorCode.BAD_TYPE_TAG_FORMAT,
+                _TYPE_FORMAT_MSG, tag
+            )
             return None
 
         full_name = full_name[1].split('.')
 
         if len(full_name) < 2:
-            context.error(node, _('Bad type tag format : {}'), tag)
+            context.error(
+                node,
+                ErrorCode.BAD_TYPE_TAG_FORMAT,
+                _TYPE_FORMAT_MSG, tag
+            )
             return None
 
         type_module = '.'.join(full_name[:-1])

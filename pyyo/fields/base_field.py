@@ -6,6 +6,7 @@ from typing import Any
 from yaml import Node
 from yaml import ScalarNode
 
+from pyyo.errors import ErrorCode
 from pyyo.loading_context import LoadingContext
 
 
@@ -37,8 +38,11 @@ class BaseField:
         """
         if node.tag == '!include':
             if not isinstance(node, ScalarNode):
-                message = _('!include tag must be placed on a scalar node')
-                context.error(node, message)
+                context.error(
+                    node,
+                    ErrorCode.UNEXPECTED_NODE_TYPE,
+                    _('!include tag must be on a scalar node')
+                )
                 return None
 
             location = node.value
@@ -69,7 +73,11 @@ class ScalarField(BaseField):
 
     def _load(self, node, context):
         if not isinstance(node, ScalarNode):
-            context.error(node, _('Expected a scalar value'))
+            context.error(
+                node,
+                ErrorCode.UNEXPECTED_NODE_TYPE,
+                _('Scalar expected')
+            )
             return None
 
         return self._convert(node.value)

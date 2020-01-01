@@ -8,6 +8,8 @@ from yaml import MappingNode
 from yaml import Node
 from yaml import SequenceNode
 
+from .errors import ErrorCode
+from .errors import PyyoError
 from .resolvers import Resolver
 
 
@@ -26,16 +28,24 @@ class LoadingContext:
         self._raise_on_error = raise_on_error
         self._resolvers = resolvers
 
-    def error(self, node: Node, message_format: str, *args, **kwargs):
+    def error(
+        self,
+        node: Node,
+        code: ErrorCode,
+        message_format: str,
+        *args,
+        **kwargs
+    ):
         """Register an error in the current loading context.
 
         If errors occured in the scope of a context, an error will be raised
         at the end of the object loading.
 
         Args:
-            node : The node on which the error occured.
-            message_format : The error message format.
-            *args, **kwargs : Arguments used to format message.
+            node: The node on which the error occured.
+            code: Code of the error.
+            message_format: The error message format.
+            *args, **kwargs: Arguments used to format message.
 
         """
         message = message_format.format(*args, **kwargs)
@@ -43,7 +53,7 @@ class LoadingContext:
             self._error_handler(node, message)
 
         if self._raise_on_error:
-            raise PyyoError(node, message)
+            raise PyyoError(node, code, message)
 
     def resolve(self, location: AnyStr) -> Union[MappingNode, SequenceNode]:
         """Resolve given location using registered resolvers.
@@ -63,19 +73,3 @@ class LoadingContext:
             isinstance(result, (MappingNode, SequenceNode))
         )
         return result
-
-
-class PyyoError(Exception):
-    """Exception raised when errors occurs during object loading."""
-
-    def __init__(self, node: Node, message: AnyStr):
-        """Initialize the error.
-
-        Arg:
-            node : The node on which the error occured.
-            message : The error description message.
-
-        """
-        super().__init__()
-        self.node = node
-        self.message = message

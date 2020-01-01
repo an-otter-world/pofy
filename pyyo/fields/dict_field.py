@@ -4,6 +4,8 @@ from gettext import gettext as _
 from yaml import MappingNode
 from yaml import ScalarNode
 
+from pyyo.errors import ErrorCode
+
 from .base_field import BaseField
 
 
@@ -23,7 +25,11 @@ class DictField(BaseField):
 
     def _load(self, node, context):
         if not isinstance(node, MappingNode):
-            context.error(node, _('Expected a mapping'))
+            context.error(
+                node,
+                ErrorCode.UNEXPECTED_NODE_TYPE,
+                _('Mapping expected')
+            )
             return None
 
         result = {}

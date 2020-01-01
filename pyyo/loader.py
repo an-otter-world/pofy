@@ -15,6 +15,8 @@ from yaml import compose
 from yaml import MappingNode
 from yaml import Node
 
+from pyyo.errors import ErrorCode
+
 from .fields.base_field import BaseField
 from .loading_context import LoadingContext
 from .resolvers import FileSystemResolver
@@ -68,7 +70,11 @@ def load_internal(object_class: Type, node: Node, context: LoadingContext):
     fields = dict(_get_fields(object_class))
 
     if not isinstance(node, MappingNode):
-        context.error(node, _('Expected a mapping.'))
+        context.error(
+            node,
+            ErrorCode.UNEXPECTED_NODE_TYPE,
+            _('Mapping expected')
+        )
         return None
 
     result = object_class()
@@ -77,7 +83,11 @@ def load_internal(object_class: Type, node: Node, context: LoadingContext):
         field_name = name_node.value
         set_fields.add(field_name)
         if field_name not in fields:
-            context.error(name_node, _('Unknown field {}'), field_name)
+            context.error(
+                name_node,
+                ErrorCode.FIELD_NOT_DECLARED,
+                _('Field {} is not declared.'), field_name
+            )
             continue
 
         field = fields[field_name]
@@ -86,7 +96,11 @@ def load_internal(object_class: Type, node: Node, context: LoadingContext):
 
     for name, field in fields.items():
         if field.required and name not in set_fields:
-            context.error(node, _('Missing required field {}'), name)
+            context.error(
+                node,
+                ErrorCode.MISSING_REQUIRED_FIELD,
+                _('Missing required field {}'), name
+            )
 
     return result
 
