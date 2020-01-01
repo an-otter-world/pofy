@@ -1,4 +1,4 @@
-"""Yaml object tests."""
+"""Yaml object loading tests."""
 from io import StringIO
 
 from pytest import raises
@@ -48,7 +48,7 @@ def test_resolve():
 
 
 def test_loading_subclass_works():
-    """Test loading a subclass loads parent fields."""
+    """Test fields declared in parent classes are loaded."""
     test = load(
         SubObjectChild,
         'test_field: parent_value\n' +

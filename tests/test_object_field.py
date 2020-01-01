@@ -11,7 +11,7 @@ from .fixtures import SubObjectChild
 
 
 def test_object_field():
-    """Test object field deserialization works."""
+    """Test object field loading works."""
     test = load(YamlObject, (
         'object_field:\n' +
         '  test_field: field_value\n'

@@ -1,11 +1,11 @@
-"""List field tests."""
+"""Dictionary field tests."""
 from pyyo import load
 
 from .fixtures import YamlObject
 
 
 def test_dict_field():
-    """Test dict field deserialization works."""
+    """Test dict field loading works."""
     test = load(YamlObject, (
         'dict_field:\n' +
         '  key_1: value_1\n' +

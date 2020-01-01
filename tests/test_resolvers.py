@@ -1,5 +1,6 @@
 """Resolvers tests."""
 from yaml import MappingNode
+from yaml import Node
 from yaml import ScalarNode
 from yaml import SequenceNode
 
@@ -25,7 +26,7 @@ def test_file_system_resolver_resolve_directory(datadir):
     _check_node(children[1])
 
 
-def _check_node(node):
+def _check_node(node: Node):
     assert isinstance(node, MappingNode)
     key_node, value_node = node.value[0]
     assert isinstance(key_node, ScalarNode)
