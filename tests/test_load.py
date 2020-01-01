@@ -42,3 +42,13 @@ def test_load_subclass():
     )
     assert test.test_field == 'parent_value'
     assert test.child_field == 'child_value'
+
+
+def test_error_on_bad_node():
+    """Test load raises an error on bad node."""
+    expect_load_error(
+        ErrorCode.UNEXPECTED_NODE_TYPE,
+        YamlObject,
+        '- item1\n' +
+        '- item2'
+    )

@@ -18,6 +18,17 @@ def test_object_field():
     assert test.object_field.test_field == 'field_value'
 
 
+def test_object_field_error_on_bad_node():
+    """Test object field loading raises an error on bad node."""
+    expect_load_error(
+        ErrorCode.UNEXPECTED_NODE_TYPE,
+        YamlObject,
+        'object_field:\n' +
+        '  - item1\n' +
+        '  - item2'
+    )
+
+
 def test_type_tag():
     """Test specifying a type for an object field works."""
     test = load(YamlObject, (
