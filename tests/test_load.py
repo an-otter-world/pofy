@@ -5,22 +5,19 @@ from pyyo import load
 from pyyo import PyyoError
 from pyyo import ErrorCode
 
-from tests.fixtures import RequiredFieldObject
-from tests.fixtures import SubObjectChild
-from tests.fixtures import YamlObject
+from .fixtures import RequiredFieldObject
+from .fixtures import SubObjectChild
+from .fixtures import YamlObject
+from .fixtures import expect_load_error
 
 
 def test_unknown_field_raise_error():
     """Test an undeclared field in YAML raises an error."""
-    error_raised = False
-
-    def _on_error(___, code, __):
-        nonlocal error_raised
-        error_raised = True
-        assert code == ErrorCode.FIELD_NOT_DECLARED
-
-    load(YamlObject, 'uknown_field: 10', error_handler=_on_error)
-    assert error_raised
+    expect_load_error(
+        ErrorCode.FIELD_NOT_DECLARED,
+        YamlObject,
+        'uknown_field: 10'
+    )
 
 
 def test_unset_required_field_raise_error():

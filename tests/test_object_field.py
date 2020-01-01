@@ -3,11 +3,13 @@ from pytest import raises
 
 from pyyo import load
 
+from pyyo import ErrorCode
 from pyyo import PyyoError
 
-from .fixtures import YamlObject
 from .fixtures import SubObject
 from .fixtures import SubObjectChild
+from .fixtures import YamlObject
+from .fixtures import expect_load_error
 
 
 def test_object_field():
@@ -34,20 +36,29 @@ def test_type_tag():
 
 def test_bad_formatted_type_tag():
     """Test an error is raised for badly formatted type tags."""
-    with raises(PyyoError):
-        load(YamlObject, (
+    expect_load_error(
+        ErrorCode.BAD_TYPE_TAG_FORMAT,
+        YamlObject,
+        (
             'object_field: !typetests.fixtures.SubObjectChild\n' +
             '  test_field: test_value'
-        ))
+        )
+    )
 
-    with raises(PyyoError):
-        load(YamlObject, (
+    expect_load_error(
+        ErrorCode.BAD_TYPE_TAG_FORMAT,
+        YamlObject,
+        (
             'object_field: !type:tests:fixtures.SubObjectChild\n' +
             '  test_field: test_value'
-        ))
+        )
+    )
 
-    with raises(PyyoError):
-        load(YamlObject, (
+    expect_load_error(
+        ErrorCode.BAD_TYPE_TAG_FORMAT,
+        YamlObject,
+        (
             'object_field: !type:tests\n' +
             '  test_field: test_value'
-        ))
+        )
+    )
