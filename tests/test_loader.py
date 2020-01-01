@@ -3,6 +3,7 @@ from pyyo import load
 from pyyo import ErrorCode
 
 from .fixtures import RequiredFieldObject
+from .fixtures import SubObject
 from .fixtures import SubObjectChild
 from .fixtures import YamlObject
 from .fixtures import expect_load_error
@@ -52,3 +53,15 @@ def test_error_on_bad_node():
         '- item1\n' +
         '- item2'
     )
+
+
+def test_resolve_root_works(datadir):
+    """Test giving a path as resolve_root instanciates FileSystemResolvers."""
+    test = load(
+        YamlObject,
+        'object_field: !include object.yaml\n',
+        resolve_roots=[datadir]
+    )
+
+    assert isinstance(test.object_field, SubObject)
+    assert test.object_field.test_field == 'test_value'
