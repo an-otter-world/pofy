@@ -53,6 +53,8 @@ To use Pyyo, you must declare a schema in the class you want to deserialize :
 
 ### Validation
 
+### Error handling
+
 ### load options
 
 ## Contributing

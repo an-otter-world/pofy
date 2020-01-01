@@ -1,4 +1,5 @@
  * Raise when an error_handler is not defined only.
  * Differentiate empty sequence / node not resolved cases in resolvers
  * Add custom validation system.
+ * Add boolean field & float field
  * Finish covering all code.
