@@ -68,7 +68,7 @@ class LoadingContext:
 class PyyoError(Exception):
     """Exception raised when errors occurs during object loading."""
 
-    def __init__(self, node, message):
+    def __init__(self, node: Node, message: AnyStr):
         """Initialize the error.
 
         Arg:

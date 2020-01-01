@@ -1,9 +1,9 @@
-"""Number field class & utilities."""
+"""Integer field class & utilities."""
 from .base_field import ScalarField
 
 
 class IntField(ScalarField):
-    """Number YAML object field."""
+    """Integer YAML object field."""
 
     def _convert(self, value):
         return int(value)

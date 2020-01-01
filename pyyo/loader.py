@@ -40,8 +40,7 @@ def load(
         resolvers : Custom pyyo.Resolvers to use when resolving includes.
         error_handler : Called with arguments (node, error_message) when an
                         error occurs.
-        raise_on_error: If true, raises an error at the end of deserialization
-                        if errors occured.
+        raise_on_error: If true, a PyyoError will be raised if an error occured.
 
     """
     node = _load_yaml(source)
@@ -64,7 +63,7 @@ def load(
 def load_internal(object_class: Type, node: Node, context: LoadingContext):
     """Load given node.
 
-    This function is meant to be used internaly, by ObjectField and load.
+    This function is meant to be used internaly.
     """
     fields = dict(_get_fields(object_class))
 

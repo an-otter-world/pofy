@@ -5,6 +5,7 @@ YAML documents.
 """
 from abc import abstractmethod
 from pathlib import Path
+from typing import AnyStr
 from typing import Union
 
 from yaml import MappingNode
@@ -16,10 +17,15 @@ class Resolver:
     """Abstract class used to resolve !include tags."""
 
     @abstractmethod
-    def resolve(self, location) -> Union[MappingNode, SequenceNode]:
+    def resolve(self, location: AnyStr) -> Union[MappingNode, SequenceNode]:
         """Resolve the given location.
 
-        Should return a yaml Node, either a sequence or a mapping.
+        Return a yaml Node, either a sequence or a mapping.
+
+        Args:
+            location: String describing the location of the YAML document to
+                      load.
+
         """
 
 
@@ -34,13 +40,13 @@ class FileSystemResolver(Resolver):
         """Initialize FileSystemResolver.
 
         Args:
-            root : The root path used when resolving files.
+            root: The root path used when resolving files.
 
         """
         self._root = root
 
     def resolve(self, location):
-        """See Resolver.resolve."""
+        """See Resolver.resolve for usage."""
         includes = list(self._root.glob(location))
         if len(includes) == 0:
             return None

@@ -7,14 +7,14 @@ from .base_field import BaseField
 
 
 class ListField(BaseField):
-    """String YAML object field."""
+    """List YAML object field."""
 
     def __init__(self, item_field: BaseField, *args, **kwargs):
-        """Initialize list field.
+        """Initialize the list field.
 
         Arg:
-            item_field (pyyo.BaseField) : Field used to load list items.
-            *args, **kwargs (list, dict) : Arguments forwarded to BaseField.
+            item_field: Field used to load list items.
+            *args, **kwargs: Arguments forwarded to BaseField.
 
         """
         super().__init__(*args, **kwargs)
