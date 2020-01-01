@@ -1,5 +1,9 @@
 # Pyyo (Python yaml objects)
 
+[![Coverage Status](https://coveralls.io/repos/github/an-otter-world/pyyo/badge.svg)](https://coveralls.io/github/an-otter-world/pyyo)
+
+[![Actions Status](https://github.com/an-otter-world/pyyo/workflows/Main/badge.svg)](https://github.com/an-otter-world/pyyo/actions)
+
 ## Overview
 
 Pyyo is a tiny library allowing to declare classes that can be deserialized
