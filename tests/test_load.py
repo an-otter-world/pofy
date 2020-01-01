@@ -1,12 +1,8 @@
 """Yaml object loading tests."""
-from io import StringIO
-
 from pytest import raises
-from yaml import compose
 
 from pyyo import load
 from pyyo import PyyoError
-from pyyo import Resolver
 
 from tests.fixtures import RequiredFieldObject
 from tests.fixtures import SubObjectChild
@@ -32,22 +28,7 @@ def test_unset_required_field_raise_error():
     assert test.not_required == 'yodeldi'
 
 
-def test_resolve():
-    """Test !include tag uses resolver to find YAML documents to load."""
-    class _DummyResolver(Resolver):
-        def resolve(self, location):
-            assert location == 'some_location'
-            return compose(StringIO('test_field: test_value'))
-
-    test = load(
-        YamlObject,
-        'object_field: !include some_location',
-        resolvers=[_DummyResolver()]
-    )
-    assert test.object_field.test_field == 'test_value'
-
-
-def test_loading_subclass_works():
+def test_load_subclass():
     """Test fields declared in parent classes are loaded."""
     test = load(
         SubObjectChild,
