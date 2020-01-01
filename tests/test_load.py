@@ -1,8 +1,5 @@
 """Yaml object loading tests."""
-from pytest import raises
-
 from pyyo import load
-from pyyo import PyyoError
 from pyyo import ErrorCode
 
 from .fixtures import RequiredFieldObject
@@ -22,8 +19,11 @@ def test_unknown_field_raise_error():
 
 def test_unset_required_field_raise_error():
     """Test an unset required field in YAML raise an error."""
-    with raises(PyyoError):
-        load(RequiredFieldObject, 'not_required: some_value')
+    expect_load_error(
+        ErrorCode.MISSING_REQUIRED_FIELD,
+        RequiredFieldObject,
+        'not_required: some_value'
+    )
 
     test = load(RequiredFieldObject, (
         'required: setted\n'

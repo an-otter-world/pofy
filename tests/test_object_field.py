@@ -1,10 +1,6 @@
 """Object field tests."""
-from pytest import raises
-
 from pyyo import load
-
 from pyyo import ErrorCode
-from pyyo import PyyoError
 
 from .fixtures import SubObject
 from .fixtures import SubObjectChild
