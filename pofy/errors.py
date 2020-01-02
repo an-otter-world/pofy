@@ -26,6 +26,9 @@ class ErrorCode(Enum):
     # Raised when a !type tags doesn't resolve to a valid python type.
     TYPE_RESOLVE_ERROR = 6
 
+    # Raised when a value can't be parsed.
+    VALUE_ERROR = 7
+
 
 class PofyError(Exception):
     """Exception raised when errors occurs during object loading."""

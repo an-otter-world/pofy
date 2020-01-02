@@ -85,14 +85,15 @@ class ScalarField(BaseField):
             )
             return None
 
-        return self._convert(node.value)
+        return self._convert(node, context)
 
     @abstractmethod
-    def _convert(self, value: str) -> Any:
+    def _convert(self, node: ScalarNode, context: LoadingContext) -> Any:
         """Convert the string value to the target type of this field.
 
         Args:
-            value : the field value as string.
+            node : the field value node.
+            context: The loading context.
 
         Return:
             The converted value.

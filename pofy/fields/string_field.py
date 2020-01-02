@@ -5,5 +5,5 @@ from .base_field import ScalarField
 class StringField(ScalarField):
     """String YAML object field."""
 
-    def _convert(self, value):
-        return value
+    def _convert(self, node, context):
+        return node.value

@@ -5,6 +5,7 @@ from typing import List
 from typing import Type
 from typing import Union
 
+from pofy import BoolField
 from pofy import DictField
 from pofy import ErrorCode
 from pofy import IntField
@@ -45,6 +46,7 @@ class YamlObject:
         object_field = ObjectField(object_class=SubObject)
         string_field = StringField()
         object_list_field = ListField(ObjectField(object_class=SubObject))
+        bool_field = BoolField()
 
     def __init__(self):
         """Initialize YamlObject."""
