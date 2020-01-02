@@ -35,6 +35,7 @@ def expect_load_error(
         tag_handlers=tag_handlers
     )
 
+
 def load_with_fail_tag(
     source: Union[AnyStr, IO[str]],
     object_class: Type,
@@ -52,6 +53,7 @@ def load_with_fail_tag(
         object_class,
         tag_handlers=[_FailTagHandler()]
     )
+
 
 @contextmanager
 def mock_loading_context(
