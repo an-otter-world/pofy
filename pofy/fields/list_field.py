@@ -33,7 +33,10 @@ class ListField(BaseField):
 
         result = []
         for item_node in node.value:
-            with context.push(item_node):
+            with context.load(item_node) as loaded:
+                if not loaded:
+                    continue
+
                 item = self._item_field.load(context)
                 result.append(item)
 

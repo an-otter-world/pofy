@@ -20,8 +20,8 @@ class ErrorCode(Enum):
     # Raised when a node type isn't the one expected for a field.
     UNEXPECTED_NODE_TYPE = 4
 
-    # Raised when an !include tag can't be resolved.
-    INCLUDE_NOT_FOUND = 5
+    # Raised when an !import tag can't be resolved.
+    IMPORT_NOT_FOUND = 5
 
     # Raised when a !type tags doesn't resolve to a valid python type.
     TYPE_RESOLVE_ERROR = 6
@@ -31,6 +31,9 @@ class ErrorCode(Enum):
 
     # Generic error code for validation errors.
     VALIDATION_ERROR = 8
+
+    # Raised when several handlers matches a tag
+    MULTIPLE_MATCHING_HANDLERS = 9
 
 
 class PofyError(Exception):

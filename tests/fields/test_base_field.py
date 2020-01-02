@@ -1,7 +1,7 @@
 """Yaml object loading tests."""
-from pofy import ErrorCode
-from pofy import LoadingContext
 from pofy import StringField
+from pofy import LoadingContext
+from pofy import ErrorCode
 
 from tests.fixtures import expect_load_error
 

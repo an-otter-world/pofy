@@ -37,7 +37,9 @@ class DictField(BaseField):
             assert isinstance(key_node, ScalarNode)
             key = key_node.value
 
-            with context.push(value_node):
+            with context.load(value_node) as loaded:
+                if not loaded:
+                    continue
                 result[key] = self._item_field.load(context)
 
         return result

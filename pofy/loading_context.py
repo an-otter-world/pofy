@@ -1,17 +1,14 @@
 """Loading context class & utilities."""
 from contextlib import contextmanager
-from typing import AnyStr
+from gettext import gettext as _
 from typing import Callable
 from typing import List
-from typing import Union
 
-from yaml import MappingNode
 from yaml import Node
-from yaml import SequenceNode
 
 from .errors import ErrorCode
 from .errors import PofyError
-from .tag_handlers.resolvers import Resolver
+from .tag_handlers.tag_handler import TagHandler
 
 
 class LoadingContext:
@@ -20,15 +17,15 @@ class LoadingContext:
     def __init__(
         self,
         error_handler: Callable,
-        resolvers: List[Resolver]
+        tag_handlers: List[TagHandler]
     ):
         """Initialize context."""
         self._error_handler = error_handler
-        self._resolvers = resolvers
+        self._tag_handlers = tag_handlers
         self._node_stack = []
 
     @contextmanager
-    def push(self, node: Node):
+    def load(self, node: Node):
         """Push a node in the context.
 
         This is solely used to know which node is currently loaded when calling
@@ -41,8 +38,21 @@ class LoadingContext:
         if len(self._node_stack) > 0:
             assert self._node_stack[-1] != node
 
+        # The node returned by handle_tag can be different than the one passed
+        # as argument (for example, the given node is an !import node)
+
         self._node_stack.append(node)
-        yield
+
+        transformed_node = self._handle_tag(node)
+
+        if node is None:
+            yield False
+        elif transformed_node == node:
+            yield True
+        else:
+            with self.load(transformed_node) as loaded:
+                yield loaded
+
         self._node_stack.pop()
 
     def current_node(self):
@@ -77,21 +87,29 @@ class LoadingContext:
         else:
             raise PofyError(node, code, message)
 
-    def resolve(self, location: AnyStr) -> Union[MappingNode, SequenceNode]:
-        """Resolve given location using registered resolvers.
+    def _handle_tag(self, node):
+        tag = node.tag
+        if not tag.startswith('!'):
+            return node
 
-        Args:
-            location : The yaml document to resolve.
+        transformed_node = None
+        handler_found = False
+        for handler in self._tag_handlers:
+            if not handler.match(node):
+                continue
 
-        """
-        result = None
-        for resolver in self._resolvers:
-            result = resolver.resolve(location)
-            if result is not None:
-                break
+            handler_found = True
 
-        assert (
-            result is None or
-            isinstance(result, (MappingNode, SequenceNode))
-        )
-        return result
+            if transformed_node is not None:
+                self.error(
+                    ErrorCode.MULTIPLE_MATCHING_HANDLERS,
+                    _('Got multiple matching handlers for tag {}'), tag
+                )
+                continue
+
+            transformed_node = handler.transform(self)
+
+        if not handler_found:
+            return node
+
+        return transformed_node

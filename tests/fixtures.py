@@ -6,7 +6,7 @@ from typing import Type
 from typing import Union
 
 from pofy import ErrorCode
-from pofy import Resolver
+from pofy import TagHandler
 from pofy import load
 
 
@@ -14,7 +14,7 @@ def expect_load_error(
     expected_error: ErrorCode,
     object_class: Type,
     source: Union[AnyStr, IO[str]],
-    resolvers: List[Resolver] = None
+    tag_handlers: List[TagHandler] = None
 ):
     """Load the given object, expecting an error to be raised."""
     error_raised = False
@@ -28,5 +28,5 @@ def expect_load_error(
         object_class,
         source,
         error_handler=_on_error,
-        resolvers=resolvers
+        tag_handlers=tag_handlers
     )

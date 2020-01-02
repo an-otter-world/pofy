@@ -47,30 +47,7 @@ class BaseField:
             Deserialized field value.
 
         """
-        node = context.current_node()
-
-        if node.tag == '!include':
-            if not isinstance(node, ScalarNode):
-                context.error(
-                    ErrorCode.UNEXPECTED_NODE_TYPE,
-                    _('!include tag must be on a scalar node')
-                )
-                return None
-
-            location = node.value
-            node = context.resolve(location)
-            if node is None:
-                context.error(
-                    ErrorCode.INCLUDE_NOT_FOUND,
-                    _("Can't resolve include {}"), location
-                )
-                return None
-
-            with context.push(node):
-                field_value = self._load(context)
-
-        else:
-            field_value = self._load(context)
+        field_value = self._load(context)
 
         validate = self._validate
         if validate is not None and not validate(context, field_value):

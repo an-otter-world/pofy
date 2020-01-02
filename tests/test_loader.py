@@ -27,7 +27,7 @@ def test_unset_required_field_raise_error():
             """Pofy fields."""
 
             required = StringField(required=True)
-            not_required = StringField(required=True)
+            not_required = StringField()
 
     expect_load_error(
         ErrorCode.MISSING_REQUIRED_FIELD,
@@ -84,7 +84,7 @@ def test_error_on_bad_node():
 
 
 def test_resolve_root_works(datadir):
-    """Test giving a path as resolve_root instanciates FileSystemResolvers."""
+    """Test giving a path as resolve_root instanciates default tag handlers."""
     class _Owned:
         class Schema:
             """Pyfo fields."""
@@ -99,7 +99,7 @@ def test_resolve_root_works(datadir):
 
     test = load(
         _Owner,
-        'object_field: !include object.yaml\n',
+        'object_field: !import object.yaml\n',
         resolve_roots=[datadir]
     )
 
