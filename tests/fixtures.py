@@ -80,6 +80,43 @@ class RequiredFieldObject:
         not_required = StringField(required=True)
 
 
+class ValidatedObject:
+    """Object with a validation method."""
+
+    class Schema:
+        """Pofy fields."""
+
+        dont_set_me = StringField()
+
+        @classmethod
+        def validate(cls, context, obj):
+            """Validate loaded objects."""
+            if obj.dont_set_me is not None:
+                context.error(ErrorCode.VALIDATION_ERROR, 'Error')
+            return False
+
+    def __init__(self):
+        """Initialize."""
+        self.dont_set_me = None
+
+
+class ValidatedObjectChild(ValidatedObject):
+    """Stub to check parent validation methods are called."""
+
+    class Schema:
+        """Pofy fields."""
+
+        @classmethod
+        def validate(cls, __, ___):
+            """Validate loaded objects."""
+            return True
+
+    def __init__(self):
+        """Initialize."""
+        super().__init__()
+        self.dont_set_me = None
+
+
 def expect_load_error(
     expected_error: ErrorCode,
     object_class: Type,

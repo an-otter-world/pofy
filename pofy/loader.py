@@ -3,6 +3,7 @@
 from gettext import gettext as _
 from inspect import getmembers
 from inspect import isclass
+from inspect import ismethod
 from typing import AnyStr
 from typing import Callable
 from typing import IO
@@ -93,14 +94,23 @@ def load_internal(object_class: Type, context: LoadingContext):
             field_value = field.load(context)
             setattr(result, field_name, field_value)
 
+    valid_object = True
     for name, field in fields.items():
         if field.required and name not in set_fields:
+            valid_object = False
             context.error(
                 ErrorCode.MISSING_REQUIRED_FIELD,
                 _('Missing required field {}'), name
             )
 
-    return result
+    for validate in _get_validation_methods(object_class):
+        if not validate(context, result):
+            valid_object = False
+
+    if valid_object:
+        return result
+
+    return None
 
 
 def _is_schema_class(member):
@@ -111,6 +121,10 @@ def _is_field(member):
     return isinstance(member, BaseField)
 
 
+def _is_validation_method(member):
+    return ismethod(member) and member.__name__ == 'validate'
+
+
 def _get_fields(cls):
     for base in cls.__bases__:
         for name, field in _get_fields(base):
@@ -119,3 +133,13 @@ def _get_fields(cls):
     for __, schemaclass in getmembers(cls, _is_schema_class):
         for name, field in getmembers(schemaclass, _is_field):
             yield (name, field)
+
+
+def _get_validation_methods(cls):
+    for base in cls.__bases__:
+        for field in _get_validation_methods(base):
+            yield field
+
+    for __, schemaclass in getmembers(cls, _is_schema_class):
+        for __, field in getmembers(schemaclass, _is_validation_method):
+            yield field
