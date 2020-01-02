@@ -30,8 +30,8 @@ def test_bool_field():
 
     for value in true_values:
         test = load(
+            'bool_field: {}'.format(value),
             _BoolObject,
-            'bool_field: {}'.format(value)
         )
 
         assert isinstance(test.bool_field, bool)
@@ -39,8 +39,8 @@ def test_bool_field():
 
     for value in false_values:
         test = load(
+            'bool_field: {}'.format(value),
             _BoolObject,
-            'bool_field: {}'.format(value)
         )
 
         assert isinstance(test.bool_field, bool)
@@ -51,12 +51,12 @@ def test_bad_value_raises():
     """Test not-scalar node for a string field raise an error."""
     expect_load_error(
         ErrorCode.VALUE_ERROR,
+        'bool_field: NotValid',
         _BoolObject,
-        'bool_field: NotValid'
     )
 
     expect_load_error(
         ErrorCode.UNEXPECTED_NODE_TYPE,
+        'bool_field: ["a", "list"]',
         _BoolObject,
-        'bool_field: ["a", "list"]'
     )

@@ -1,87 +1,10 @@
 """Yaml object loading tests."""
-from pofy import ErrorCode
 from pofy import ListField
 from pofy import ObjectField
 from pofy import StringField
 from pofy import load
 
-from .fixtures import expect_load_error
-
-
-def test_unknown_field_raise_error():
-    """Test an undeclared field in YAML raises an error."""
-    class _EmptyObject:
-        class Schema:
-            """Pyfo fields."""
-
-    expect_load_error(
-        ErrorCode.FIELD_NOT_DECLARED,
-        _EmptyObject,
-        'uknown_field: 10'
-    )
-
-
-def test_unset_required_field_raise_error():
-    """Test an unset required field in YAML raise an error."""
-    class _RequiredFieldObject:
-        class Schema:
-            """Pofy fields."""
-
-            required = StringField(required=True)
-            not_required = StringField()
-
-    expect_load_error(
-        ErrorCode.MISSING_REQUIRED_FIELD,
-        _RequiredFieldObject,
-        'not_required: some_value'
-    )
-
-    test = load(_RequiredFieldObject, (
-        'required: setted\n'
-        'not_required: yodeldi'
-    ))
-    assert test.required == 'setted'
-    assert test.not_required == 'yodeldi'
-
-
-def test_load_subclass():
-    """Test fields declared in parent classes are loaded."""
-    class _Parent:
-        class Schema:
-            """Pyfo fields."""
-
-            parent_field = StringField()
-
-    class _Child(_Parent):
-        class Schema:
-            """Pyfo fields."""
-
-            child_field = StringField()
-
-    test = load(
-        _Child,
-        'parent_field: parent_value\n' +
-        'child_field: child_value',
-    )
-
-    assert test.parent_field == 'parent_value'
-    assert test.child_field == 'child_value'
-
-
-def test_error_on_bad_node():
-    """Test load raises an error on bad node."""
-    class _DummyObject:
-        class Schema:
-            """Pyfo fields."""
-
-            some_field = StringField()
-
-    expect_load_error(
-        ErrorCode.UNEXPECTED_NODE_TYPE,
-        _DummyObject,
-        '- item1\n' +
-        '- item2'
-    )
+from tests.fixtures import load_with_fail_tag
 
 
 def test_resolve_root_works(datadir):
@@ -102,8 +25,8 @@ def test_resolve_root_works(datadir):
             )
 
     test = load(
-        _Owner,
         'object_field: !import object.yaml\n',
+        _Owner,
         resolve_roots=[datadir]
     )
 
@@ -111,8 +34,8 @@ def test_resolve_root_works(datadir):
     assert test.object_field.test_field == 'test_value'
 
     test = load(
-        _Owner,
         'object_list: !glob glob_directory/*.yaml\n',
+        _Owner,
         resolve_roots=[datadir]
     )
 
@@ -123,37 +46,28 @@ def test_resolve_root_works(datadir):
     assert test.object_list[1].test_field == 'test_value'
 
 
-def test_object_validation_works():
-    """Test object validation methods are executed."""
+def test_root_field_is_correctly_inferred():
+    """Test that the root field is correctly inferred from object_class."""
+    assert load('on', bool)
+    assert load('10', int) == 10
+    assert load('10.0', float) == 10.0
+    assert load('string_value', str) == 'string_value'
+    test_list = load(
+        '- item_1\n'
+        '- item_2',
+        list)
 
-    class _ValidatedObject:
-        class Schema:
-            """Pofy fields."""
+    assert test_list == ['item_1', 'item_2']
 
-            dont_set_me = StringField()
-
-            @classmethod
-            def validate(cls, context, obj):
-                """Validate loaded objects."""
-                if obj.dont_set_me is not None:
-                    context.error(ErrorCode.VALIDATION_ERROR, 'Error')
-                return False
-
-        def __init__(self):
-            """Initialize."""
-            self.dont_set_me = None
-
-    class _ValidatedObjectChild(_ValidatedObject):
-        class Schema:
-            """Pofy fields."""
-
-            @classmethod
-            def validate(cls, __, ___):
-                """Validate loaded objects."""
-                return True
-
-    expect_load_error(
-        ErrorCode.VALIDATION_ERROR,
-        _ValidatedObjectChild,
-        'dont_set_me: Wathever'
+    test_dict = load(
+        'key_1: value_1\n'
+        'key_2: value_2\n',
+        dict
     )
+
+    assert test_dict == {'key_1': 'value_1', 'key_2': 'value_2'}
+
+
+def test_tag_handler_fails_on_root_node_returns_none():
+    """Test nothing is deserialized when handling root node fails."""
+    assert load_with_fail_tag('!fail some_value', str) is None

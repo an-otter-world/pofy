@@ -5,7 +5,9 @@ from typing import List
 from yaml import Node
 from yaml import SequenceNode
 from yaml import compose
+from yaml.parser import ParserError
 
+from pofy.errors import ErrorCode
 from pofy.loading_context import LoadingContext
 
 from .tag_handler import TagHandler
@@ -48,7 +50,13 @@ class GlobHandler(TagHandler):
                     try:
                         content = compose(yaml_file)
                         result.append(content)
-                    finally:
-                        pass
+                    except ParserError as error:
+                        context.error(
+                            ErrorCode.VALUE_ERROR,
+                            _('Parse error while loading {} : {}'),
+                            path,
+                            error
+                        )
+                        return None
 
         return SequenceNode('', result, node.start_mark, node.end_mark)

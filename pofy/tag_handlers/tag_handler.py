@@ -29,11 +29,12 @@ class TagHandler:
             node: The node on which the tag to test is defined.
 
         """
-        if node.tag is None:
-            return False
+        assert node.tag is not None
+        assert node.tag[0] == '!'  # Only handle custom tags.
 
         pattern = self._compiled_pattern
         tag = node.tag[1:]  # Remove !
+
         return pattern.match(tag) is not None
 
     @abstractmethod

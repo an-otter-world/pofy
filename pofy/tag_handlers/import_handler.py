@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import List
 from yaml import Node
 from yaml import compose
+from yaml.parser import ParserError
 
 from pofy.errors import ErrorCode
 from pofy.loading_context import LoadingContext
@@ -48,13 +49,20 @@ class ImportHandler(TagHandler):
                 try:
                     content = compose(yaml_file)
                     return content
-                finally:
-                    pass
+                except ParserError as error:
+                    context.error(
+                        ErrorCode.VALUE_ERROR,
+                        _('Parse error while loading {} : {}'),
+                        path,
+                        error
+                    )
+                    return None
 
         if node.tag == '!import':
             context.error(
                 ErrorCode.IMPORT_NOT_FOUND,
-                _('Unable to find file {} in any of the configured directories')
+                _('Unable to find {} in any of the configured directories'),
+                path
             )
 
         return None

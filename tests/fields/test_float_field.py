@@ -17,7 +17,7 @@ class _FloatObject:
 
 def test_float_field():
     """Test float field loading works."""
-    test = load(_FloatObject, 'float_field: 42.2')
+    test = load('float_field: 42.2', _FloatObject)
     assert test.float_field == 42.2
 
 
@@ -25,8 +25,8 @@ def test_float_field_bad_value_raises():
     """Test bad value on a float field raises an error."""
     expect_load_error(
         ErrorCode.VALUE_ERROR,
+        'float_field: not_convertible',
         _FloatObject,
-        'float_field: not_convertible'
     )
 
 
@@ -34,15 +34,15 @@ def test_float_field_min_max():
     """Test float field minimum / maximum parameter works."""
     expect_load_error(
         ErrorCode.VALIDATION_ERROR,
+        'bound_float_field: 0.0',
         _FloatObject,
-        'bound_float_field: 0.0'
     )
 
     expect_load_error(
         ErrorCode.VALIDATION_ERROR,
+        'bound_float_field: 100.0',
         _FloatObject,
-        'bound_float_field: 100.0'
     )
 
-    test = load(_FloatObject, 'bound_float_field: 17.2')
+    test = load('bound_float_field: 17.2', _FloatObject)
     assert test.bound_float_field == 17.2

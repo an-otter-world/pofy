@@ -122,7 +122,8 @@ class LoadingContext:
         *args,
         **kwargs
     ):
-        if not isinstance(self.current_node(), node_type):
+        current_node = self.current_node()
+        if not isinstance(current_node, node_type):
             self.error(
                 ErrorCode.UNEXPECTED_NODE_TYPE,
                 error_format,
