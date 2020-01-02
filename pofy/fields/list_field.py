@@ -1,9 +1,5 @@
 """List field class & utilities."""
-from gettext import gettext as _
-
-from yaml import SequenceNode
-
-from pofy.errors import ErrorCode
+from pofy.loading_context import LoadingContext
 
 from .base_field import BaseField
 
@@ -22,15 +18,11 @@ class ListField(BaseField):
         super().__init__(*args, **kwargs)
         self._item_field = item_field
 
-    def _load(self, context):
-        node = context.current_node()
-        if not isinstance(node, SequenceNode):
-            context.error(
-                ErrorCode.UNEXPECTED_NODE_TYPE,
-                _('Sequence expected')
-            )
+    def _load(self, context: LoadingContext):
+        if not context.expect_sequence():
             return None
 
+        node = context.current_node()
         result = []
         for item_node in node.value:
             with context.load(item_node) as loaded:

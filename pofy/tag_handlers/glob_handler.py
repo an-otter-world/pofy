@@ -3,11 +3,9 @@ from gettext import gettext as _
 from pathlib import Path
 from typing import List
 from yaml import Node
-from yaml import ScalarNode
 from yaml import SequenceNode
 from yaml import compose
 
-from pofy.errors import ErrorCode
 from pofy.loading_context import LoadingContext
 
 from .tag_handler import TagHandler
@@ -33,14 +31,12 @@ class GlobHandler(TagHandler):
 
     def transform(self, context: LoadingContext) -> Node:
         """See Resolver.resolve for usage."""
-        node = context.current_node()
-        if not isinstance(node, ScalarNode):
-            context.error(
-                ErrorCode.UNEXPECTED_NODE_TYPE,
-                _('glob must be set on a scalar node')
-            )
+        if not context.expect_scalar(
+            _('glob must be set on a scalar node')
+        ):
             return None
 
+        node = context.current_node()
         glob = node.value
         result = []
         for root in self._roots:

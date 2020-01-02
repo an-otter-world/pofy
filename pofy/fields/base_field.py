@@ -5,8 +5,6 @@ from typing import Any
 from typing import Callable
 from typing import Union
 
-from yaml import ScalarNode
-
 from pofy.errors import ErrorCode
 from pofy.loading_context import LoadingContext
 
@@ -74,13 +72,8 @@ class BaseField:
 class ScalarField(BaseField):
     """Base class for scalar value fields."""
 
-    def _load(self, context):
-        node = context.current_node()
-        if not isinstance(node, ScalarNode):
-            context.error(
-                ErrorCode.UNEXPECTED_NODE_TYPE,
-                _('Scalar expected')
-            )
+    def _load(self, context: LoadingContext):
+        if not context.expect_scalar():
             return None
 
         return self._convert(context)

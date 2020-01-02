@@ -4,8 +4,6 @@ from inspect import isclass
 from typing import AnyStr
 from typing import Type
 
-from yaml import MappingNode
-
 from pofy.errors import ErrorCode
 from pofy.loader import load_internal
 from pofy.loading_context import LoadingContext
@@ -30,13 +28,8 @@ class ObjectField(BaseField):
         super().__init__(*args, **kwargs)
         self._object_class = object_class
 
-    def _load(self, context):
-        node = context.current_node()
-        if not isinstance(node, MappingNode):
-            context.error(
-                ErrorCode.UNEXPECTED_NODE_TYPE,
-                _('Mapping expected')
-            )
+    def _load(self, context: LoadingContext):
+        if not context.expect_mapping():
             return None
 
         object_class = self._resolve_type(context)

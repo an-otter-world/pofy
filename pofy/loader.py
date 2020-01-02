@@ -14,7 +14,6 @@ from typing import Type
 from typing import Union
 
 from yaml import compose
-from yaml import MappingNode
 
 from pofy.errors import ErrorCode
 
@@ -71,13 +70,7 @@ def load_internal(object_class: Type, context: LoadingContext):
 
     This function is meant to be used internaly.
     """
-    node = context.current_node()
-
-    if not isinstance(node, MappingNode):
-        context.error(
-            ErrorCode.UNEXPECTED_NODE_TYPE,
-            _('Mapping expected')
-        )
+    if not context.expect_mapping():
         return None
 
     fields = dict(_get_fields(object_class))

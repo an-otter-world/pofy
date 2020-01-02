@@ -3,7 +3,6 @@ from gettext import gettext as _
 from pathlib import Path
 from typing import List
 from yaml import Node
-from yaml import ScalarNode
 from yaml import compose
 
 from pofy.errors import ErrorCode
@@ -32,14 +31,12 @@ class ImportHandler(TagHandler):
 
     def transform(self, context: LoadingContext) -> Node:
         """See Resolver.resolve for usage."""
-        node = context.current_node()
-        if not isinstance(node, ScalarNode):
-            context.error(
-                ErrorCode.UNEXPECTED_NODE_TYPE,
-                _('import / try-import must be set on a scalar node')
-            )
+        if not context.expect_scalar(
+            _('import / try-import must be set on a scalar node')
+        ):
             return None
 
+        node = context.current_node()
         file_path = Path(node.value)
 
         for root in self._roots:

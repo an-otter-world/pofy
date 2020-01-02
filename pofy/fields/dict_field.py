@@ -1,10 +1,7 @@
 """Dictionary field class & utilities."""
-from gettext import gettext as _
-
-from yaml import MappingNode
 from yaml import ScalarNode
 
-from pofy.errors import ErrorCode
+from pofy.loading_context import LoadingContext
 
 from .base_field import BaseField
 
@@ -23,13 +20,9 @@ class DictField(BaseField):
         super().__init__(*args, **kwargs)
         self._item_field = item_field
 
-    def _load(self, context):
+    def _load(self, context: LoadingContext):
         node = context.current_node()
-        if not isinstance(node, MappingNode):
-            context.error(
-                ErrorCode.UNEXPECTED_NODE_TYPE,
-                _('Mapping expected')
-            )
+        if not context.expect_mapping():
             return None
 
         result = {}
