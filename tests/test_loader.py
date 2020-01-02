@@ -1,10 +1,11 @@
 """Yaml object loading tests."""
-from pyyo import load
-from pyyo import ErrorCode
+from pofy import load
+from pofy import ErrorCode
 
 from .fixtures import RequiredFieldObject
 from .fixtures import SubObject
 from .fixtures import SubObjectChild
+from .fixtures import ValidatedObjectChild
 from .fixtures import YamlObject
 from .fixtures import expect_load_error
 
@@ -65,3 +66,12 @@ def test_resolve_root_works(datadir):
 
     assert isinstance(test.object_field, SubObject)
     assert test.object_field.test_field == 'test_value'
+
+
+def test_object_validation_works():
+    """Test object validation methods are executed."""
+    expect_load_error(
+        ErrorCode.VALIDATION_ERROR,
+        ValidatedObjectChild,
+        'dont_set_me: Wathever'
+    )

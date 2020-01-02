@@ -1,6 +1,6 @@
 """String field tests."""
-from pyyo import load
-from pyyo import ErrorCode
+from pofy import load
+from pofy import ErrorCode
 
 from .fixtures import YamlObject
 from .fixtures import expect_load_error
@@ -18,4 +18,19 @@ def test_bad_value_raises():
         ErrorCode.UNEXPECTED_NODE_TYPE,
         YamlObject,
         'string_field: ["a", "list"]'
+    )
+
+
+def test_pattern():
+    """Test string validates pattern when given."""
+    test = load(
+        YamlObject,
+        'match_string_field: Matching'
+    )
+    assert test.match_string_field == 'Matching'
+
+    expect_load_error(
+        ErrorCode.VALIDATION_ERROR,
+        YamlObject,
+        'match_string_field: NotMatching'
     )

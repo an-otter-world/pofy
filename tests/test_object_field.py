@@ -1,6 +1,6 @@
 """Object field tests."""
-from pyyo import load
-from pyyo import ErrorCode
+from pofy import load
+from pofy import ErrorCode
 
 from .fixtures import SubObject
 from .fixtures import SubObjectChild

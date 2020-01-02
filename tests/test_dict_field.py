@@ -1,6 +1,6 @@
 """Dictionary field tests."""
-from pyyo import ErrorCode
-from pyyo import load
+from pofy import ErrorCode
+from pofy import load
 
 from .fixtures import YamlObject
 from .fixtures import expect_load_error

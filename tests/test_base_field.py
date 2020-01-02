@@ -3,9 +3,9 @@ from io import StringIO
 
 from yaml import compose
 
-from pyyo import ErrorCode
-from pyyo import Resolver
-from pyyo import load
+from pofy import ErrorCode
+from pofy import Resolver
+from pofy import load
 
 from .fixtures import YamlObject
 from .fixtures import expect_load_error
@@ -44,4 +44,13 @@ def test_unresolved_include_raise_error():
         YamlObject,
         'object_field: !include bad_location',
         resolvers=[_DummyResolver()]
+    )
+
+
+def test_field_validation():
+    """Test custom field validaton works."""
+    expect_load_error(
+        ErrorCode.VALIDATION_ERROR,
+        YamlObject,
+        'validated_field: error_is_always_raised',
     )

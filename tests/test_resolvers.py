@@ -4,7 +4,7 @@ from yaml import Node
 from yaml import ScalarNode
 from yaml import SequenceNode
 
-from pyyo.resolvers import FileSystemResolver
+from pofy.resolvers import FileSystemResolver
 
 
 def test_file_system_resolver_resolve_file(datadir):

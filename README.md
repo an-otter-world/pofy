@@ -1,29 +1,29 @@
-# Pyyo (Python yaml objects)
+# Pofy (Python yaml objects)
 
-[![WTFPL license](https://img.shields.io/badge/License-WTFPL-blue.svg)](https://raw.githubusercontent.com/an-otter-world/pyyo/master/COPYING)
-[![Actions Status](https://github.com/an-otter-world/pyyo/workflows/Checks/badge.svg)](https://github.com/an-otter-world/pyyo/actions)
-[![Coverage Status](https://coveralls.io/repos/github/an-otter-world/pyyo/badge.svg)](https://coveralls.io/github/an-otter-world/pyyo)
+[![WTFPL license](https://img.shields.io/badge/License-WTFPL-blue.svg)](https://raw.githubusercontent.com/an-otter-world/pofy/master/COPYING)
+[![Actions Status](https://github.com/an-otter-world/pofy/workflows/Checks/badge.svg)](https://github.com/an-otter-world/pofy/actions)
+[![Coverage Status](https://coveralls.io/repos/github/an-otter-world/pofy/badge.svg)](https://coveralls.io/github/an-otter-world/pofy)
 
 ## Overview
 
-Pyyo is a tiny library allowing to declare classes that can be deserialized
+Pofy is a tiny library allowing to declare classes that can be deserialized
 from YAML, using pyyaml. Classes declares a schema as a list of fields, used
 to check for data validation during deserialization.
 
-Pyyo is distributed under the term of the WTFPL V2 (See COPYING file).
+Pofy is distributed under the term of the WTFPL V2 (See COPYING file).
 
 ## Installation
 
-Pyyo is tested with Python 3.8. It be installed through pip :
+Pofy is tested with Python 3.8. It be installed through pip :
 
-  `pip install pyyo`
+  `pip install pofy`
 
 ## Quickstart
 
-To use Pyyo, you must declare a schema in the class you want to deserialize :
+To use Pofy, you must declare a schema in the class you want to deserialize :
 
   ```python
-      from pyyo import StringField, load
+      from pofy import StringField, load
 
       class SomeObject:
           class Schema:

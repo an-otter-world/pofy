@@ -3,7 +3,7 @@ from gettext import gettext as _
 
 from yaml import SequenceNode
 
-from pyyo.errors import ErrorCode
+from pofy.errors import ErrorCode
 
 from .base_field import BaseField
 
@@ -22,13 +22,19 @@ class ListField(BaseField):
         super().__init__(*args, **kwargs)
         self._item_field = item_field
 
-    def _load(self, node, context):
+    def _load(self, context):
+        node = context.current_node()
         if not isinstance(node, SequenceNode):
             context.error(
-                node,
                 ErrorCode.UNEXPECTED_NODE_TYPE,
                 _('Sequence expected')
             )
             return None
 
-        return [self._item_field.load(it, context) for it in node.value]
+        result = []
+        for item_node in node.value:
+            with context.push(item_node):
+                item = self._item_field.load(context)
+                result.append(item)
+
+        return result

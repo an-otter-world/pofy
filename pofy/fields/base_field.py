@@ -2,29 +2,40 @@
 from abc import abstractmethod
 from gettext import gettext as _
 from typing import Any
+from typing import Callable
+from typing import Union
 
-from yaml import Node
 from yaml import ScalarNode
 
-from pyyo.errors import ErrorCode
-from pyyo.loading_context import LoadingContext
+from pofy.errors import ErrorCode
+from pofy.loading_context import LoadingContext
 
 
 class BaseField:
     """Base class for YAML object fields."""
 
-    def __init__(self, required: bool = False):
+    def __init__(
+        self,
+        required: bool = False,
+        validate: Callable = None
+    ):
         """Initialize the field.
 
         Args:
             required: If it's true and the field is not defined in yaml, it
                       will create an error that will eventually be raised at
                       the end of deserialization.
+            validate: Function accepting a Node, LoadingContext and the
+                      deserialized field value, that should return True if the
+                      value is valid, false otherwise, and call context.error
+                      to report errors, eventually using the
+                      ErrorCode.VALIDATION_ERROR code.
 
         """
         self.required = required
+        self._validate = validate
 
-    def load(self, node: Node, context: LoadingContext) -> Any:
+    def load(self, context: LoadingContext) -> Any:
         """Deserialize this field.
 
         Args:
@@ -36,10 +47,11 @@ class BaseField:
             Deserialized field value.
 
         """
+        node = context.current_node()
+
         if node.tag == '!include':
             if not isinstance(node, ScalarNode):
                 context.error(
-                    node,
                     ErrorCode.UNEXPECTED_NODE_TYPE,
                     _('!include tag must be on a scalar node')
                 )
@@ -49,16 +61,25 @@ class BaseField:
             node = context.resolve(location)
             if node is None:
                 context.error(
-                    node,
                     ErrorCode.INCLUDE_NOT_FOUND,
                     _("Can't resolve include {}"), location
                 )
                 return None
 
-        return self._load(node, context)
+            with context.push(node):
+                field_value = self._load(context)
+
+        else:
+            field_value = self._load(context)
+
+        validate = self._validate
+        if validate is not None and not validate(context, field_value):
+            return None
+
+        return field_value
 
     @abstractmethod
-    def _load(self, node: Node, context: LoadingContext) -> Any:
+    def _load(self, context: LoadingContext) -> Any:
         """Deserialize this field using the given node.
 
         Args:
@@ -76,26 +97,49 @@ class BaseField:
 class ScalarField(BaseField):
     """Base class for scalar value fields."""
 
-    def _load(self, node, context):
+    def _load(self, context):
+        node = context.current_node()
         if not isinstance(node, ScalarNode):
             context.error(
-                node,
                 ErrorCode.UNEXPECTED_NODE_TYPE,
                 _('Scalar expected')
             )
             return None
 
-        return self._convert(node.value)
+        return self._convert(context)
 
     @abstractmethod
-    def _convert(self, value: str) -> Any:
+    def _convert(self, context: LoadingContext) -> Any:
         """Convert the string value to the target type of this field.
 
         Args:
-            value : the field value as string.
+            context: The loading context.
 
         Return:
             The converted value.
 
         """
         raise NotImplementedError
+
+    @staticmethod
+    def _check_in_bounds(
+        context: LoadingContext,
+        value: Union[int, float],
+        minimum: Union[int, float],
+        maximum: Union[int, float]
+    ):
+        if minimum is not None and value < minimum:
+            context.error(
+                ErrorCode.VALIDATION_ERROR,
+                _('Value is too small (minimum : {})'), minimum
+            )
+            return None
+
+        if maximum is not None and value > maximum:
+            context.error(
+                ErrorCode.VALIDATION_ERROR,
+                _('Value is too big (maximum : {})'), maximum
+            )
+            return None
+
+        return value

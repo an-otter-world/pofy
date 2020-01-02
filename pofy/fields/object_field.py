@@ -5,11 +5,10 @@ from typing import AnyStr
 from typing import Type
 
 from yaml import MappingNode
-from yaml import Node
 
-from pyyo.errors import ErrorCode
-from pyyo.loader import load_internal
-from pyyo.loading_context import LoadingContext
+from pofy.errors import ErrorCode
+from pofy.loader import load_internal
+from pofy.loading_context import LoadingContext
 
 from .base_field import BaseField
 
@@ -31,29 +30,29 @@ class ObjectField(BaseField):
         super().__init__(*args, **kwargs)
         self._object_class = object_class
 
-    def _load(self, node, context):
+    def _load(self, context):
+        node = context.current_node()
         if not isinstance(node, MappingNode):
             context.error(
-                node,
                 ErrorCode.UNEXPECTED_NODE_TYPE,
                 _('Mapping expected')
             )
             return None
 
-        object_class = self._resolve_type(node, context)
+        object_class = self._resolve_type(context)
         if object_class is None:
             return None
 
-        return load_internal(object_class, node, context)
+        return load_internal(object_class, context)
 
-    def _resolve_type(self, node: Node, context: LoadingContext):
+    def _resolve_type(self, context: LoadingContext):
+        node = context.current_node()
         tag = node.tag
         if not tag.startswith('!type'):
             return self._object_class
 
         if ':' not in tag:
             context.error(
-                node,
                 ErrorCode.BAD_TYPE_TAG_FORMAT,
                 _TYPE_FORMAT_MSG, tag
             )
@@ -62,7 +61,6 @@ class ObjectField(BaseField):
         full_name = tag.split(':')
         if len(full_name) != 2:
             context.error(
-                node,
                 ErrorCode.BAD_TYPE_TAG_FORMAT,
                 _TYPE_FORMAT_MSG, tag
             )
@@ -73,7 +71,6 @@ class ObjectField(BaseField):
 
         if len(full_name) < 2:
             context.error(
-                node,
                 ErrorCode.BAD_TYPE_TAG_FORMAT,
                 _TYPE_FORMAT_MSG, tag
             )
@@ -81,11 +78,10 @@ class ObjectField(BaseField):
 
         module_name = '.'.join(full_name[:-1])
         type_name = full_name[-1]
-        return _get_type(node, module_name, type_name, context)
+        return _get_type(module_name, type_name, context)
 
 
 def _get_type(
-    node: Node,
     module_name: AnyStr,
     type_name: AnyStr,
     context: LoadingContext
@@ -95,7 +91,6 @@ def _get_type(
 
     if not hasattr(module, type_name):
         context.error(
-            node,
             ErrorCode.TYPE_RESOLVE_ERROR,
             _('Can\'t find python type {}'), full_name
         )
@@ -105,7 +100,6 @@ def _get_type(
 
     if not isclass(resolved_type):
         context.error(
-            node,
             ErrorCode.TYPE_RESOLVE_ERROR,
             _('Python type {} is not a class'), full_name
         )

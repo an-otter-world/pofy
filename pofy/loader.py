@@ -1,8 +1,9 @@
-"""Pyyo deserializing function."""
+"""Pofy deserializing function."""
 
 from gettext import gettext as _
 from inspect import getmembers
 from inspect import isclass
+from inspect import ismethod
 from typing import AnyStr
 from typing import Callable
 from typing import IO
@@ -12,9 +13,8 @@ from typing import Union
 
 from yaml import compose
 from yaml import MappingNode
-from yaml import Node
 
-from pyyo.errors import ErrorCode
+from pofy.errors import ErrorCode
 
 from .fields.base_field import BaseField
 from .loading_context import LoadingContext
@@ -35,11 +35,11 @@ def load(
         cls : Class of the object to create.
         source : Either a string containing YAML, or a stream to a YAML source.
         resolve_roots: Base filesystem paths used to resolve !include tags.
-                       (will instanciate a pyyo.FileSystemResolver for each
+                       (will instanciate a pofy.FileSystemResolver for each
                        path if this parameter is not none.)
-        resolvers : Custom pyyo.Resolvers to use when resolving includes.
+        resolvers : Custom pofy.Resolvers to use when resolving includes.
         error_handler : Called with arguments (node, error_message) when an
-                        error occurs. If it's not specified, a PyyoError will
+                        error occurs. If it's not specified, a PofyError will
                         be raised when an error occurs.
 
     """
@@ -56,19 +56,21 @@ def load(
         error_handler=error_handler,
         resolvers=all_resolvers
     )
-    return load_internal(cls, node, context)
+    with context.push(node):
+        return load_internal(cls, context)
 
 
-def load_internal(object_class: Type, node: Node, context: LoadingContext):
+def load_internal(object_class: Type, context: LoadingContext):
     """Load given node.
 
     This function is meant to be used internaly.
     """
+    node = context.current_node()
+
     fields = dict(_get_fields(object_class))
 
     if not isinstance(node, MappingNode):
         context.error(
-            node,
             ErrorCode.UNEXPECTED_NODE_TYPE,
             _('Mapping expected')
         )
@@ -77,29 +79,38 @@ def load_internal(object_class: Type, node: Node, context: LoadingContext):
     result = object_class()
     set_fields = set()
     for name_node, value_node in node.value:
-        field_name = name_node.value
-        set_fields.add(field_name)
-        if field_name not in fields:
-            context.error(
-                name_node,
-                ErrorCode.FIELD_NOT_DECLARED,
-                _('Field {} is not declared.'), field_name
-            )
-            continue
+        with context.push(name_node):
+            field_name = name_node.value
+            set_fields.add(field_name)
+            if field_name not in fields:
+                context.error(
+                    ErrorCode.FIELD_NOT_DECLARED,
+                    _('Field {} is not declared.'), field_name
+                )
+                continue
 
-        field = fields[field_name]
-        field_value = field.load(value_node, context)
-        setattr(result, field_name, field_value)
+        with context.push(value_node):
+            field = fields[field_name]
+            field_value = field.load(context)
+            setattr(result, field_name, field_value)
 
+    valid_object = True
     for name, field in fields.items():
         if field.required and name not in set_fields:
+            valid_object = False
             context.error(
-                node,
                 ErrorCode.MISSING_REQUIRED_FIELD,
                 _('Missing required field {}'), name
             )
 
-    return result
+    for validate in _get_validation_methods(object_class):
+        if not validate(context, result):
+            valid_object = False
+
+    if valid_object:
+        return result
+
+    return None
 
 
 def _is_schema_class(member):
@@ -110,6 +121,10 @@ def _is_field(member):
     return isinstance(member, BaseField)
 
 
+def _is_validation_method(member):
+    return ismethod(member) and member.__name__ == 'validate'
+
+
 def _get_fields(cls):
     for base in cls.__bases__:
         for name, field in _get_fields(base):
@@ -118,3 +133,13 @@ def _get_fields(cls):
     for __, schemaclass in getmembers(cls, _is_schema_class):
         for name, field in getmembers(schemaclass, _is_field):
             yield (name, field)
+
+
+def _get_validation_methods(cls):
+    for base in cls.__bases__:
+        for field in _get_validation_methods(base):
+            yield field
+
+    for __, schemaclass in getmembers(cls, _is_schema_class):
+        for __, field in getmembers(schemaclass, _is_validation_method):
+            yield field

@@ -1,4 +1,4 @@
-"""PyYO installation configuration."""
+"""Pofy installation configuration."""
 from pathlib import Path
 from re import compile as re_compile
 from subprocess import CalledProcessError
@@ -38,7 +38,7 @@ setup(
     long_description_content_type="text/markdown",
     version=get_git_version(),
     keywords=['YAML', 'serialization'],
-    packages=['pyyo'],
+    packages=['pofy'],
     license='WTFPL',
     classifiers=[
         "Development Status :: 3 - Alpha",

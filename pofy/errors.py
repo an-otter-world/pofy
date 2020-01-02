@@ -6,7 +6,7 @@ from yaml import Node
 
 
 class ErrorCode(Enum):
-    """Pyyo error codes."""
+    """Pofy error codes."""
 
     # Raised when a !type tag isn't correctly formed.
     BAD_TYPE_TAG_FORMAT = 1
@@ -26,8 +26,14 @@ class ErrorCode(Enum):
     # Raised when a !type tags doesn't resolve to a valid python type.
     TYPE_RESOLVE_ERROR = 6
 
+    # Raised when a value can't be parsed.
+    VALUE_ERROR = 7
 
-class PyyoError(Exception):
+    # Generic error code for validation errors.
+    VALIDATION_ERROR = 8
+
+
+class PofyError(Exception):
     """Exception raised when errors occurs during object loading."""
 
     def __init__(self, node: Node, code: ErrorCode, message: AnyStr):
