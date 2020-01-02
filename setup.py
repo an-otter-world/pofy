@@ -38,7 +38,11 @@ setup(
     long_description_content_type="text/markdown",
     version=get_git_version(),
     keywords=['YAML', 'serialization'],
-    packages=['pofy'],
+    packages=[
+        'pofy',
+        'pofy.fields',
+        'pofy.tag_handlers'
+    ],
     license='WTFPL',
     classifiers=[
         "Development Status :: 3 - Alpha",
