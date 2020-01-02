@@ -20,6 +20,7 @@ from pofy.errors import ErrorCode
 
 from .fields.base_field import BaseField
 from .loading_context import LoadingContext
+from .tag_handlers.glob_handler import GlobHandler
 from .tag_handlers.import_handler import ImportHandler
 from .tag_handlers.tag_handler import TagHandler
 
@@ -52,6 +53,7 @@ def load(
 
     if resolve_roots is not None:
         all_tag_handlers.append(ImportHandler(resolve_roots))
+        all_tag_handlers.append(GlobHandler(resolve_roots))
 
     context = LoadingContext(
         error_handler=error_handler,
