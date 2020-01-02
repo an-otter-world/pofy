@@ -9,7 +9,8 @@ from .base_field import ScalarField
 class BoolField(ScalarField):
     """Boolean YAML object field."""
 
-    def _convert(self, node, context):
+    def _convert(self, context):
+        node = context.current_node()
         true_values = [
             'y', 'Y', 'yes', 'Yes', 'YES',
             'true', 'True', 'TRUE',
@@ -29,7 +30,6 @@ class BoolField(ScalarField):
             return False
 
         context.error(
-            node,
             ErrorCode.VALUE_ERROR,
             _('Boolean value should be one of {}'),
             ', '.join(true_values + false_values)

@@ -36,20 +36,19 @@ class IntField(ScalarField):
         self._minimum = minimum
         self._maximum = maximum
 
-    def _convert(self, node, context):
+    def _convert(self, context) -> int:
+        node = context.current_node()
         value = node.value
         try:
             result = int(value, self._base)
         except ValueError:
             context.error(
-                node,
                 ErrorCode.VALUE_ERROR,
                 _('Can\'t convert "{}" to an integer'), value
             )
             return None
 
         return ScalarField._check_in_bounds(
-            node,
             context,
             result,
             self._minimum,

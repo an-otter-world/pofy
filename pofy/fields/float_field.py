@@ -31,20 +31,19 @@ class FloatField(ScalarField):
         self._minimum = minimum
         self._maximum = maximum
 
-    def _convert(self, node, context):
+    def _convert(self, context) -> float:
+        node = context.current_node()
         value = node.value
         try:
             result = float(value)
         except ValueError:
             context.error(
-                node,
                 ErrorCode.VALUE_ERROR,
                 _('Can\'t convert "{}" to a float'), value
             )
             return None
 
         return ScalarField._check_in_bounds(
-            node,
             context,
             result,
             self._minimum,

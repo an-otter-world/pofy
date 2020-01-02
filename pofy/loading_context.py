@@ -1,4 +1,5 @@
 """Loading context class & utilities."""
+from contextlib import contextmanager
 from typing import AnyStr
 from typing import Callable
 from typing import List
@@ -23,12 +24,35 @@ class LoadingContext:
     ):
         """Initialize context."""
         self._error_handler = error_handler
-        self._errors = []
         self._resolvers = resolvers
+        self._node_stack = []
+
+    @contextmanager
+    def push(self, node: Node):
+        """Push a node in the context.
+
+        This is solely used to know which node is currently loaded when calling
+        error function, to avoid having to pass around node objects.
+
+        Args:
+            node: Currently loaded node.
+
+        """
+        if len(self._node_stack) > 0:
+            assert self._node_stack[-1] != node
+
+        self._node_stack.append(node)
+        yield
+        self._node_stack.pop()
+
+    def current_node(self):
+        """Return the currently loaded node."""
+        nodes = self._node_stack
+        assert len(nodes) > 0
+        return nodes[-1]
 
     def error(
         self,
-        node: Node,
         code: ErrorCode,
         message_format: str,
         *args,
@@ -40,12 +64,13 @@ class LoadingContext:
         at the end of the object loading.
 
         Args:
-            node: The node on which the error occured.
             code: Code of the error.
             message_format: The error message format.
             *args, **kwargs: Arguments used to format message.
 
         """
+        assert len(self._node_stack) > 0
+        node = self._node_stack[-1]
         message = message_format.format(*args, **kwargs)
         if self._error_handler is not None:
             self._error_handler(node, code, message)

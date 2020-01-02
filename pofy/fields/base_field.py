@@ -5,7 +5,6 @@ from typing import Any
 from typing import Callable
 from typing import Union
 
-from yaml import Node
 from yaml import ScalarNode
 
 from pofy.errors import ErrorCode
@@ -36,7 +35,7 @@ class BaseField:
         self.required = required
         self._validate = validate
 
-    def load(self, node: Node, context: LoadingContext) -> Any:
+    def load(self, context: LoadingContext) -> Any:
         """Deserialize this field.
 
         Args:
@@ -48,10 +47,11 @@ class BaseField:
             Deserialized field value.
 
         """
+        node = context.current_node()
+
         if node.tag == '!include':
             if not isinstance(node, ScalarNode):
                 context.error(
-                    node,
                     ErrorCode.UNEXPECTED_NODE_TYPE,
                     _('!include tag must be on a scalar node')
                 )
@@ -61,22 +61,25 @@ class BaseField:
             node = context.resolve(location)
             if node is None:
                 context.error(
-                    node,
                     ErrorCode.INCLUDE_NOT_FOUND,
                     _("Can't resolve include {}"), location
                 )
                 return None
 
-        field_value = self._load(node, context)
+            with context.push(node):
+                field_value = self._load(context)
+
+        else:
+            field_value = self._load(context)
 
         validate = self._validate
-        if validate is not None and not validate(node, context, field_value):
+        if validate is not None and not validate(context, field_value):
             return None
 
         return field_value
 
     @abstractmethod
-    def _load(self, node: Node, context: LoadingContext) -> Any:
+    def _load(self, context: LoadingContext) -> Any:
         """Deserialize this field using the given node.
 
         Args:
@@ -94,23 +97,22 @@ class BaseField:
 class ScalarField(BaseField):
     """Base class for scalar value fields."""
 
-    def _load(self, node, context):
+    def _load(self, context):
+        node = context.current_node()
         if not isinstance(node, ScalarNode):
             context.error(
-                node,
                 ErrorCode.UNEXPECTED_NODE_TYPE,
                 _('Scalar expected')
             )
             return None
 
-        return self._convert(node, context)
+        return self._convert(context)
 
     @abstractmethod
-    def _convert(self, node: ScalarNode, context: LoadingContext) -> Any:
+    def _convert(self, context: LoadingContext) -> Any:
         """Convert the string value to the target type of this field.
 
         Args:
-            node : the field value node.
             context: The loading context.
 
         Return:
@@ -121,7 +123,6 @@ class ScalarField(BaseField):
 
     @staticmethod
     def _check_in_bounds(
-        node: Node,
         context: LoadingContext,
         value: Union[int, float],
         minimum: Union[int, float],
@@ -129,7 +130,6 @@ class ScalarField(BaseField):
     ):
         if minimum is not None and value < minimum:
             context.error(
-                node,
                 ErrorCode.VALIDATION_ERROR,
                 _('Value is too small (minimum : {})'), minimum
             )
@@ -137,7 +137,6 @@ class ScalarField(BaseField):
 
         if maximum is not None and value > maximum:
             context.error(
-                node,
                 ErrorCode.VALIDATION_ERROR,
                 _('Value is too big (maximum : {})'), maximum
             )

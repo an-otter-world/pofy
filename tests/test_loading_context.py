@@ -9,8 +9,9 @@ def test_loading_context_raises():
     """Test loading context raises an error when no error_handler is set."""
     context = LoadingContext(error_handler=None, resolvers=[])
 
-    with raises(PofyError):
-        context.error(None, 0, 'Test message')
+    with context.push(None):
+        with raises(PofyError):
+            context.error(0, 'Test message')
 
 
 def test_loading_context_calls_error_handler():
@@ -25,5 +26,6 @@ def test_loading_context_calls_error_handler():
         assert message == 'Message'
 
     context = LoadingContext(error_handler=_handler, resolvers=[])
-    context.error('Node', 0, 'Message')
+    with context.push('Node'):
+        context.error(0, 'Message')
     assert handler_called

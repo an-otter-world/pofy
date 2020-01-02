@@ -5,8 +5,6 @@ from typing import List
 from typing import Type
 from typing import Union
 
-from yaml import Node
-
 from pofy import BoolField
 from pofy import DictField
 from pofy import ErrorCode
@@ -38,8 +36,8 @@ class SubObjectChild(SubObject):
         child_field = StringField()
 
 
-def _validate(node: Node, context: LoadingContext, _: str):
-    context.error(node, ErrorCode.VALIDATION_ERROR, 'Test')
+def _validate(context: LoadingContext, _: str):
+    context.error(ErrorCode.VALIDATION_ERROR, 'Test')
     return False
 
 

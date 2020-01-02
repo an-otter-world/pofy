@@ -12,7 +12,6 @@ from typing import Union
 
 from yaml import compose
 from yaml import MappingNode
-from yaml import Node
 
 from pofy.errors import ErrorCode
 
@@ -56,19 +55,21 @@ def load(
         error_handler=error_handler,
         resolvers=all_resolvers
     )
-    return load_internal(cls, node, context)
+    with context.push(node):
+        return load_internal(cls, context)
 
 
-def load_internal(object_class: Type, node: Node, context: LoadingContext):
+def load_internal(object_class: Type, context: LoadingContext):
     """Load given node.
 
     This function is meant to be used internaly.
     """
+    node = context.current_node()
+
     fields = dict(_get_fields(object_class))
 
     if not isinstance(node, MappingNode):
         context.error(
-            node,
             ErrorCode.UNEXPECTED_NODE_TYPE,
             _('Mapping expected')
         )
@@ -77,24 +78,24 @@ def load_internal(object_class: Type, node: Node, context: LoadingContext):
     result = object_class()
     set_fields = set()
     for name_node, value_node in node.value:
-        field_name = name_node.value
-        set_fields.add(field_name)
-        if field_name not in fields:
-            context.error(
-                name_node,
-                ErrorCode.FIELD_NOT_DECLARED,
-                _('Field {} is not declared.'), field_name
-            )
-            continue
+        with context.push(name_node):
+            field_name = name_node.value
+            set_fields.add(field_name)
+            if field_name not in fields:
+                context.error(
+                    ErrorCode.FIELD_NOT_DECLARED,
+                    _('Field {} is not declared.'), field_name
+                )
+                continue
 
-        field = fields[field_name]
-        field_value = field.load(value_node, context)
-        setattr(result, field_name, field_value)
+        with context.push(value_node):
+            field = fields[field_name]
+            field_value = field.load(context)
+            setattr(result, field_name, field_value)
 
     for name, field in fields.items():
         if field.required and name not in set_fields:
             context.error(
-                node,
                 ErrorCode.MISSING_REQUIRED_FIELD,
                 _('Missing required field {}'), name
             )

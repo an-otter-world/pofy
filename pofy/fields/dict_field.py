@@ -23,10 +23,10 @@ class DictField(BaseField):
         super().__init__(*args, **kwargs)
         self._item_field = item_field
 
-    def _load(self, node, context):
+    def _load(self, context):
+        node = context.current_node()
         if not isinstance(node, MappingNode):
             context.error(
-                node,
                 ErrorCode.UNEXPECTED_NODE_TYPE,
                 _('Mapping expected')
             )
@@ -36,6 +36,8 @@ class DictField(BaseField):
         for key_node, value_node in node.value:
             assert isinstance(key_node, ScalarNode)
             key = key_node.value
-            result[key] = self._item_field.load(value_node, context)
+
+            with context.push(value_node):
+                result[key] = self._item_field.load(context)
 
         return result
