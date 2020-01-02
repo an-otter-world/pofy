@@ -8,6 +8,7 @@ from typing import Union
 from pofy import BoolField
 from pofy import DictField
 from pofy import ErrorCode
+from pofy import FloatField
 from pofy import IntField
 from pofy import ListField
 from pofy import ObjectField
@@ -40,13 +41,14 @@ class YamlObject:
     class Schema:
         """Pofy fields."""
 
+        bool_field = BoolField()
         dict_field = DictField(StringField())
+        float_field = FloatField()
         int_field = IntField()
         list_field = ListField(StringField())
         object_field = ObjectField(object_class=SubObject)
-        string_field = StringField()
         object_list_field = ListField(ObjectField(object_class=SubObject))
-        bool_field = BoolField()
+        string_field = StringField()
 
     def __init__(self):
         """Initialize YamlObject."""
