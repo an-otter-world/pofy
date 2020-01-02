@@ -1,6 +1,6 @@
 """String field tests."""
-from pyyo import load
-from pyyo import ErrorCode
+from pofy import load
+from pofy import ErrorCode
 
 from .fixtures import YamlObject
 from .fixtures import expect_load_error

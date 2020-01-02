@@ -3,9 +3,9 @@ from io import StringIO
 
 from yaml import compose
 
-from pyyo import ErrorCode
-from pyyo import Resolver
-from pyyo import load
+from pofy import ErrorCode
+from pofy import Resolver
+from pofy import load
 
 from .fixtures import YamlObject
 from .fixtures import expect_load_error

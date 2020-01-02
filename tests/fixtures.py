@@ -5,21 +5,21 @@ from typing import List
 from typing import Type
 from typing import Union
 
-from pyyo import DictField
-from pyyo import ErrorCode
-from pyyo import IntField
-from pyyo import ListField
-from pyyo import ObjectField
-from pyyo import Resolver
-from pyyo import StringField
-from pyyo import load
+from pofy import DictField
+from pofy import ErrorCode
+from pofy import IntField
+from pofy import ListField
+from pofy import ObjectField
+from pofy import Resolver
+from pofy import StringField
+from pofy import load
 
 
 class SubObject:
     """Test class for object field of YamlObject."""
 
     class Schema:
-        """Pyyo fields."""
+        """Pofy fields."""
 
         test_field = StringField()
 
@@ -28,7 +28,7 @@ class SubObjectChild(SubObject):
     """Test class for object field of YamlObject, subclassing another class."""
 
     class Schema:
-        """Pyyo fields."""
+        """Pofy fields."""
 
         child_field = StringField()
 
@@ -37,7 +37,7 @@ class YamlObject:
     """Test class for serialization tests."""
 
     class Schema:
-        """Pyyo fields."""
+        """Pofy fields."""
 
         dict_field = DictField(StringField())
         int_field = IntField()
@@ -60,7 +60,7 @@ class RequiredFieldObject:
     """Stub with a required field."""
 
     class Schema:
-        """Pyyo fields."""
+        """Pofy fields."""
 
         required = StringField(required=True)
         not_required = StringField(required=True)

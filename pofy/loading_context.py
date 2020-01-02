@@ -9,7 +9,7 @@ from yaml import Node
 from yaml import SequenceNode
 
 from .errors import ErrorCode
-from .errors import PyyoError
+from .errors import PofyError
 from .resolvers import Resolver
 
 
@@ -50,7 +50,7 @@ class LoadingContext:
         if self._error_handler is not None:
             self._error_handler(node, code, message)
         else:
-            raise PyyoError(node, code, message)
+            raise PofyError(node, code, message)
 
     def resolve(self, location: AnyStr) -> Union[MappingNode, SequenceNode]:
         """Resolve given location using registered resolvers.

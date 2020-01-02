@@ -7,9 +7,9 @@ from typing import Type
 from yaml import MappingNode
 from yaml import Node
 
-from pyyo.errors import ErrorCode
-from pyyo.loader import load_internal
-from pyyo.loading_context import LoadingContext
+from pofy.errors import ErrorCode
+from pofy.loader import load_internal
+from pofy.loading_context import LoadingContext
 
 from .base_field import BaseField
 

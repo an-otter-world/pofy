@@ -3,7 +3,7 @@ from gettext import gettext as _
 
 from yaml import SequenceNode
 
-from pyyo.errors import ErrorCode
+from pofy.errors import ErrorCode
 
 from .base_field import BaseField
 

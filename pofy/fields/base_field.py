@@ -6,8 +6,8 @@ from typing import Any
 from yaml import Node
 from yaml import ScalarNode
 
-from pyyo.errors import ErrorCode
-from pyyo.loading_context import LoadingContext
+from pofy.errors import ErrorCode
+from pofy.loading_context import LoadingContext
 
 
 class BaseField:

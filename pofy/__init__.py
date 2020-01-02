@@ -1,7 +1,7 @@
 """YAML python object deserializer."""
 
 from .errors import ErrorCode
-from .errors import PyyoError
+from .errors import PofyError
 from .fields.base_field import BaseField
 from .fields.dict_field import DictField
 from .fields.int_field import IntField

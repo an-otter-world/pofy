@@ -1,4 +1,4 @@
-"""Pyyo deserializing function."""
+"""Pofy deserializing function."""
 
 from gettext import gettext as _
 from inspect import getmembers
@@ -14,7 +14,7 @@ from yaml import compose
 from yaml import MappingNode
 from yaml import Node
 
-from pyyo.errors import ErrorCode
+from pofy.errors import ErrorCode
 
 from .fields.base_field import BaseField
 from .loading_context import LoadingContext
@@ -35,11 +35,11 @@ def load(
         cls : Class of the object to create.
         source : Either a string containing YAML, or a stream to a YAML source.
         resolve_roots: Base filesystem paths used to resolve !include tags.
-                       (will instanciate a pyyo.FileSystemResolver for each
+                       (will instanciate a pofy.FileSystemResolver for each
                        path if this parameter is not none.)
-        resolvers : Custom pyyo.Resolvers to use when resolving includes.
+        resolvers : Custom pofy.Resolvers to use when resolving includes.
         error_handler : Called with arguments (node, error_message) when an
-                        error occurs. If it's not specified, a PyyoError will
+                        error occurs. If it's not specified, a PofyError will
                         be raised when an error occurs.
 
     """

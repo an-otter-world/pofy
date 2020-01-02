@@ -1,5 +1,5 @@
 """Integer field tests."""
-from pyyo import load
+from pofy import load
 
 from .fixtures import YamlObject
 

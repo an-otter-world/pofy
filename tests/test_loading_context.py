@@ -1,15 +1,15 @@
 """Loading context tests."""
 from pytest import raises
 
-from pyyo import PyyoError
-from pyyo.loading_context import LoadingContext
+from pofy import PofyError
+from pofy.loading_context import LoadingContext
 
 
 def test_loading_context_raises():
     """Test loading context raises an error when no error_handler is set."""
     context = LoadingContext(error_handler=None, resolvers=[])
 
-    with raises(PyyoError):
+    with raises(PofyError):
         context.error(None, 0, 'Test message')
 
 
