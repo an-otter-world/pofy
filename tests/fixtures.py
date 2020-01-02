@@ -30,3 +30,22 @@ def expect_load_error(
         error_handler=_on_error,
         tag_handlers=tag_handlers
     )
+
+
+def load_with_fail_tag(
+    object_class: Type,
+    source: Union[AnyStr, IO[str]]
+):
+    """Load the given object, expecting an error to be raised."""
+    class _FailTagHandler(TagHandler):
+        tag_pattern = '^fail$'
+
+        def transform(self, _):
+            """TagHandler.transform implementation."""
+            return None
+
+    return load(
+        object_class,
+        source,
+        tag_handlers=[_FailTagHandler()]
+    )
