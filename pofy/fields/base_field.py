@@ -2,6 +2,7 @@
 from abc import abstractmethod
 from gettext import gettext as _
 from typing import Any
+from typing import Callable
 
 from yaml import Node
 from yaml import ScalarNode
@@ -13,16 +14,26 @@ from pofy.loading_context import LoadingContext
 class BaseField:
     """Base class for YAML object fields."""
 
-    def __init__(self, required: bool = False):
+    def __init__(
+        self,
+        required: bool = False,
+        validate: Callable = None
+    ):
         """Initialize the field.
 
         Args:
             required: If it's true and the field is not defined in yaml, it
                       will create an error that will eventually be raised at
                       the end of deserialization.
+            validate: Function accepting a Node, LoadingContext and the
+                      deserialized field value, that should return True if the
+                      value is valid, false otherwise, and call context.error
+                      to report errors, eventually using the
+                      ErrorCode.VALIDATION_ERROR code.
 
         """
         self.required = required
+        self._validate = validate
 
     def load(self, node: Node, context: LoadingContext) -> Any:
         """Deserialize this field.
@@ -55,7 +66,13 @@ class BaseField:
                 )
                 return None
 
-        return self._load(node, context)
+        field_value = self._load(node, context)
+
+        validate = self._validate
+        if validate is not None and not validate(node, context, field_value):
+            return None
+
+        return field_value
 
     @abstractmethod
     def _load(self, node: Node, context: LoadingContext) -> Any:

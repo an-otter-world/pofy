@@ -45,3 +45,12 @@ def test_unresolved_include_raise_error():
         'object_field: !include bad_location',
         resolvers=[_DummyResolver()]
     )
+
+
+def test_field_validation():
+    """Test custom field validaton works."""
+    expect_load_error(
+        ErrorCode.VALIDATION_ERROR,
+        YamlObject,
+        'validated_field: error_is_always_raised',
+    )

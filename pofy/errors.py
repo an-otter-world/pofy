@@ -29,6 +29,9 @@ class ErrorCode(Enum):
     # Raised when a value can't be parsed.
     VALUE_ERROR = 7
 
+    # Generic error code for validation errors.
+    VALIDATION_ERROR = 8
+
 
 class PofyError(Exception):
     """Exception raised when errors occurs during object loading."""

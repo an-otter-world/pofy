@@ -5,12 +5,15 @@ from typing import List
 from typing import Type
 from typing import Union
 
+from yaml import Node
+
 from pofy import BoolField
 from pofy import DictField
 from pofy import ErrorCode
 from pofy import FloatField
 from pofy import IntField
 from pofy import ListField
+from pofy import LoadingContext
 from pofy import ObjectField
 from pofy import Resolver
 from pofy import StringField
@@ -35,6 +38,11 @@ class SubObjectChild(SubObject):
         child_field = StringField()
 
 
+def _validate(node: Node, context: LoadingContext, _: str):
+    context.error(node, ErrorCode.VALIDATION_ERROR, 'Test')
+    return False
+
+
 class YamlObject:
     """Test class for serialization tests."""
 
@@ -50,6 +58,7 @@ class YamlObject:
         object_field = ObjectField(object_class=SubObject)
         object_list_field = ListField(ObjectField(object_class=SubObject))
         string_field = StringField()
+        validated_field = StringField(validate=_validate)
 
     def __init__(self):
         """Initialize YamlObject."""

@@ -11,4 +11,5 @@ from .fields.list_field import ListField
 from .fields.object_field import ObjectField
 from .fields.string_field import StringField
 from .loader import load
+from .loading_context import LoadingContext
 from .resolvers import Resolver
