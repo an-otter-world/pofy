@@ -32,33 +32,3 @@ To use Pofy, you must declare a schema in the class you want to deserialize :
       deserialized_object = load(SomeObject, 'field: value')
       assert deserialized_object.field == 'value`
   ```
-
-## Reference
-
-### Fields
-
-#### Common parameters
-
-#### StringField
-
-#### IntField
-
-#### DictField
-
-#### ListField
-
-#### ObjectField
-
-### Tags
-
-#### '!include' Tag
-
-#### '!class' Tag
-
-### Validation
-
-### Error handling
-
-### load options
-
-## Contributing
