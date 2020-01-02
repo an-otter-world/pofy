@@ -45,6 +45,7 @@ class YamlObject:
         dict_field = DictField(StringField())
         float_field = FloatField()
         int_field = IntField()
+        hex_int_field = IntField(base=16)
         list_field = ListField(StringField())
         object_field = ObjectField(object_class=SubObject)
         object_list_field = ListField(ObjectField(object_class=SubObject))
