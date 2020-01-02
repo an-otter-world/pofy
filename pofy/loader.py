@@ -22,6 +22,15 @@ from .tag_handlers.glob_handler import GlobHandler
 from .tag_handlers.import_handler import ImportHandler
 from .tag_handlers.tag_handler import TagHandler
 
+_ROOT_FIELDS_MAPPING = {
+    bool: BoolField(),
+    dict: DictField(StringField()),
+    float: FloatField(),
+    int: IntField(),
+    list: ListField(StringField()),
+    str: StringField()
+}
+
 
 def load(
     source: Union[str, IO[str]],
@@ -64,18 +73,12 @@ def load(
     )
 
     if root_field is None:
-        if object_class == list:
-            root_field = ListField(StringField())
-        elif object_class == dict:
-            root_field = DictField(StringField())
-        elif object_class == bool:
-            root_field = BoolField()
-        elif object_class == int:
-            root_field = IntField()
-        elif object_class == float:
-            root_field = FloatField()
-        else:
-            root_field = ObjectField(object_class=object_class)
+        assert object_class is not None
+        root_field = _ROOT_FIELDS_MAPPING.get(object_class)
+
+    if root_field is None:
+        assert object_class is not None
+        root_field = ObjectField(object_class=object_class)
 
     node = compose(source)
 
