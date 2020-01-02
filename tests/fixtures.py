@@ -59,6 +59,7 @@ class YamlObject:
         validated_field = StringField(validate=_validate)
         bounded_int_field = IntField(minimum=10, maximum=20)
         bounded_float_field = FloatField(minimum=10.0, maximum=20.0)
+        match_string_field = StringField(pattern='^Matching$')
 
     def __init__(self):
         """Initialize YamlObject."""
