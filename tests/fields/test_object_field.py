@@ -5,6 +5,7 @@ from pofy import StringField
 from pofy import load
 
 from tests.fixtures import expect_load_error
+from tests.fixtures import load_with_fail_tag
 
 
 class _SubObject:
@@ -124,7 +125,7 @@ def test_object_field_load_subclass():
             child_field = StringField()
 
     test = load(
-        'parent_field: parent_value\n' +
+        'parent_field: parent_value\n'
         'child_field: child_value',
         _Child,
     )
@@ -204,3 +205,25 @@ def test_unset_required_field_raise_error():
     )
     assert test.required == 'setted'
     assert test.not_required == 'yodeldi'
+
+
+def test_object_field_ignores_tag_handler_failure():
+    """Test that object field just doesn't add fields when tag handler fails."""
+    class _TestObject:
+        class Schema:
+            """Pyfo fields."""
+
+            field_1 = StringField()
+            field_2 = StringField()
+            field_3 = StringField()
+
+    test = load_with_fail_tag(
+        'field_1: !fail test_value\n'
+        '!fail field_2: test_value\n'
+        'field_3: test_value\n',
+        _TestObject,
+    )
+
+    assert not hasattr(test, 'field_1')
+    assert not hasattr(test, 'field_2')
+    assert test.field_3 == 'test_value'
