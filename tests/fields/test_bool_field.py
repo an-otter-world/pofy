@@ -1,10 +1,18 @@
 """String field tests."""
 from pofy import load
 from pofy import ErrorCode
+from pofy import BoolField
 
-from tests.fixtures import YamlObject
 from tests.fixtures import expect_load_error
 
+
+class _BoolObject:
+    """Test class for bool field tests."""
+
+    class Schema:
+        """Pofy fields."""
+
+        bool_field = BoolField()
 
 def test_bool_field():
     """Test bool field loading works."""
@@ -21,7 +29,7 @@ def test_bool_field():
 
     for value in true_values:
         test = load(
-            YamlObject,
+            _BoolObject,
             'bool_field: {}'.format(value)
         )
 
@@ -30,7 +38,7 @@ def test_bool_field():
 
     for value in false_values:
         test = load(
-            YamlObject,
+            _BoolObject,
             'bool_field: {}'.format(value)
         )
 
@@ -42,12 +50,12 @@ def test_bad_value_raises():
     """Test not-scalar node for a string field raise an error."""
     expect_load_error(
         ErrorCode.VALUE_ERROR,
-        YamlObject,
+        _BoolObject,
         'bool_field: NotValid'
     )
 
     expect_load_error(
         ErrorCode.UNEXPECTED_NODE_TYPE,
-        YamlObject,
+        _BoolObject,
         'bool_field: ["a", "list"]'
     )
