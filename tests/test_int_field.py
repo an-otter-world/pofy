@@ -31,3 +31,18 @@ def test_int_field_base():
     """Test integer field base parameter works."""
     test = load(YamlObject, 'hex_int_field: F00D00FAFA')
     assert test.hex_int_field == 0xF00D00FAFA
+
+
+def test_int_field_min_max():
+    """Test integer field minimum / maximum parameter works."""
+    expect_load_error(
+        ErrorCode.VALIDATION_ERROR,
+        YamlObject,
+        'bounded_int_field: 0'
+    )
+
+    expect_load_error(
+        ErrorCode.VALIDATION_ERROR,
+        YamlObject,
+        'bounded_int_field: 100'
+    )

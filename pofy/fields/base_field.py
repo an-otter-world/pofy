@@ -3,6 +3,7 @@ from abc import abstractmethod
 from gettext import gettext as _
 from typing import Any
 from typing import Callable
+from typing import Union
 
 from yaml import Node
 from yaml import ScalarNode
@@ -117,3 +118,29 @@ class ScalarField(BaseField):
 
         """
         raise NotImplementedError
+
+    @staticmethod
+    def _check_in_bounds(
+        node: Node,
+        context: LoadingContext,
+        value: Union[int, float],
+        minimum: Union[int, float],
+        maximum: Union[int, float]
+    ):
+        if minimum is not None and value < minimum:
+            context.error(
+                node,
+                ErrorCode.VALIDATION_ERROR,
+                _('Value is too small (minimum : {})'), minimum
+            )
+            return None
+
+        if maximum is not None and value > maximum:
+            context.error(
+                node,
+                ErrorCode.VALIDATION_ERROR,
+                _('Value is too big (maximum : {})'), maximum
+            )
+            return None
+
+        return value

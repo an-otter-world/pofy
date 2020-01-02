@@ -59,6 +59,8 @@ class YamlObject:
         object_list_field = ListField(ObjectField(object_class=SubObject))
         string_field = StringField()
         validated_field = StringField(validate=_validate)
+        bounded_int_field = IntField(minimum=10, maximum=20)
+        bounded_float_field = FloatField(minimum=10.0, maximum=20.0)
 
     def __init__(self):
         """Initialize YamlObject."""

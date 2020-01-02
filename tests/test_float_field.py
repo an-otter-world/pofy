@@ -19,3 +19,18 @@ def test_float_field_bad_value_raises():
         YamlObject,
         'float_field: not_convertible'
     )
+
+
+def test_float_field_min_max():
+    """Test float field minimum / maximum parameter works."""
+    expect_load_error(
+        ErrorCode.VALIDATION_ERROR,
+        YamlObject,
+        'bounded_float_field: 0.0'
+    )
+
+    expect_load_error(
+        ErrorCode.VALIDATION_ERROR,
+        YamlObject,
+        'bounded_float_field: 100.0'
+    )
