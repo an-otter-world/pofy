@@ -14,6 +14,7 @@ class _BoolObject:
 
         bool_field = BoolField()
 
+
 def test_bool_field():
     """Test bool field loading works."""
     true_values = [
