@@ -11,7 +11,7 @@ from yaml import SequenceNode
 
 from .errors import ErrorCode
 from .errors import PofyError
-from .resolvers import Resolver
+from .tag_handlers.resolvers import Resolver
 
 
 class LoadingContext:

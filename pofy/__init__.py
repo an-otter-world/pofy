@@ -12,4 +12,5 @@ from .fields.object_field import ObjectField
 from .fields.string_field import StringField
 from .loader import load
 from .loading_context import LoadingContext
-from .resolvers import Resolver
+from .tag_handlers.resolvers import Resolver
+from .tag_handlers.resolvers import FileSystemResolver

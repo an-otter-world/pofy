@@ -18,8 +18,8 @@ from pofy.errors import ErrorCode
 
 from .fields.base_field import BaseField
 from .loading_context import LoadingContext
-from .resolvers import FileSystemResolver
-from .resolvers import Resolver
+from .tag_handlers.resolvers import FileSystemResolver
+from .tag_handlers.resolvers import Resolver
 
 
 def load(

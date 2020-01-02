@@ -2,10 +2,10 @@
 from pofy import load
 from pofy import ErrorCode
 
-from .fixtures import SubObject
-from .fixtures import SubObjectChild
-from .fixtures import YamlObject
-from .fixtures import expect_load_error
+from tests.fixtures import SubObject
+from tests.fixtures import SubObjectChild
+from tests.fixtures import YamlObject
+from tests.fixtures import expect_load_error
 
 
 def test_object_field():

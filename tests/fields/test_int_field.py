@@ -2,8 +2,8 @@
 from pofy import ErrorCode
 from pofy import load
 
-from .fixtures import YamlObject
-from .fixtures import expect_load_error
+from tests.fixtures import YamlObject
+from tests.fixtures import expect_load_error
 
 
 def test_int_field():
