@@ -106,9 +106,6 @@ def _get_type(
 
 
 def _load(object_class: Type, context: LoadingContext):
-    if not context.expect_mapping():
-        return None
-
     fields = dict(_get_fields(object_class))
     result, set_fields = _load_object(object_class, fields, context)
     if _validate_object(object_class, result, fields, set_fields, context):
