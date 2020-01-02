@@ -1,11 +1,15 @@
 """Test fixtures & dummy classes."""
+from contextlib import contextmanager
 from typing import AnyStr
 from typing import IO
 from typing import List
 from typing import Type
 from typing import Union
 
+from yaml import Node
+
 from pofy import ErrorCode
+from pofy import LoadingContext
 from pofy import TagHandler
 from pofy import load
 
@@ -31,7 +35,6 @@ def expect_load_error(
         tag_handlers=tag_handlers
     )
 
-
 def load_with_fail_tag(
     source: Union[AnyStr, IO[str]],
     object_class: Type,
@@ -49,3 +52,32 @@ def load_with_fail_tag(
         object_class,
         tag_handlers=[_FailTagHandler()]
     )
+
+@contextmanager
+def mock_loading_context(
+    tag: str = None,
+    expected_error: ErrorCode = None,
+    tag_handlers: List[TagHandler] = None
+):
+    """Load the given object, expecting an error to be raised."""
+    handler_called = False
+
+    def _handler(__, code, ___):
+        nonlocal handler_called
+        handler_called = True
+        assert expected_error is not None
+        assert code == expected_error
+
+    context = LoadingContext(
+        error_handler=_handler,
+        tag_handlers=tag_handlers
+    )
+
+    if tag is None:
+        tag = ''
+
+    with context.load(Node(tag, 'value', None, None)):
+        yield context
+
+    if expected_error is not None:
+        assert handler_called
