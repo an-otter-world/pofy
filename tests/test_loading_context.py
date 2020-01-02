@@ -34,7 +34,7 @@ def test_loading_context_raises_on_multiple_tag_match():
             return context.current_node()
 
     with mock_loading_context(
-        tag='!dummy',
+        node=Node('!dummy', '', None, None),
         expected_error=ErrorCode.MULTIPLE_MATCHING_HANDLERS,
         tag_handlers=[
             _DummyHandler(),

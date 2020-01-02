@@ -57,11 +57,9 @@ def load_with_fail_tag(
 
 @contextmanager
 def mock_loading_context(
-    tag: str = None,
-    value: str = None,
     expected_error: ErrorCode = None,
     tag_handlers: List[TagHandler] = None,
-    node_type: Type = Node
+    node: Node = None
 ):
     """Load the given object, expecting an error to be raised."""
     handler_called = False
@@ -77,13 +75,10 @@ def mock_loading_context(
         tag_handlers=tag_handlers
     )
 
-    if tag is None:
-        tag = ''
+    if node is None:
+        node = Node('', '', None, None)
 
-    if value is None:
-        value = ''
-
-    with context.load(node_type(tag, value, None, None)):
+    with context.load(node):
         yield context
 
     if expected_error is not None:

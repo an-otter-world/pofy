@@ -9,18 +9,9 @@ from tests.fixtures import mock_loading_context
 
 
 def test_bad_node_for_glob_raises():
-    """Test not-scalar node for a string field raise an error."""
+    """Test glob tag on a not-scalar node raise an error."""
     with mock_loading_context(
-        node_type=SequenceNode,
-        tag='!glob',
-        expected_error=ErrorCode.UNEXPECTED_NODE_TYPE,
-        tag_handlers=[GlobHandler([])]
-    ):
-        pass
-
-    with mock_loading_context(
-        node_type=SequenceNode,
-        tag='!glob',
+        node=SequenceNode('!glob', '', None, None),
         expected_error=ErrorCode.UNEXPECTED_NODE_TYPE,
         tag_handlers=[GlobHandler([])]
     ):
@@ -31,9 +22,7 @@ def test_glob_resolves_correctly(datadir):
     """Test glob resolves correctly files."""
     handler = GlobHandler([datadir])
     with mock_loading_context(
-        node_type=ScalarNode,
-        tag='!glob',
-        value='folder/**/*',
+        node=ScalarNode('!glob', 'folder/**/*', None, None),
         tag_handlers=[handler]
     ) as context:
         node = context.current_node()
@@ -47,9 +36,7 @@ def test_glob_raise_error_on_yaml_load_failure(datadir):
     """Test glob raises a VALUE_ERROR if a file can't be deserialized."""
     handler = GlobHandler([datadir])
     with mock_loading_context(
-        node_type=ScalarNode,
-        tag='!glob',
-        value='**/*',
+        node=ScalarNode('!glob', '**/*', None, None),
         expected_error=ErrorCode.VALUE_ERROR,
         tag_handlers=[handler]
     ):
