@@ -12,8 +12,8 @@ from pofy import load
 
 def expect_load_error(
     expected_error: ErrorCode,
-    object_class: Type,
     source: Union[AnyStr, IO[str]],
+    object_class: Type,
     tag_handlers: List[TagHandler] = None
 ):
     """Load the given object, expecting an error to be raised."""
@@ -25,16 +25,16 @@ def expect_load_error(
         assert error == expected_error
 
     load(
-        object_class,
         source,
+        object_class,
         error_handler=_on_error,
         tag_handlers=tag_handlers
     )
 
 
 def load_with_fail_tag(
+    source: Union[AnyStr, IO[str]],
     object_class: Type,
-    source: Union[AnyStr, IO[str]]
 ):
     """Load the given object, expecting an error to be raised."""
     class _FailTagHandler(TagHandler):
@@ -45,7 +45,7 @@ def load_with_fail_tag(
             return None
 
     return load(
-        object_class,
         source,
+        object_class,
         tag_handlers=[_FailTagHandler()]
     )

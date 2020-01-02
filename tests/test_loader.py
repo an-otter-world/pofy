@@ -16,8 +16,8 @@ def test_unknown_field_raise_error():
 
     expect_load_error(
         ErrorCode.FIELD_NOT_DECLARED,
+        'uknown_field: 10',
         _EmptyObject,
-        'uknown_field: 10'
     )
 
 
@@ -32,14 +32,15 @@ def test_unset_required_field_raise_error():
 
     expect_load_error(
         ErrorCode.MISSING_REQUIRED_FIELD,
+        'not_required: some_value',
         _RequiredFieldObject,
-        'not_required: some_value'
     )
 
-    test = load(_RequiredFieldObject, (
+    test = load(
         'required: setted\n'
-        'not_required: yodeldi'
-    ))
+        'not_required: yodeldi',
+        _RequiredFieldObject,
+    )
     assert test.required == 'setted'
     assert test.not_required == 'yodeldi'
 
@@ -59,9 +60,9 @@ def test_load_subclass():
             child_field = StringField()
 
     test = load(
-        _Child,
         'parent_field: parent_value\n' +
         'child_field: child_value',
+        _Child,
     )
 
     assert test.parent_field == 'parent_value'
@@ -78,9 +79,9 @@ def test_error_on_bad_node():
 
     expect_load_error(
         ErrorCode.UNEXPECTED_NODE_TYPE,
+        '- item1\n'
+        '- item2',
         _DummyObject,
-        '- item1\n' +
-        '- item2'
     )
 
 
@@ -102,8 +103,8 @@ def test_resolve_root_works(datadir):
             )
 
     test = load(
-        _Owner,
         'object_field: !import object.yaml\n',
+        _Owner,
         resolve_roots=[datadir]
     )
 
@@ -111,8 +112,8 @@ def test_resolve_root_works(datadir):
     assert test.object_field.test_field == 'test_value'
 
     test = load(
-        _Owner,
         'object_list: !glob glob_directory/*.yaml\n',
+        _Owner,
         resolve_roots=[datadir]
     )
 
@@ -154,6 +155,6 @@ def test_object_validation_works():
 
     expect_load_error(
         ErrorCode.VALIDATION_ERROR,
+        'dont_set_me: Wathever',
         _ValidatedObjectChild,
-        'dont_set_me: Wathever'
     )

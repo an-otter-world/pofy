@@ -21,6 +21,6 @@ def test_field_validation():
 
     expect_load_error(
         ErrorCode.VALIDATION_ERROR,
-        _ValidateFieldObject,
         'validated_field: error_is_always_raised',
+        _ValidateFieldObject,
     )

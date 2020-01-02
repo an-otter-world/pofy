@@ -1,11 +1,15 @@
 """Object field class & utilities."""
 from gettext import gettext as _
+from inspect import getmembers
 from inspect import isclass
+from inspect import ismethod
+from typing import Any
 from typing import AnyStr
+from typing import List
+from typing import Set
 from typing import Type
 
 from pofy.errors import ErrorCode
-from pofy.loader import load_internal
 from pofy.loading_context import LoadingContext
 
 from .base_field import BaseField
@@ -36,7 +40,7 @@ class ObjectField(BaseField):
         if object_class is None:
             return None
 
-        return load_internal(object_class, context)
+        return _load(object_class, context)
 
     def _resolve_type(self, context: LoadingContext):
         node = context.current_node()
@@ -99,3 +103,104 @@ def _get_type(
         return None
 
     return resolved_type
+
+
+def _load(object_class: Type, context: LoadingContext):
+    if not context.expect_mapping():
+        return None
+
+    fields = dict(_get_fields(object_class))
+    result, set_fields = _load_object(object_class, fields, context)
+    if _validate_object(object_class, result, fields, set_fields, context):
+        return result
+
+    return None
+
+
+def _load_object(
+    object_class: Type,
+    fields: List[BaseField],
+    context: LoadingContext
+):
+    node = context.current_node()
+    result = object_class()
+    set_fields = set()
+
+    for name_node, value_node in node.value:
+        with context.load(name_node) as loaded:
+            if not loaded:
+                continue
+
+            field_name = name_node.value
+            set_fields.add(field_name)
+            if field_name not in fields:
+                context.error(
+                    ErrorCode.FIELD_NOT_DECLARED,
+                    _('Field {} is not declared.'), field_name
+                )
+                continue
+
+        with context.load(value_node) as loaded:
+            if not loaded:
+                continue
+
+            field = fields[field_name]
+            field_value = field.load(context)
+            setattr(result, field_name, field_value)
+
+    return (result, set_fields)
+
+
+def _validate_object(
+    object_class: Type,
+    obj: Any,
+    fields: List[BaseField],
+    set_fields: Set[str],
+    context: LoadingContext
+) -> bool:
+    valid_object = True
+    for name, field in fields.items():
+        if field.required and name not in set_fields:
+            valid_object = False
+            context.error(
+                ErrorCode.MISSING_REQUIRED_FIELD,
+                _('Missing required field {}'), name
+            )
+
+    for validate in _get_validation_methods(object_class):
+        if not validate(context, obj):
+            valid_object = False
+
+    return valid_object
+
+
+def _is_schema_class(member):
+    return isclass(member) and member.__name__ == 'Schema'
+
+
+def _is_field(member):
+    return isinstance(member, BaseField)
+
+
+def _is_validation_method(member):
+    return ismethod(member) and member.__name__ == 'validate'
+
+
+def _get_fields(cls):
+    for base in cls.__bases__:
+        for name, field in _get_fields(base):
+            yield (name, field)
+
+    for __, schemaclass in getmembers(cls, _is_schema_class):
+        for name, field in getmembers(schemaclass, _is_field):
+            yield (name, field)
+
+
+def _get_validation_methods(cls):
+    for base in cls.__bases__:
+        for field in _get_validation_methods(base):
+            yield field
+
+    for __, schemaclass in getmembers(cls, _is_schema_class):
+        for __, field in getmembers(schemaclass, _is_validation_method):
+            yield field
