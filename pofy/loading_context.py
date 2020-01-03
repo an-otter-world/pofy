@@ -14,8 +14,8 @@ from yaml import SequenceNode
 
 from pofy.common import ErrorCode
 from pofy.common import get_exception_type
-from pofy.interfaces import ILoadingContext
 from pofy.interfaces import IBaseField
+from pofy.interfaces import ILoadingContext
 from pofy.tag_handlers.tag_handler import TagHandler
 
 ErrorHandler = Optional[Callable[[Node, ErrorCode, str], Any]]

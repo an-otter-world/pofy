@@ -7,8 +7,8 @@ from typing import Optional
 from typing import Union
 
 from pofy.common import ErrorCode
-from pofy.interfaces import ILoadingContext
 from pofy.interfaces import IBaseField
+from pofy.interfaces import ILoadingContext
 
 
 class BaseField(IBaseField):

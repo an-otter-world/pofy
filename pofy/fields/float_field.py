@@ -3,9 +3,8 @@ from gettext import gettext as _
 from typing import Optional
 
 from pofy.common import ErrorCode
+from pofy.fields.base_field import ScalarField
 from pofy.interfaces import ILoadingContext
-
-from .base_field import ScalarField
 
 
 class FloatField(ScalarField):

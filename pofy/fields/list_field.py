@@ -3,9 +3,8 @@ from gettext import gettext as _
 from typing import Optional
 
 from pofy.common import LOADING_FAILED
+from pofy.fields.base_field import BaseField
 from pofy.interfaces import ILoadingContext
-
-from .base_field import BaseField
 
 
 class ListField(BaseField):

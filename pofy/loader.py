@@ -1,5 +1,4 @@
 """Pofy deserializing function."""
-
 from gettext import gettext as _
 from inspect import isclass
 from io import TextIOBase

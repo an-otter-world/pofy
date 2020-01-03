@@ -11,8 +11,7 @@ from pofy.common import LOADING_FAILED
 from pofy.common import ErrorCode
 from pofy.interfaces import ILoadingContext
 from pofy.interfaces import IBaseField
-
-from .tag_handler import TagHandler
+from pofy.tag_handlers.tag_handler import TagHandler
 
 
 class GlobHandler(TagHandler):

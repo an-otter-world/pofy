@@ -1,8 +1,8 @@
 """Tag handler used to import files in YAML documents."""
 from gettext import gettext as _
 from pathlib import Path
-from typing import List
 from typing import Any
+from typing import List
 
 from yaml import compose
 from yaml.parser import ParserError

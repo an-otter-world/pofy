@@ -2,8 +2,7 @@
 from gettext import gettext as _
 
 from pofy.common import ErrorCode
-
-from .base_field import ScalarField
+from pofy.fields.base_field import ScalarField
 
 
 class BoolField(ScalarField):

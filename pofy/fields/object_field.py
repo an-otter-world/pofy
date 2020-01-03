@@ -9,12 +9,11 @@ from typing import Optional
 from typing import Set
 from typing import Type
 
-from pofy.common import LOADING_FAILED
 from pofy.common import ErrorCode
+from pofy.common import LOADING_FAILED
+from pofy.fields.base_field import BaseField
+from pofy.fields.string_field import StringField
 from pofy.interfaces import ILoadingContext
-
-from .base_field import BaseField
-from .string_field import StringField
 
 
 _TYPE_FORMAT_MSG = _("""\
