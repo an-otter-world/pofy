@@ -48,4 +48,3 @@ class ImportHandler(PathHandler):
             )
 
         return LOADING_FAILED
-
