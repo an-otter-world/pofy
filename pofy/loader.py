@@ -1,5 +1,8 @@
 """Pofy deserializing function."""
 
+from gettext import gettext as _
+from inspect import isclass
+from io import StringIO
 from typing import AnyStr
 from typing import Callable
 from typing import IO
@@ -59,19 +62,37 @@ def load(
                     as cls parameter to get it infered.)
 
     """
+    assert isinstance(source, (str, StringIO)), \
+        _('source parameter must be a string or StringIO.')
+
     all_tag_handlers = []
+
     if tag_handlers is not None:
+        assert isinstance(tag_handlers, list), \
+            _('tag_handlers must be a list of TagHandlers implementations.')
+
+        for handler_it in tag_handlers:
+            assert isinstance(handler_it, TagHandler), \
+                _('tag_handlers items should be subclass of TagHandler')
         all_tag_handlers.extend(tag_handlers)
 
     if resolve_roots is not None:
+        assert isinstance(resolve_roots, list), \
+            _('resolve_roots must be a list of Path.')
+
         all_tag_handlers.append(ImportHandler(resolve_roots))
         all_tag_handlers.append(GlobHandler(resolve_roots))
+
+    if error_handler is not None:
+        assert callable(error_handler), \
+            _('error_handler must be a callable object.')
 
     context = LoadingContext(
         error_handler=error_handler,
         tag_handlers=all_tag_handlers
     )
 
+    assert isclass(object_class), _('object_class must be a type')
     if root_field is None:
         assert object_class is not None
         root_field = _ROOT_FIELDS_MAPPING.get(object_class)

@@ -30,6 +30,8 @@ class BaseField:
                       ErrorCode.VALIDATION_ERROR code.
 
         """
+        if validate is not None:
+            assert callable(validate), _('validate must be a callable object.')
         self.required = required
         self._validate = validate
 

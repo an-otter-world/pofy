@@ -31,6 +31,8 @@ class ObjectField(BaseField):
 
         """
         super().__init__(*args, **kwargs)
+        assert isclass(object_class), \
+            _('object_class must be a type')
         self._object_class = object_class
 
     def _load(self, context: LoadingContext):

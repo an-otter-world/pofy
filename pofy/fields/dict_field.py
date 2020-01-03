@@ -1,4 +1,5 @@
 """Dictionary field class & utilities."""
+from gettext import gettext as _
 from yaml import ScalarNode
 
 from pofy.loading_context import LoadingContext
@@ -18,6 +19,8 @@ class DictField(BaseField):
 
         """
         super().__init__(*args, **kwargs)
+        assert isinstance(item_field, BaseField), \
+            _('item_field must be an implementation of BaseField.')
         self._item_field = item_field
 
     def _load(self, context: LoadingContext):

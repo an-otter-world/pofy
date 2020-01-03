@@ -29,6 +29,10 @@ class GlobHandler(TagHandler):
 
         """
         super().__init__()
+        for root_it in roots:
+            assert isinstance(root_it, Path), \
+                _('roots must be a list of Path objects')
+
         self._roots = roots
 
     def transform(self, context: LoadingContext) -> Node:

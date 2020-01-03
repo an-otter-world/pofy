@@ -1,7 +1,6 @@
 """String field class & utilities."""
 from gettext import gettext as _
 from re import compile as re_compile
-from typing import AnyStr
 
 from pofy.errors import ErrorCode
 
@@ -11,7 +10,7 @@ from .base_field import ScalarField
 class StringField(ScalarField):
     """String YAML object field."""
 
-    def __init__(self, *args, pattern: AnyStr = None, **kwargs):
+    def __init__(self, *args, pattern: str = None, **kwargs):
         """Initialize string field.
 
         Args:
@@ -24,6 +23,8 @@ class StringField(ScalarField):
         super().__init__(*args, **kwargs)
 
         if pattern is not None:
+            assert isinstance(pattern, str), \
+                _('pattern must be a string.')
             self._pattern_str = pattern
             self._pattern = re_compile(pattern)
         else:

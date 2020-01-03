@@ -27,6 +27,10 @@ class ImportHandler(TagHandler):
             roots: Roots paths to use when resolving files.
 
         """
+        for root_it in roots:
+            assert isinstance(root_it, Path), \
+                _('roots must be a list of Path objects')
+
         super().__init__()
         self._roots = roots
 
