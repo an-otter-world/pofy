@@ -3,8 +3,9 @@ from pytest import raises
 from yaml import Node
 
 from pofy import ErrorCode
-from pofy import PofyError
+from pofy import PofyValueError
 from pofy import TagHandler
+from pofy import ErrorCode
 from pofy.loading_context import LoadingContext
 
 from tests.fixtures import mock_loading_context
@@ -15,8 +16,8 @@ def test_loading_context_raises():
     context = LoadingContext(error_handler=None, tag_handlers=[])
 
     with context.load(Node('', 'some_value', None, None)):
-        with raises(PofyError):
-            context.error(0, 'Test message')
+        with raises(PofyValueError):
+            context.error(ErrorCode.VALUE_ERROR, 'Test message')
 
 
 def test_loading_context_calls_error_handler():

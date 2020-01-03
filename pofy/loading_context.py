@@ -12,7 +12,7 @@ from yaml import ScalarNode
 from yaml import SequenceNode
 
 from .errors import ErrorCode
-from .errors import PofyError
+from .errors import get_exception_type
 from .tag_handlers.tag_handler import TagHandler
 
 
@@ -113,7 +113,8 @@ class LoadingContext:
         if self._error_handler is not None:
             self._error_handler(node, code, message)
         else:
-            raise PofyError(node, code, message)
+            exception_type = get_exception_type(code)
+            raise exception_type(node, message)
 
     def _expect_node(
         self,
