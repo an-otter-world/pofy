@@ -2,6 +2,7 @@
 from gettext import gettext as _
 from pathlib import Path
 from typing import Any
+from typing import Optional
 
 from pofy.common import ErrorCode
 from pofy.common import LOADING_FAILED
@@ -25,26 +26,35 @@ class ImportHandler(PathHandler):
         ):
             return LOADING_FAILED
 
+        file_path = self._get_file(context)
+        if file_path is None:
+            node = context.current_node()
+            if node.tag == '!import':
+                context.error(
+                    ErrorCode.IMPORT_NOT_FOUND,
+                    _('Unable to find {} in any of the configured directories'),
+                    file_path
+                )
+
+            return LOADING_FAILED
+
+        file_yaml_node = self._load_file(context, file_path)
+
+        if file_yaml_node is None:
+            return LOADING_FAILED
+
+        return context.load(field, file_yaml_node, str(file_path))
+
+    def _get_file(self, context: ILoadingContext) -> Optional[Path]:
         node = context.current_node()
         file_path = Path(node.value)
 
+        if file_path.is_absolute():
+            return file_path
+
         for root in self._get_roots(context):
             path = root / file_path
-            if not path.is_file():
-                continue
+            if path.is_file():
+                return path
 
-            content = self._load_file(context, path)
-
-            if content is None:
-                return LOADING_FAILED
-
-            return context.load(field, content, str(path))
-
-        if node.tag == '!import':
-            context.error(
-                ErrorCode.IMPORT_NOT_FOUND,
-                _('Unable to find {} in any of the configured directories'),
-                file_path
-            )
-
-        return LOADING_FAILED
+        return None

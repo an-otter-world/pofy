@@ -57,7 +57,7 @@ def load_with_fail_tag(
 
 
 def load_node(
-    expected_error: Optional[int] = None,
+    expected_error: Optional[ErrorCode] = None,
     tag_handlers: Optional[List[TagHandler]] = None,
     node: Node = None,
     location: Optional[str] = None

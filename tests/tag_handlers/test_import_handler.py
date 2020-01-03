@@ -1,6 +1,7 @@
 """Glob handler tests."""
-from yaml import SequenceNode
+from pathlib import Path
 from yaml import ScalarNode
+from yaml import SequenceNode
 
 from pofy.common import LOADING_FAILED
 from pofy import ErrorCode
@@ -79,8 +80,8 @@ def test_import_on_parse_error(datadir):
     )
 
 
-def test_relative_import(datadir):
-    """Test import works with relative paths."""
+def test_relative_import(datadir: Path):
+    """Test import works with paths relative to the loaded file."""
     value = load_node(
         node=ScalarNode('!import', 'file1.yaml', None, None),
         tag_handlers=[ImportHandler(allow_relative=True)],
@@ -95,3 +96,14 @@ def test_relative_import(datadir):
         expected_error=ErrorCode.IMPORT_NOT_FOUND,
         location=str(datadir / 'parent_file.yaml')
     )
+
+
+def test_absolute_import(datadir: Path):
+    """Test import works with absolute paths."""
+    assert datadir.is_absolute()
+    value = load_node(
+        node=ScalarNode('!import', str(datadir / 'file1.yaml'), None, None),
+        tag_handlers=[ImportHandler()]
+    )
+
+    assert value == 'file1_content'
