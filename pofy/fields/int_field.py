@@ -1,6 +1,7 @@
 """Integer field class & utilities."""
 from gettext import gettext as _
 from typing import Optional
+from typing import cast
 
 from pofy.errors import ErrorCode
 
@@ -39,6 +40,8 @@ class IntField(ScalarField):
     def _convert(self, context) -> Optional[int]:
         node = context.current_node()
         value = node.value
+        result: Optional[int] = None
+
         try:
             result = int(value, self._base)
         except ValueError:
@@ -48,9 +51,9 @@ class IntField(ScalarField):
             )
             return None
 
-        return ScalarField._check_in_bounds(
+        return cast(Optional[int], ScalarField._check_in_bounds(
             context,
             result,
             self._minimum,
             self._maximum
-        )
+        ))

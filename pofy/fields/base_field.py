@@ -100,7 +100,7 @@ class ScalarField(BaseField):
         value: Union[int, float],
         minimum: Optional[Union[int, float]],
         maximum: Optional[Union[int, float]]
-    ):
+    ) -> Optional[Union[int, float]]:
         if minimum is not None and value < minimum:
             context.error(
                 ErrorCode.VALIDATION_ERROR,
