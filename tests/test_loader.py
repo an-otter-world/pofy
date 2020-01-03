@@ -1,4 +1,6 @@
 """Yaml object loading tests."""
+from io import StringIO
+
 from pofy import ListField
 from pofy import ObjectField
 from pofy import StringField
@@ -71,3 +73,13 @@ def test_root_field_is_correctly_inferred():
 def test_tag_handler_fails_on_root_node_returns_none():
     """Test nothing is deserialized when handling root node fails."""
     assert load_with_fail_tag('!fail some_value', str) is None
+
+
+def test_load_handles_stream(datadir):
+    """Test that stream can be given as source parameter for load."""
+    with open(datadir / 'object.yaml') as yaml_file:
+        test = load(yaml_file, dict)
+        assert test == {'test_field': 'test_value'}
+
+    test = load(StringIO('test_field: test_value'), dict)
+    assert test == {'test_field': 'test_value'}
