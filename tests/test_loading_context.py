@@ -42,18 +42,24 @@ def test_loading_context_raises_on_multiple_tag_match():
     )
 
 
-def test_loading_context_returns_node_path():
-    """Test loading context raises an error a tag is ambigous."""
-    class _ChildField(BaseField):
-        def _load(self, context):
-            assert context.current_location() == '/some/path'
+def test_loading_context_returns_node_location():
+    """Test loading context stores the last given location for a node."""
+    def _check(location):
+        class _ChildField(BaseField):
+            def _load(self, context):
+                assert context.current_location() == location
 
-    class _ParentField(BaseField):
-        def _load(self, context):
-            context.load(_ChildField(), _get_dummy_node())
+        class _ParentField(BaseField):
+            def _load(self, context):
+                context.load(_ChildField(), _get_dummy_node())
 
-    context = LoadingContext(error_handler=None, tag_handlers=[])
-    context.load(_ParentField(), _get_dummy_node(), '/some/path')
+        context = LoadingContext(error_handler=None, tag_handlers=[])
+        context.load(_ParentField(), _get_dummy_node(), location)
+
+    _check('/some/location')
+
+    # This should go all the way up in the node stack and finally return None
+    _check(None)
 
 
 def _get_dummy_node():
