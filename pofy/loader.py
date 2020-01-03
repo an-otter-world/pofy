@@ -2,7 +2,7 @@
 
 from gettext import gettext as _
 from inspect import isclass
-from io import StringIO
+from io import TextIOBase
 from pathlib import Path
 from typing import Callable
 from typing import IO
@@ -63,8 +63,8 @@ def load(
                     as cls parameter to get it infered.)
 
     """
-    assert isinstance(source, (str, StringIO)), \
-        _('source parameter must be a string or StringIO.')
+    assert isinstance(source, (str, TextIOBase)), \
+        _('source parameter must be a string or Text I/O.')
 
     all_tag_handlers = []
 
