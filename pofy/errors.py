@@ -35,6 +35,9 @@ class ErrorCode(Enum):
     # Raised when several handlers matches a tag
     MULTIPLE_MATCHING_HANDLERS = 9
 
+    # Raised when an object schema is incorrect
+    SCHEMA_ERROR = 10
+
 
 class PofyError(Exception):
     """Exception raised when errors occurs during object loading."""

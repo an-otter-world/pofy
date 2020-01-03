@@ -5,6 +5,7 @@ from inspect import isclass
 from inspect import ismethod
 from typing import Any
 from typing import AnyStr
+from typing import Dict
 from typing import List
 from typing import Set
 from typing import Type
@@ -106,7 +107,11 @@ def _get_type(
 
 
 def _load(object_class: Type, context: LoadingContext):
-    fields = dict(_get_fields(object_class))
+    fields = _get_fields(object_class, context)
+
+    if fields is None:
+        return None
+
     result, set_fields = _load_object(object_class, fields, context)
     if _validate_object(object_class, result, fields, set_fields, context):
         return result
@@ -183,14 +188,33 @@ def _is_validation_method(member):
     return ismethod(member) and member.__name__ == 'validate'
 
 
-def _get_fields(cls):
+def _get_schema_classes(cls):
     for base in cls.__bases__:
-        for name, field in _get_fields(base):
-            yield (name, field)
+        for schema_class in _get_schema_classes(base):
+            yield schema_class
 
-    for __, schemaclass in getmembers(cls, _is_schema_class):
-        for name, field in getmembers(schemaclass, _is_field):
-            yield (name, field)
+    for __, schema_class in getmembers(cls, _is_schema_class):
+        yield schema_class
+
+
+def _get_fields(cls, context: LoadingContext) -> Dict[str, BaseField]:
+    schema_classes = list(_get_schema_classes(cls))
+
+    if len(schema_classes) == 0:
+        context.error(
+            ErrorCode.SCHEMA_ERROR,
+            _('No Schema class found for type {}, check that your schema is '
+              'correctly configured.'),
+            cls.__name__
+        )
+        return None
+
+    fields = {}
+    for schema_it in schema_classes:
+        for name, field in getmembers(schema_it, _is_field):
+            fields[name] = field
+
+    return fields
 
 
 def _get_validation_methods(cls):
