@@ -1,16 +1,20 @@
 """Error handling tests."""
-from pofy import ErrorCode
+from yaml import Node
+from yaml.error import Mark
+
 from pofy import BadTypeFormatError
-from pofy import get_exception_type
+from pofy import ErrorCode
 from pofy import FieldNotDeclaredError
-from pofy import MissingRequiredFieldError
-from pofy import UnexpectedNodeTypeError
 from pofy import ImportNotFoundError
-from pofy import TypeResolveError
-from pofy import PofyValueError
-from pofy import ValidationError
+from pofy import MissingRequiredFieldError
 from pofy import MultipleMatchingHandlersError
+from pofy import PofyError
+from pofy import PofyValueError
 from pofy import SchemaError
+from pofy import TypeResolveError
+from pofy import UnexpectedNodeTypeError
+from pofy import ValidationError
+from pofy import get_exception_type
 
 
 def test_get_exception_type_is_correct():
@@ -28,3 +32,22 @@ def test_get_exception_type_is_correct():
     _check(ErrorCode.VALIDATION_ERROR, ValidationError)
     _check(ErrorCode.MULTIPLE_MATCHING_HANDLERS, MultipleMatchingHandlersError)
     _check(ErrorCode.SCHEMA_ERROR, SchemaError)
+
+
+def test_exception_format():
+    """Test exception __str__ method gives usefull informations."""
+    node = Node(
+        'tag',
+        'value',
+        Mark('file_name', 0, 10, 42, None, None),
+        Mark('file_name', 0, 12, 32, None, None)
+    )
+
+    message = 'Error message'
+    error = PofyError(node, message)
+
+    location_string = '{}:{}:{}'.format('file_name', 10, 42)
+
+    error_string = str(error)
+    assert location_string in error_string
+    assert message in error_string

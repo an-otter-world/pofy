@@ -51,9 +51,19 @@ class PofyError(Exception):
             message : The error description message.
 
         """
-        super().__init__()
+        super().__init__(PofyError._get_message(node, message))
         self.node = node
-        self.message = message
+
+    @staticmethod
+    def _get_message(node, message):
+        start = node.start_mark
+        file_name = getattr(start, 'name', '<Unkwnown>')
+        return '{file}:{line}:{column} : {message}'.format(
+            file=file_name,
+            line=start.line,
+            column=start.column,
+            message=message
+        )
 
 
 class BadTypeFormatError(PofyError):
