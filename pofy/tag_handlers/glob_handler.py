@@ -2,14 +2,15 @@
 from gettext import gettext as _
 from pathlib import Path
 from typing import List
-from typing import Optional
-from yaml import Node
+from typing import Any
 from yaml import SequenceNode
 from yaml import compose
 from yaml.parser import ParserError
 
+from pofy.common import LOADING_FAILED
 from pofy.errors import ErrorCode
-from pofy.loading_context import LoadingContext
+from pofy.common import ILoadingContext
+from pofy.common import IBaseField
 
 from .tag_handler import TagHandler
 
@@ -36,12 +37,13 @@ class GlobHandler(TagHandler):
 
         self._roots = roots
 
-    def transform(self, context: LoadingContext) -> Optional[Node]:
+    def load(self, context: ILoadingContext, field: IBaseField) \
+            -> Any:
         """See Resolver.resolve for usage."""
         if not context.expect_scalar(
             _('glob must be set on a scalar node')
         ):
-            return None
+            return LOADING_FAILED
 
         node = context.current_node()
         glob = node.value
@@ -62,6 +64,6 @@ class GlobHandler(TagHandler):
                             path,
                             error
                         )
-                        return None
 
-        return SequenceNode('', result, node.start_mark, node.end_mark)
+        fake_node = SequenceNode('', result, node.start_mark, node.end_mark)
+        return context.load(field, fake_node)

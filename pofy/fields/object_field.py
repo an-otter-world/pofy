@@ -9,10 +9,13 @@ from typing import Optional
 from typing import Set
 from typing import Type
 
+from pofy.common import LOADING_FAILED
 from pofy.errors import ErrorCode
-from pofy.loading_context import LoadingContext
+from pofy.common import ILoadingContext
 
 from .base_field import BaseField
+from .string_field import StringField
+
 
 _TYPE_FORMAT_MSG = _("""\
 Type tag should be in the form !type:path.to.Type, got {}""")
@@ -34,17 +37,17 @@ class ObjectField(BaseField):
             _('object_class must be a type')
         self._object_class = object_class
 
-    def _load(self, context: LoadingContext):
+    def _load(self, context: ILoadingContext) -> Any:
         if not context.expect_mapping():
             return None
 
         object_class = self._resolve_type(context)
         if object_class is None:
-            return None
+            return LOADING_FAILED
 
         return _load(object_class, context)
 
-    def _resolve_type(self, context: LoadingContext):
+    def _resolve_type(self, context: ILoadingContext):
         node = context.current_node()
         tag = node.tag
         if not tag.startswith('!type'):
@@ -83,7 +86,7 @@ class ObjectField(BaseField):
 def _get_type(
     module_name: str,
     type_name: str,
-    context: LoadingContext
+    context: ILoadingContext
 ):
     full_name = r'{}.{}'.format(module_name, type_name)
     module = __import__(module_name, fromlist=type_name)
@@ -107,7 +110,7 @@ def _get_type(
     return resolved_type
 
 
-def _load(object_class: Type, context: LoadingContext):
+def _load(object_class: Type, context: ILoadingContext):
     fields = _get_fields(object_class, context)
 
     if fields is None:
@@ -123,33 +126,32 @@ def _load(object_class: Type, context: LoadingContext):
 def _load_object(
     object_class: Type,
     fields: Dict[str, BaseField],
-    context: LoadingContext
+    context: ILoadingContext
 ):
     node = context.current_node()
     result = object_class()
     set_fields = set()
 
     for name_node, value_node in node.value:
-        with context.load(name_node) as loaded:
-            if not loaded:
-                continue
+        field_name = context.load(StringField(), name_node)
+        if field_name is LOADING_FAILED:
+            continue
 
-            field_name = name_node.value
-            set_fields.add(field_name)
-            if field_name not in fields:
-                context.error(
-                    ErrorCode.FIELD_NOT_DECLARED,
-                    _('Field {} is not declared.'), field_name
-                )
-                continue
+        field_name = name_node.value
+        set_fields.add(field_name)
+        if field_name not in fields:
+            context.error(
+                ErrorCode.FIELD_NOT_DECLARED,
+                _('Field {} is not declared.'), field_name
+            )
+            continue
 
-        with context.load(value_node) as loaded:
-            if not loaded:
-                continue
+        field = fields[field_name]
+        field_value = context.load(field, value_node)
+        if field_value is LOADING_FAILED:
+            continue
 
-            field = fields[field_name]
-            field_value = field.load(context)
-            setattr(result, field_name, field_value)
+        setattr(result, field_name, field_value)
 
     return (result, set_fields)
 
@@ -159,7 +161,7 @@ def _validate_object(
     obj: Any,
     fields: Dict[str, BaseField],
     set_fields: Set[str],
-    context: LoadingContext
+    context: ILoadingContext
 ) -> bool:
     valid_object = True
     for name, field in fields.items():
@@ -198,7 +200,8 @@ def _get_schema_classes(cls):
         yield schema_class
 
 
-def _get_fields(cls, context: LoadingContext) -> Optional[Dict[str, BaseField]]:
+def _get_fields(cls, context: ILoadingContext) \
+        -> Optional[Dict[str, BaseField]]:
     schema_classes = list(_get_schema_classes(cls))
 
     if len(schema_classes) == 0:

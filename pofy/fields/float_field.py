@@ -3,7 +3,7 @@ from gettext import gettext as _
 from typing import Optional
 
 from pofy.errors import ErrorCode
-from pofy.loading_context import LoadingContext
+from pofy.common import ILoadingContext
 
 from .base_field import ScalarField
 
@@ -32,7 +32,7 @@ class FloatField(ScalarField):
         self._minimum: Optional[float] = minimum
         self._maximum: Optional[float] = maximum
 
-    def _convert(self, context: LoadingContext) -> Optional[float]:
+    def _convert(self, context: ILoadingContext) -> Optional[float]:
         node = context.current_node()
         value = node.value
         try:

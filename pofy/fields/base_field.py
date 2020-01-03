@@ -7,10 +7,11 @@ from typing import Optional
 from typing import Union
 
 from pofy.errors import ErrorCode
-from pofy.loading_context import LoadingContext
+from pofy.common import ILoadingContext
+from pofy.common import IBaseField
 
 
-class BaseField:
+class BaseField(IBaseField):
     """Base class for YAML object fields."""
 
     def __init__(
@@ -24,7 +25,7 @@ class BaseField:
             required: If it's true and the field is not defined in yaml, it
                       will create an error that will eventually be raised at
                       the end of deserialization.
-            validate: Function accepting a Node, LoadingContext and the
+            validate: Function accepting a Node, ILoadingContext and the
                       deserialized field value, that should return True if the
                       value is valid, false otherwise, and call context.error
                       to report errors, eventually using the
@@ -36,7 +37,7 @@ class BaseField:
         self.required = required
         self._validate = validate
 
-    def load(self, context: LoadingContext) -> Any:
+    def load(self, context: ILoadingContext) -> Any:
         """Deserialize this field.
 
         Args:
@@ -45,7 +46,7 @@ class BaseField:
                      management.
 
         Return:
-            Deserialized field value.
+            Deserialized field value, or LOADING_FAILED if loading failed.
 
         """
         field_value = self._load(context)
@@ -57,7 +58,7 @@ class BaseField:
         return field_value
 
     @abstractmethod
-    def _load(self, context: LoadingContext) -> Any:
+    def _load(self, context: ILoadingContext) -> Any:
         """Deserialize this field using the given node.
 
         Args:
@@ -75,14 +76,14 @@ class BaseField:
 class ScalarField(BaseField):
     """Base class for scalar value fields."""
 
-    def _load(self, context: LoadingContext):
+    def _load(self, context: ILoadingContext):
         if not context.expect_scalar():
             return None
 
         return self._convert(context)
 
     @abstractmethod
-    def _convert(self, context: LoadingContext) -> Any:
+    def _convert(self, context: ILoadingContext) -> Any:
         """Convert the string value to the target type of this field.
 
         Args:
@@ -96,7 +97,7 @@ class ScalarField(BaseField):
 
     @staticmethod
     def _check_in_bounds(
-        context: LoadingContext,
+        context: ILoadingContext,
         value: Union[int, float],
         minimum: Optional[Union[int, float]],
         maximum: Optional[Union[int, float]]

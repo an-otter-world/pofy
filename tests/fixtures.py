@@ -1,5 +1,4 @@
 """Test fixtures & dummy classes."""
-from contextlib import contextmanager
 from typing import IO
 from typing import List
 from typing import Optional
@@ -8,10 +7,12 @@ from typing import Union
 
 from yaml import Node
 
+from pofy import BaseField
 from pofy import ErrorCode
 from pofy import LoadingContext
 from pofy import TagHandler
 from pofy import load
+from pofy.common import LOADING_FAILED
 
 
 def expect_load_error(
@@ -44,9 +45,9 @@ def load_with_fail_tag(
     class _FailTagHandler(TagHandler):
         tag_pattern = '^fail$'
 
-        def transform(self, _):
+        def load(self, __, ___):
             """TagHandler.transform implementation."""
-            return None
+            return LOADING_FAILED
 
     return load(
         source,
@@ -55,8 +56,7 @@ def load_with_fail_tag(
     )
 
 
-@contextmanager
-def mock_loading_context(
+def load_node(
     expected_error: Optional[int] = None,
     tag_handlers: Optional[List[TagHandler]] = None,
     node: Node = None
@@ -73,16 +73,21 @@ def mock_loading_context(
     if tag_handlers is None:
         tag_handlers = []
 
+    if node is None:
+        node = Node('', '', None, None)
+
+    class _MockField(BaseField):
+        def _load(self, context):
+            return context.current_node().value
+
     context = LoadingContext(
         error_handler=_handler,
         tag_handlers=tag_handlers
     )
 
-    if node is None:
-        node = Node('', '', None, None)
-
-    with context.load(node):
-        yield context
+    result = context.load(_MockField(), node)
 
     if expected_error is not None:
         assert handler_called
+
+    return result

@@ -5,9 +5,12 @@ YAML documents.
 """
 from abc import abstractmethod
 from re import compile as re_compile
-from typing import Optional
+from typing import Any
 
 from yaml import Node
+
+from pofy.common import IBaseField
+from pofy.common import ILoadingContext
 
 
 class TagHandler:
@@ -39,13 +42,16 @@ class TagHandler:
         return pattern.match(tag) is not None
 
     @abstractmethod
-    def transform(self, context) -> Optional[Node]:
+    def load(self, context: ILoadingContext, field: IBaseField) -> Any:
         """Transform the given node.
 
         Args:
             context: The loading context.
+            field: The field descriptor to load.
 
         Return:
-            The transformed node (loaded yaml file, environment variable....)
+            A tuple of the transformed node (loaded yaml file, environment,
+            variable....) and a string representing it's location, if
+            applicable.
 
         """

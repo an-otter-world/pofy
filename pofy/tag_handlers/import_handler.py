@@ -2,13 +2,15 @@
 from gettext import gettext as _
 from pathlib import Path
 from typing import List
-from typing import Optional
-from yaml import Node
+from typing import Any
+
 from yaml import compose
 from yaml.parser import ParserError
 
+from pofy.common import LOADING_FAILED
 from pofy.errors import ErrorCode
-from pofy.loading_context import LoadingContext
+from pofy.common import ILoadingContext
+from pofy.common import IBaseField
 
 from .tag_handler import TagHandler
 
@@ -35,12 +37,12 @@ class ImportHandler(TagHandler):
         super().__init__()
         self._roots = roots
 
-    def transform(self, context: LoadingContext) -> Optional[Node]:
+    def load(self, context: ILoadingContext, field: IBaseField) -> Any:
         """See Resolver.resolve for usage."""
         if not context.expect_scalar(
             _('import / try-import must be set on a scalar node')
         ):
-            return None
+            return LOADING_FAILED
 
         node = context.current_node()
         file_path = Path(node.value)
@@ -53,7 +55,8 @@ class ImportHandler(TagHandler):
             with open(path, 'r') as yaml_file:
                 try:
                     content = compose(yaml_file)
-                    return content
+                    return context.load(field, content, str(path))
+
                 except ParserError as error:
                     context.error(
                         ErrorCode.VALUE_ERROR,
@@ -61,7 +64,7 @@ class ImportHandler(TagHandler):
                         path,
                         error
                     )
-                    return None
+                    return LOADING_FAILED
 
         if node.tag == '!import':
             context.error(
@@ -70,4 +73,4 @@ class ImportHandler(TagHandler):
                 path
             )
 
-        return None
+        return LOADING_FAILED
