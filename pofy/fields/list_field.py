@@ -3,7 +3,7 @@ from gettext import gettext as _
 from typing import Optional
 
 from pofy.common import LOADING_FAILED
-from pofy.common import ILoadingContext
+from pofy.interfaces import ILoadingContext
 
 from .base_field import BaseField
 

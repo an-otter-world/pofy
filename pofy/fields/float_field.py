@@ -2,8 +2,8 @@
 from gettext import gettext as _
 from typing import Optional
 
-from pofy.errors import ErrorCode
-from pofy.common import ILoadingContext
+from pofy.common import ErrorCode
+from pofy.interfaces import ILoadingContext
 
 from .base_field import ScalarField
 

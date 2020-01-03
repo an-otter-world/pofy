@@ -4,7 +4,7 @@ from re import compile as re_compile
 from typing import Optional
 from typing import Pattern
 
-from pofy.errors import ErrorCode
+from pofy.common import ErrorCode
 
 from .base_field import ScalarField
 

@@ -1,7 +1,7 @@
 """Boolean field class & utilities."""
 from gettext import gettext as _
 
-from pofy.errors import ErrorCode
+from pofy.common import ErrorCode
 
 from .base_field import ScalarField
 

@@ -5,7 +5,7 @@ from typing import Optional
 from yaml import ScalarNode
 
 from pofy.common import LOADING_FAILED
-from pofy.common import ILoadingContext
+from pofy.interfaces import ILoadingContext
 
 from .base_field import BaseField
 

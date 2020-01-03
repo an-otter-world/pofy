@@ -10,8 +10,8 @@ from typing import Set
 from typing import Type
 
 from pofy.common import LOADING_FAILED
-from pofy.errors import ErrorCode
-from pofy.common import ILoadingContext
+from pofy.common import ErrorCode
+from pofy.interfaces import ILoadingContext
 
 from .base_field import BaseField
 from .string_field import StringField

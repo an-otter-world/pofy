@@ -6,9 +6,9 @@ from typing import Callable
 from typing import Optional
 from typing import Union
 
-from pofy.errors import ErrorCode
-from pofy.common import ILoadingContext
-from pofy.common import IBaseField
+from pofy.common import ErrorCode
+from pofy.interfaces import ILoadingContext
+from pofy.interfaces import IBaseField
 
 
 class BaseField(IBaseField):

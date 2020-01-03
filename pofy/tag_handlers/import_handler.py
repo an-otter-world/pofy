@@ -7,12 +7,11 @@ from typing import Any
 from yaml import compose
 from yaml.parser import ParserError
 
+from pofy.common import ErrorCode
 from pofy.common import LOADING_FAILED
-from pofy.errors import ErrorCode
-from pofy.common import ILoadingContext
-from pofy.common import IBaseField
-
-from .tag_handler import TagHandler
+from pofy.interfaces import IBaseField
+from pofy.interfaces import ILoadingContext
+from pofy.tag_handlers.tag_handler import TagHandler
 
 
 class ImportHandler(TagHandler):
