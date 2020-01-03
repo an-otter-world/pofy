@@ -1,9 +1,10 @@
 """Loading context class & utilities."""
 from contextlib import contextmanager
 from gettext import gettext as _
-from typing import AnyStr
+from typing import Any
 from typing import Callable
 from typing import List
+from typing import Optional
 from typing import Type
 
 from yaml import MappingNode
@@ -12,8 +13,10 @@ from yaml import ScalarNode
 from yaml import SequenceNode
 
 from .errors import ErrorCode
-from .errors import PofyError
+from .errors import get_exception_type
 from .tag_handlers.tag_handler import TagHandler
+
+ErrorHandler = Optional[Callable[[Node, ErrorCode, str], Any]]
 
 
 class LoadingContext:
@@ -21,13 +24,13 @@ class LoadingContext:
 
     def __init__(
         self,
-        error_handler: Callable,
+        error_handler: ErrorHandler,
         tag_handlers: List[TagHandler]
     ):
         """Initialize context."""
         self._error_handler = error_handler
         self._tag_handlers = tag_handlers
-        self._node_stack = []
+        self._node_stack: List[Node] = []
 
     @contextmanager
     def load(self, node: Node):
@@ -113,12 +116,13 @@ class LoadingContext:
         if self._error_handler is not None:
             self._error_handler(node, code, message)
         else:
-            raise PofyError(node, code, message)
+            exception_type = get_exception_type(code)
+            raise exception_type(node, message)
 
     def _expect_node(
         self,
         node_type: Type[Node],
-        error_format: AnyStr,
+        error_format: str,
         *args,
         **kwargs
     ):

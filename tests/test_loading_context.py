@@ -1,9 +1,10 @@
 """Loading context tests."""
 from pytest import raises
 from yaml import Node
+from yaml.error import Mark
 
 from pofy import ErrorCode
-from pofy import PofyError
+from pofy import PofyValueError
 from pofy import TagHandler
 from pofy.loading_context import LoadingContext
 
@@ -14,9 +15,16 @@ def test_loading_context_raises():
     """Test loading context raises an error when no error_handler is set."""
     context = LoadingContext(error_handler=None, tag_handlers=[])
 
-    with context.load(Node('', 'some_value', None, None)):
-        with raises(PofyError):
-            context.error(0, 'Test message')
+    node = Node(
+        'tag',
+        'value',
+        Mark('file_name', 0, 10, 42, None, None),
+        Mark('file_name', 0, 12, 32, None, None)
+    )
+
+    with context.load(node):
+        with raises(PofyValueError):
+            context.error(ErrorCode.VALUE_ERROR, 'Test message')
 
 
 def test_loading_context_calls_error_handler():

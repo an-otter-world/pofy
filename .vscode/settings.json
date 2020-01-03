@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": ".env/bin/python",
+    "python.pythonPath": "d:\\Personnel\\an-otter-world\\pofy\\.env\\Scripts\\python.exe",
     "python.testing.pytestArgs": [
         "tests",
         "--no-cov"

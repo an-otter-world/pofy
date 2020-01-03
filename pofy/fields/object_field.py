@@ -4,8 +4,8 @@ from inspect import getmembers
 from inspect import isclass
 from inspect import ismethod
 from typing import Any
-from typing import AnyStr
-from typing import List
+from typing import Dict
+from typing import Optional
 from typing import Set
 from typing import Type
 
@@ -30,6 +30,8 @@ class ObjectField(BaseField):
 
         """
         super().__init__(*args, **kwargs)
+        assert isclass(object_class), \
+            _('object_class must be a type')
         self._object_class = object_class
 
     def _load(self, context: LoadingContext):
@@ -79,11 +81,11 @@ class ObjectField(BaseField):
 
 
 def _get_type(
-    module_name: AnyStr,
-    type_name: AnyStr,
+    module_name: str,
+    type_name: str,
     context: LoadingContext
 ):
-    full_name = '{}.{}'.format(module_name, type_name)
+    full_name = r'{}.{}'.format(module_name, type_name)
     module = __import__(module_name, fromlist=type_name)
 
     if not hasattr(module, type_name):
@@ -106,7 +108,11 @@ def _get_type(
 
 
 def _load(object_class: Type, context: LoadingContext):
-    fields = dict(_get_fields(object_class))
+    fields = _get_fields(object_class, context)
+
+    if fields is None:
+        return None
+
     result, set_fields = _load_object(object_class, fields, context)
     if _validate_object(object_class, result, fields, set_fields, context):
         return result
@@ -116,7 +122,7 @@ def _load(object_class: Type, context: LoadingContext):
 
 def _load_object(
     object_class: Type,
-    fields: List[BaseField],
+    fields: Dict[str, BaseField],
     context: LoadingContext
 ):
     node = context.current_node()
@@ -151,7 +157,7 @@ def _load_object(
 def _validate_object(
     object_class: Type,
     obj: Any,
-    fields: List[BaseField],
+    fields: Dict[str, BaseField],
     set_fields: Set[str],
     context: LoadingContext
 ) -> bool:
@@ -183,14 +189,33 @@ def _is_validation_method(member):
     return ismethod(member) and member.__name__ == 'validate'
 
 
-def _get_fields(cls):
+def _get_schema_classes(cls):
     for base in cls.__bases__:
-        for name, field in _get_fields(base):
-            yield (name, field)
+        for schema_class in _get_schema_classes(base):
+            yield schema_class
 
-    for __, schemaclass in getmembers(cls, _is_schema_class):
-        for name, field in getmembers(schemaclass, _is_field):
-            yield (name, field)
+    for __, schema_class in getmembers(cls, _is_schema_class):
+        yield schema_class
+
+
+def _get_fields(cls, context: LoadingContext) -> Optional[Dict[str, BaseField]]:
+    schema_classes = list(_get_schema_classes(cls))
+
+    if len(schema_classes) == 0:
+        context.error(
+            ErrorCode.SCHEMA_ERROR,
+            _('No Schema class found for type {}, check that your schema is '
+              'correctly configured.'),
+            cls.__name__
+        )
+        return None
+
+    fields = {}
+    for schema_it in schema_classes:
+        for name, field in getmembers(schema_it, _is_field):
+            fields[name] = field
+
+    return fields
 
 
 def _get_validation_methods(cls):

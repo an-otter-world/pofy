@@ -1,4 +1,7 @@
 """List field class & utilities."""
+from gettext import gettext as _
+from typing import Optional
+
 from pofy.loading_context import LoadingContext
 
 from .base_field import BaseField
@@ -16,9 +19,11 @@ class ListField(BaseField):
 
         """
         super().__init__(*args, **kwargs)
+        assert isinstance(item_field, BaseField), \
+            _('item_field must be an implementation of BaseField.')
         self._item_field = item_field
 
-    def _load(self, context: LoadingContext):
+    def _load(self, context: LoadingContext) -> Optional[list]:
         if not context.expect_sequence():
             return None
 

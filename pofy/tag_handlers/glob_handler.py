@@ -2,6 +2,7 @@
 from gettext import gettext as _
 from pathlib import Path
 from typing import List
+from typing import Optional
 from yaml import Node
 from yaml import SequenceNode
 from yaml import compose
@@ -29,9 +30,13 @@ class GlobHandler(TagHandler):
 
         """
         super().__init__()
+        for root_it in roots:
+            assert isinstance(root_it, Path), \
+                _('roots must be a list of Path objects')
+
         self._roots = roots
 
-    def transform(self, context: LoadingContext) -> Node:
+    def transform(self, context: LoadingContext) -> Optional[Node]:
         """See Resolver.resolve for usage."""
         if not context.expect_scalar(
             _('glob must be set on a scalar node')

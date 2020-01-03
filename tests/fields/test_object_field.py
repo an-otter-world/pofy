@@ -227,3 +227,15 @@ def test_object_field_ignores_tag_handler_failure():
     assert not hasattr(test, 'field_1')
     assert not hasattr(test, 'field_2')
     assert test.field_3 == 'test_value'
+
+
+def test_object_without_schema_raise_error():
+    """Test giving a type without a Schema raise an an error."""
+    class _ObjectWithoutSchema:
+        pass
+
+    expect_load_error(
+        ErrorCode.SCHEMA_ERROR,
+        'i_should: not_event_be_parsed',
+        _ObjectWithoutSchema,
+    )

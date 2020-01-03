@@ -3,6 +3,7 @@ from abc import abstractmethod
 from gettext import gettext as _
 from typing import Any
 from typing import Callable
+from typing import Optional
 from typing import Union
 
 from pofy.errors import ErrorCode
@@ -30,6 +31,8 @@ class BaseField:
                       ErrorCode.VALIDATION_ERROR code.
 
         """
+        if validate is not None:
+            assert callable(validate), _('validate must be a callable object.')
         self.required = required
         self._validate = validate
 
@@ -95,9 +98,9 @@ class ScalarField(BaseField):
     def _check_in_bounds(
         context: LoadingContext,
         value: Union[int, float],
-        minimum: Union[int, float],
-        maximum: Union[int, float]
-    ):
+        minimum: Optional[Union[int, float]],
+        maximum: Optional[Union[int, float]]
+    ) -> Optional[Union[int, float]]:
         if minimum is not None and value < minimum:
             context.error(
                 ErrorCode.VALIDATION_ERROR,
