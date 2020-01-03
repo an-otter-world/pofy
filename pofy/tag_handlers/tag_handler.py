@@ -4,6 +4,7 @@ Resolvers are used when an !include tag is encountered, to load the included
 YAML documents.
 """
 from abc import abstractmethod
+from abc import ABC
 from re import compile as re_compile
 from typing import Any
 
@@ -13,7 +14,7 @@ from pofy.interfaces import IBaseField
 from pofy.interfaces import ILoadingContext
 
 
-class TagHandler:
+class TagHandler(ABC):
     """Abstract class used to transform yaml node when a tag is encountered.
 
     Members:

@@ -77,3 +77,21 @@ def test_import_on_parse_error(datadir):
         expected_error=ErrorCode.VALUE_ERROR,
         tag_handlers=handlers
     )
+
+
+def test_relative_import(datadir):
+    """Test import works with relative paths."""
+    value = load_node(
+        node=ScalarNode('!import', 'file1.yaml', None, None),
+        tag_handlers=[ImportHandler(allow_relative=True)],
+        location=str(datadir / 'parent_file.yaml')
+    )
+
+    assert value == 'file1_content'
+
+    load_node(
+        node=ScalarNode('!import', 'file1.yaml', None, None),
+        tag_handlers=[ImportHandler(allow_relative=False)],
+        expected_error=ErrorCode.IMPORT_NOT_FOUND,
+        location=str(datadir / 'parent_file.yaml')
+    )

@@ -59,7 +59,8 @@ def load_with_fail_tag(
 def load_node(
     expected_error: Optional[int] = None,
     tag_handlers: Optional[List[TagHandler]] = None,
-    node: Node = None
+    node: Node = None,
+    location: Optional[str] = None
 ):
     """Load the given object, expecting an error to be raised."""
     handler_called = False
@@ -85,7 +86,7 @@ def load_node(
         tag_handlers=tag_handlers
     )
 
-    result = context.load(_MockField(), node)
+    result = context.load(_MockField(), node, location)
 
     if expected_error is not None:
         assert handler_called

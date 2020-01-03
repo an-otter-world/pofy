@@ -1,40 +1,18 @@
 """Tag handler used to import files in YAML documents."""
 from gettext import gettext as _
-from pathlib import Path
-from typing import List
 from typing import Any
 from yaml import SequenceNode
-from yaml import compose
-from yaml.parser import ParserError
 
 from pofy.common import LOADING_FAILED
-from pofy.common import ErrorCode
 from pofy.interfaces import ILoadingContext
 from pofy.interfaces import IBaseField
-from pofy.tag_handlers.tag_handler import TagHandler
+from pofy.tag_handlers.path_handler import PathHandler
 
 
-class GlobHandler(TagHandler):
-    """Include a YAML document.
-
-    Will replace the tagged node by the loaded document.
-    """
+class GlobHandler(PathHandler):
+    """glob tag, include a list of file as a sequence node."""
 
     tag_pattern = '^(glob)$'
-
-    def __init__(self, roots: List[Path]):
-        """Initialize GlobHandler.
-
-        Args:
-            roots: Roots paths to use when resolving files.
-
-        """
-        super().__init__()
-        for root_it in roots:
-            assert isinstance(root_it, Path), \
-                _('roots must be a list of Path objects')
-
-        self._roots = roots
 
     def load(self, context: ILoadingContext, field: IBaseField) \
             -> Any:
@@ -47,22 +25,15 @@ class GlobHandler(TagHandler):
         node = context.current_node()
         glob = node.value
         result = []
-        for root in self._roots:
+        for root in self._get_roots(context):
             for path in root.glob(glob):
                 if not path.is_file():
                     continue
 
-                with open(path, 'r') as yaml_file:
-                    try:
-                        content = compose(yaml_file)
-                        result.append(content)
-                    except ParserError as error:
-                        context.error(
-                            ErrorCode.VALUE_ERROR,
-                            _('Parse error while loading {} : {}'),
-                            path,
-                            error
-                        )
+                content = self._load_file(context, path)
+
+                if content is not None:
+                    result.append(content)
 
         fake_node = SequenceNode('', result, node.start_mark, node.end_mark)
         return context.load(field, fake_node)

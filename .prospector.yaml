@@ -22,6 +22,7 @@ pep257:
     - D203
     - D213
     - D407
+    - D102
 
 pep8:
   options:
