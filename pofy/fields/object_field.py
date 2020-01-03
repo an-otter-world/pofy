@@ -4,9 +4,8 @@ from inspect import getmembers
 from inspect import isclass
 from inspect import ismethod
 from typing import Any
-from typing import AnyStr
 from typing import Dict
-from typing import List
+from typing import Optional
 from typing import Set
 from typing import Type
 
@@ -82,11 +81,11 @@ class ObjectField(BaseField):
 
 
 def _get_type(
-    module_name: AnyStr,
-    type_name: AnyStr,
+    module_name: str,
+    type_name: str,
     context: LoadingContext
 ):
-    full_name = '{}.{}'.format(module_name, type_name)
+    full_name = r'{}.{}'.format(module_name, type_name)
     module = __import__(module_name, fromlist=type_name)
 
     if not hasattr(module, type_name):
@@ -123,7 +122,7 @@ def _load(object_class: Type, context: LoadingContext):
 
 def _load_object(
     object_class: Type,
-    fields: List[BaseField],
+    fields: Dict[str, BaseField],
     context: LoadingContext
 ):
     node = context.current_node()
@@ -158,7 +157,7 @@ def _load_object(
 def _validate_object(
     object_class: Type,
     obj: Any,
-    fields: List[BaseField],
+    fields: Dict[str, BaseField],
     set_fields: Set[str],
     context: LoadingContext
 ) -> bool:
@@ -199,7 +198,7 @@ def _get_schema_classes(cls):
         yield schema_class
 
 
-def _get_fields(cls, context: LoadingContext) -> Dict[str, BaseField]:
+def _get_fields(cls, context: LoadingContext) -> Optional[Dict[str, BaseField]]:
     schema_classes = list(_get_schema_classes(cls))
 
     if len(schema_classes) == 0:

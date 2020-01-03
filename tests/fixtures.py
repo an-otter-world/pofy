@@ -1,8 +1,8 @@
 """Test fixtures & dummy classes."""
 from contextlib import contextmanager
-from typing import AnyStr
 from typing import IO
 from typing import List
+from typing import Optional
 from typing import Type
 from typing import Union
 
@@ -16,14 +16,14 @@ from pofy import load
 
 def expect_load_error(
     expected_error: ErrorCode,
-    source: Union[AnyStr, IO[str]],
+    source: Union[str, IO[str]],
     object_class: Type,
     tag_handlers: List[TagHandler] = None
 ):
     """Load the given object, expecting an error to be raised."""
     error_raised = False
 
-    def _on_error(__, error, ___):
+    def _on_error(__: Node, error: ErrorCode, ___: str):
         nonlocal error_raised
         error_raised = True
         assert error == expected_error
@@ -37,9 +37,9 @@ def expect_load_error(
 
 
 def load_with_fail_tag(
-    source: Union[AnyStr, IO[str]],
+    source: Union[str, IO[str]],
     object_class: Type,
-):
+) -> Optional[object]:
     """Load the given object, expecting an error to be raised."""
     class _FailTagHandler(TagHandler):
         tag_pattern = '^fail$'
@@ -57,18 +57,21 @@ def load_with_fail_tag(
 
 @contextmanager
 def mock_loading_context(
-    expected_error: ErrorCode = None,
-    tag_handlers: List[TagHandler] = None,
+    expected_error: Optional[int] = None,
+    tag_handlers: Optional[List[TagHandler]] = None,
     node: Node = None
 ):
     """Load the given object, expecting an error to be raised."""
     handler_called = False
 
-    def _handler(__, code, ___):
+    def _handler(__: Node, code: ErrorCode, ___: str):
         nonlocal handler_called
         handler_called = True
         assert expected_error is not None
         assert code == expected_error
+
+    if tag_handlers is None:
+        tag_handlers = []
 
     context = LoadingContext(
         error_handler=_handler,

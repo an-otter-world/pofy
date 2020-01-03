@@ -3,10 +3,11 @@
 from gettext import gettext as _
 from inspect import isclass
 from io import StringIO
-from typing import AnyStr
+from pathlib import Path
 from typing import Callable
 from typing import IO
 from typing import List
+from typing import Optional
 from typing import Type
 from typing import Union
 
@@ -38,11 +39,11 @@ _ROOT_FIELDS_MAPPING = {
 def load(
     source: Union[str, IO[str]],
     object_class: Type = None,
-    resolve_roots: List[AnyStr] = None,
+    resolve_roots: List[Path] = None,
     tag_handlers: List[TagHandler] = None,
     error_handler: Callable = None,
     root_field: BaseField = None
-) -> object:
+) -> Optional[object]:
     """Deserialize a YAML document into an object.
 
     Args:

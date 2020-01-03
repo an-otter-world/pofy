@@ -5,6 +5,7 @@ YAML documents.
 """
 from abc import abstractmethod
 from re import compile as re_compile
+from typing import Optional
 
 from yaml import Node
 
@@ -16,7 +17,7 @@ class TagHandler:
         tag_pattern: The tag pattern for this handler, without leading !
     """
 
-    tag_pattern: str = None
+    tag_pattern: str
 
     def __init__(self):
         """Initialize TagHandler."""
@@ -38,7 +39,7 @@ class TagHandler:
         return pattern.match(tag) is not None
 
     @abstractmethod
-    def transform(self, context) -> Node:
+    def transform(self, context) -> Optional[Node]:
         """Transform the given node.
 
         Args:

@@ -36,7 +36,7 @@ class IntField(ScalarField):
         self._minimum = minimum
         self._maximum = maximum
 
-    def _convert(self, context) -> int:
+    def _convert(self, context) -> Optional[int]:
         node = context.current_node()
         value = node.value
         try:

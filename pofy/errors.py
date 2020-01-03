@@ -120,7 +120,7 @@ _CODE_TO_EXCEPTION_TYPE_MAPPING = {
 }
 
 
-def get_exception_type(error_code: int):
+def get_exception_type(error_code: ErrorCode):
     """Get exception type that should be raised for a given error code.
 
     Args:

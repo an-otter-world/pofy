@@ -28,10 +28,10 @@ class FloatField(ScalarField):
 
         """
         super().__init__(*args, **kwargs)
-        self._minimum = minimum
-        self._maximum = maximum
+        self._minimum: Optional[float] = minimum
+        self._maximum: Optional[float] = maximum
 
-    def _convert(self, context) -> float:
+    def _convert(self, context) -> Optional[float]:
         node = context.current_node()
         value = node.value
         try:
