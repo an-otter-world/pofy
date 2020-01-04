@@ -3,7 +3,6 @@ from pathlib import Path
 
 from pofy import ErrorCode
 from pofy import PathField
-from pofy import load
 
 from tests.fixtures import check_field
 from tests.fixtures import check_field_error
@@ -38,7 +37,7 @@ def test_path_field(datadir: Path) -> None:
         result = check_load(yaml_file, _PathObject)
         assert result.field == datadir / 'some_file.txt'
 
-    result = load('not_checked: doesnt_exists.txt', _PathObject)
+    result = check_load('not_checked: doesnt_exists.txt', _PathObject)
     assert result.not_checked == Path('doesnt_exists.txt')
 
 
