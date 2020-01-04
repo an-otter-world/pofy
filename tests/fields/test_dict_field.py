@@ -1,5 +1,4 @@
 """Dictionary field tests."""
-from typing import Any
 
 from pofy import DictField
 from pofy import ErrorCode
@@ -16,15 +15,15 @@ class _DictObject:
         dict_field = DictField(StringField())
 
 
-def _check_dict_field(yaml_value: str, expected_value: dict) -> Any:
+def _check_dict_field(yaml_value: str, expected_value: dict) -> None:
     check_field(_DictObject, 'dict_field', yaml_value, expected_value)
 
 
-def _check_dict_field_error(yaml_value: str, expected_error: ErrorCode) -> Any:
+def _check_dict_field_error(yaml_value: str, expected_error: ErrorCode) -> None:
     check_field_error(_DictObject, 'dict_field', yaml_value, expected_error)
 
 
-def test_dict_field() -> Any:
+def test_dict_field() -> None:
     """Test dict field loads correct values."""
     _check_dict_field(
         '\n  key_1: value_1'
@@ -40,7 +39,7 @@ def test_dict_field() -> Any:
     )
 
 
-def test_dict_field_error_handling() -> Any:
+def test_dict_field_error_handling() -> None:
     """Test BoolField error handling behaves correctly."""
     _check_dict_field_error('["a", "list"]', ErrorCode.UNEXPECTED_NODE_TYPE)
     _check_dict_field_error('scalar_value', ErrorCode.UNEXPECTED_NODE_TYPE)
