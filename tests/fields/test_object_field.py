@@ -1,12 +1,9 @@
 """Object field tests."""
-from typing import Type
-
 from pofy import ErrorCode
 from pofy import LOADING_FAILED
 from pofy import ObjectField
 from pofy import StringField
 from pofy import BoolField
-from pofy import load
 
 from tests.fixtures import check_field_error
 from tests.fixtures import check_load
