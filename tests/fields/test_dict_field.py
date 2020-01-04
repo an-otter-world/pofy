@@ -12,34 +12,32 @@ class _DictObject:
     class Schema:
         """Pofy fields."""
 
-        dict_field = DictField(StringField())
+        field = DictField(StringField())
 
 
-def _check_dict_field(yaml_value: str, expected_value: dict) -> None:
-    check_field(_DictObject, 'dict_field', yaml_value, expected_value)
+def _check_field(yaml_value: str, expected_value: dict) -> None:
+    check_field(_DictObject, 'field', yaml_value, expected_value)
 
 
-def _check_dict_field_error(yaml_value: str, expected_error: ErrorCode) -> None:
-    check_field_error(_DictObject, 'dict_field', yaml_value, expected_error)
+def _check_field_error(yaml_value: str, expected_error: ErrorCode) -> None:
+    check_field_error(_DictObject, 'field', yaml_value, expected_error)
 
 
 def test_dict_field() -> None:
-    """Test dict field loads correct values."""
-    _check_dict_field(
-        '\n  key_1: value_1'
-        '\n  key_2: value_2',
+    """Dict field should load correct values."""
+    _check_field(
+        '{key_1: value_1, key_2: value_2}',
         {'key_1': 'value_1', 'key_2': 'value_2'}
     )
 
     # A loading failure on an item shouldn't set the corresponding key
-    _check_dict_field(
-        '\n  key_1: !fail value_1'
-        '\n  key_2: value_2',
+    _check_field(
+        '{key_1: !fail value_1, key_2: value_2}',
         {'key_2': 'value_2'}
     )
 
 
 def test_dict_field_error_handling() -> None:
-    """Test BoolField error handling behaves correctly."""
-    _check_dict_field_error('["a", "list"]', ErrorCode.UNEXPECTED_NODE_TYPE)
-    _check_dict_field_error('scalar_value', ErrorCode.UNEXPECTED_NODE_TYPE)
+    """Dict field should correctly handle errors."""
+    _check_field_error('scalar_value', ErrorCode.UNEXPECTED_NODE_TYPE)
+    _check_field_error('[a, list]', ErrorCode.UNEXPECTED_NODE_TYPE)

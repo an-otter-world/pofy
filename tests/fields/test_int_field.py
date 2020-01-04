@@ -1,9 +1,9 @@
 """Integer field tests."""
 from pofy import ErrorCode
 from pofy import IntField
-from pofy import load
 
-from tests.fixtures import expect_load_error
+from tests.fixtures import check_field
+from tests.fixtures import check_field_error
 
 
 class _IntObject:
@@ -11,54 +11,37 @@ class _IntObject:
     class Schema:
         """Pofy fields."""
 
-        int_field = IntField()
-        hex_int_field = IntField(base=16)
-        bounded_int_field = IntField(minimum=10, maximum=20)
+        field = IntField(minimum=10, maximum=20)
+        hex_field = IntField(base=16)
 
 
-def test_int_field():
-    """Test integer field loading works."""
-    test = load('int_field: 10', _IntObject)
-    assert test.int_field == 10
-
-    test = load('int_field: 0xF00D00FAFA', _IntObject)
-    assert test.int_field == 0xF00D00FAFA
-
-    test = load('int_field: 0o42', _IntObject)
-    assert test.int_field == 0o42
+def _check_field(field: str, yml_value: str, expected_value: int) -> None:
+    check_field(_IntObject, field, yml_value, expected_value)
 
 
-def test_int_field_bad_value_raises():
-    """Test integer field bad value raises an error."""
-    result = expect_load_error(
-        ErrorCode.VALUE_ERROR,
-        'int_field: not_convertible',
-        _IntObject,
-    )
-    assert not hasattr(result, 'int_field')
+def _check_field_error(
+    field: str,
+    yml_value: str,
+    expected_error: ErrorCode
+) -> None:
+    check_field_error(_IntObject, field, yml_value, expected_error)
 
 
-def test_int_field_base():
-    """Test integer field base parameter works."""
-    test = load('hex_int_field: F00D00FAFA', _IntObject)
-    assert test.hex_int_field == 0xF00D00FAFA
+def test_int_field() -> None:
+    """Int field should load correct values."""
+    _check_field('field', '15', 15)
+    _check_field('field', '0xF', 0xF)
+    _check_field('field', '0o20', 0o20)
+    _check_field('hex_field', 'F00D00FAFA', 0xF00D00FAFA)
 
 
-def test_int_field_min_max():
-    """Test integer field minimum / maximum parameter works."""
-    result = expect_load_error(
-        ErrorCode.VALIDATION_ERROR,
-        'bounded_int_field: 0',
-        _IntObject,
-    )
-    assert not hasattr(result, 'int_field')
+def test_int_field_error_handling() -> None:
+    """Int field should correctly handle errors."""
+    _check_field_error('field', '[a, list]', ErrorCode.UNEXPECTED_NODE_TYPE)
+    _check_field_error('field', '{a: dict}', ErrorCode.UNEXPECTED_NODE_TYPE)
 
-    result = expect_load_error(
-        ErrorCode.VALIDATION_ERROR,
-        'bounded_int_field: 100',
-        _IntObject,
-    )
-    assert not hasattr(result, 'int_field')
+    _check_field_error('field', 'bad_value', ErrorCode.VALUE_ERROR)
 
-    test = load('bounded_int_field: 20', _IntObject)
-    assert test.bounded_int_field == 20
+    # Out of bounds
+    _check_field_error('field', '0', ErrorCode.VALIDATION_ERROR)
+    _check_field_error('field', '100', ErrorCode.VALIDATION_ERROR)

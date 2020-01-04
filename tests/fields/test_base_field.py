@@ -7,7 +7,7 @@ from tests.fixtures import check_field_error
 
 
 def test_field_validation():
-    """Test custom field validation behaves correctly."""
+    """Custom field validation should behave correctly."""
     def _validate(context: LoadingContext, _: str):
         context.error(ErrorCode.VALIDATION_ERROR, 'Test')
         return False
