@@ -3,7 +3,7 @@ from pofy import StringField
 from pofy import LoadingContext
 from pofy import ErrorCode
 
-from tests.fixtures import expect_field_error
+from tests.fixtures import check_field_error
 
 
 def test_field_validation():
@@ -19,7 +19,7 @@ def test_field_validation():
 
             validated_field = StringField(validate=_validate)
 
-    expect_field_error(
+    check_field_error(
         _ValidateFieldObject,
         'validated_field',
         'value',

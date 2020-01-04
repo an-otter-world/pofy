@@ -22,8 +22,8 @@ def check_field(
     field_value: str,
     expected_value: Any
 ):
-    """Checks a field correctly loads the given YAML value."""
-    result = load(
+    """Check a field correctly loads the given YAML value."""
+    result = check_load(
         '{}: {}'.format(field_name, field_value),
         object_class
     )
@@ -37,13 +37,66 @@ def check_field_error(
     field_value: str,
     expected_error: ErrorCode,
 ):
-    """Check that loading a field raises an error and doesn't set the field."""
-    result = expect_load_error(
-        expected_error,
+    """Check that loading emits the given error and doesn't set the field."""
+    result = check_load(
         '{}: {}'.format(field_name, field_value),
         object_class,
+        expected_error=expected_error,
     )
     assert not hasattr(result, field_value)
+
+
+def check_load(
+    source: Union[str, IO[str]],
+    object_class: Type,
+    expected_error: ErrorCode = None,
+):
+    """Check than loading given source returns or not an error."""
+    class _FailTagHandler(TagHandler):
+        tag_pattern = '^fail$'
+
+        def load(self, __, ___):
+            """TagHandler.transform implementation."""
+            return LOADING_FAILED
+
+    handler_called = False
+
+    def _handler(__: Node, code: ErrorCode, ___: str):
+        nonlocal handler_called
+        handler_called = True
+        assert expected_error is not None
+        assert code == expected_error
+
+    result = load(
+        source,
+        object_class,
+        tag_handlers=[_FailTagHandler()],
+        error_handler=_handler
+    )
+
+    if expected_error is not None:
+        assert handler_called
+
+    return result
+
+
+def load_with_fail_tag(
+    source: Union[str, IO[str]],
+    object_class: Type,
+) -> Optional[object]:
+    """Load the given object, expecting an error to be raised."""
+    class _FailTagHandler(TagHandler):
+        tag_pattern = '^fail$'
+
+        def load(self, __, ___):
+            """TagHandler.transform implementation."""
+            return LOADING_FAILED
+
+    return load(
+        source,
+        object_class,
+        tag_handlers=[_FailTagHandler()]
+    )
 
 
 def expect_load_error(

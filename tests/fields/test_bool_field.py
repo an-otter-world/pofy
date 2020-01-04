@@ -26,7 +26,7 @@ def _check_bool_field_error(yaml_value: str, expected_error: ErrorCode):
 
 
 def test_bool_field() -> Any:
-    """Test bool field loads correct values."""
+    """Test BoolField loads correct values."""
     true_values = [
         'y', 'Y', 'yes', 'Yes', 'YES',
         'true', 'True', 'TRUE',
