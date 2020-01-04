@@ -4,7 +4,9 @@ from inspect import getmembers
 from inspect import isclass
 from inspect import ismethod
 from typing import Any
+from typing import Callable
 from typing import Dict
+from typing import Iterable
 from typing import Optional
 from typing import Set
 from typing import Type
@@ -116,7 +118,7 @@ def _load(object_class: Type, context: ILoadingContext):
         return None
 
     result, set_fields = _load_object(object_class, fields, context)
-    if _validate_object(object_class, result, fields, set_fields, context):
+    if _validate_object(result, fields, set_fields, context):
         return result
 
     return None
@@ -152,16 +154,18 @@ def _load_object(
 
         setattr(result, field_name, field_value)
 
+    _post_load(result)
+
     return (result, set_fields)
 
 
 def _validate_object(
-    object_class: Type,
     obj: Any,
     fields: Dict[str, BaseField],
     set_fields: Set[str],
     context: ILoadingContext
 ) -> bool:
+    object_class = obj.__class__
     valid_object = True
     for name, field in fields.items():
         if field.required and name not in set_fields:
@@ -171,11 +175,17 @@ def _validate_object(
                 _('Missing required field {}'), name
             )
 
-    for validate in _get_validation_methods(object_class):
+    for validate in _get_methods(object_class, 'validate'):
         if not validate(context, obj):
             valid_object = False
 
     return valid_object
+
+
+def _post_load(obj: Any) -> Any:
+    object_class = obj.__class__
+    for post_load_method in _get_methods(object_class, 'post_load'):
+        post_load_method(obj)
 
 
 def _is_schema_class(member):
@@ -184,10 +194,6 @@ def _is_schema_class(member):
 
 def _is_field(member):
     return isinstance(member, BaseField)
-
-
-def _is_validation_method(member):
-    return ismethod(member) and member.__name__ == 'validate'
 
 
 def _get_schema_classes(cls):
@@ -220,11 +226,14 @@ def _get_fields(cls, context: ILoadingContext) \
     return fields
 
 
-def _get_validation_methods(cls):
-    for base in cls.__bases__:
-        for field in _get_validation_methods(base):
-            yield field
+def _get_methods(cls: Type, method_name: str) -> Iterable[Callable]:
+    def _is_validation_method(member):
+        return ismethod(member) and member.__name__ == method_name
 
-    for __, schemaclass in getmembers(cls, _is_schema_class):
-        for __, field in getmembers(schemaclass, _is_validation_method):
-            yield field
+    for base in cls.__bases__:
+        for method in _get_methods(base, method_name):
+            yield method
+
+    for __, schema_class in getmembers(cls, _is_schema_class):
+        for __, method in getmembers(schema_class, _is_validation_method):
+            yield method

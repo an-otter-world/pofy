@@ -239,3 +239,25 @@ def test_object_without_schema_raise_error():
         'i_should: not_event_be_parsed',
         _ObjectWithoutSchema,
     )
+
+
+def test_post_load_called():
+    """Test that post_load methods are called."""
+    post_load_called = False
+
+    class _PostLoadObject:
+        class Schema:
+            """Pofy fields."""
+
+            test_field = StringField()
+
+            @classmethod
+            def post_load(cls, obj):
+                """Post load."""
+
+                nonlocal post_load_called
+                post_load_called = True
+                assert obj.test_field == 'test_value'
+
+    load('test_field: test_value', _PostLoadObject)
+    assert post_load_called
