@@ -254,7 +254,6 @@ def test_post_load_called():
             @classmethod
             def post_load(cls, obj):
                 """Post load."""
-
                 nonlocal post_load_called
                 post_load_called = True
                 assert obj.test_field == 'test_value'
