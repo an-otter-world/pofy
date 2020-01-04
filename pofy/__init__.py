@@ -26,6 +26,7 @@ from .fields.string_field import StringField
 from .loader import load
 from .loading_context import LoadingContext
 
+from .tag_handlers.env_handler import EnvHandler
 from .tag_handlers.glob_handler import GlobHandler
 from .tag_handlers.import_handler import ImportHandler
 from .tag_handlers.tag_handler import TagHandler

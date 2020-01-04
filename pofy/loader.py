@@ -22,6 +22,7 @@ from pofy.fields.list_field import ListField
 from pofy.fields.object_field import ObjectField
 from pofy.fields.string_field import StringField
 from pofy.loading_context import LoadingContext
+from pofy.tag_handlers.env_handler import EnvHandler
 from pofy.tag_handlers.glob_handler import GlobHandler
 from pofy.tag_handlers.import_handler import ImportHandler
 from pofy.tag_handlers.tag_handler import TagHandler
@@ -51,10 +52,9 @@ def load(
         object_class : Class of the object to create. It will infer the root
                        field to use from this type (Scalar, list, dictionary,
                        or object).
-        resolve_roots: Base filesystem paths used to resolve !include tags.
-                       (will instanciate a pofy.FileSystemResolver for each
-                       path if this parameter is not none.)
-        tag_handlers : Custom pofy.Resolvers to use when resolving includes.
+        resolve_roots: Base filesystem paths used to resolve !import and !glob
+                       tags.
+        tag_handlers : Custom TagHandlers.
         error_handler : Called with arguments (node, error_message) when an
                         error occurs. If it's not specified, a PofyError will
                         be raised when an error occurs.
@@ -77,12 +77,9 @@ def load(
                 _('tag_handlers items should be subclass of TagHandler')
         all_tag_handlers.extend(tag_handlers)
 
-    if resolve_roots is not None:
-        assert isinstance(resolve_roots, list), \
-            _('resolve_roots must be a list of Path.')
-
-        all_tag_handlers.append(ImportHandler(resolve_roots))
-        all_tag_handlers.append(GlobHandler(resolve_roots))
+    all_tag_handlers.append(ImportHandler(resolve_roots))
+    all_tag_handlers.append(GlobHandler(resolve_roots))
+    all_tag_handlers.append(EnvHandler())
 
     if error_handler is not None:
         assert callable(error_handler), \
