@@ -1,9 +1,9 @@
 """String field tests."""
 from pofy import BoolField
 from pofy import ErrorCode
-from pofy import load
 
-from tests.fixtures import expect_field_error
+from tests.fixtures import check_field
+from tests.fixtures import check_field_error
 
 
 class _BoolObject:
@@ -15,6 +15,14 @@ class _BoolObject:
         bool_field = BoolField()
 
 
+def _check_bool_field(value, expected_value):
+    check_field(_BoolObject, 'bool_field', value, expected_value)
+
+
+def _check_bool_field_error(value, expected_error):
+    check_field_error(_BoolObject, 'bool_field', value, expected_error)
+
+
 def test_bool_field():
     """Test bool field loads correct values."""
     true_values = [
@@ -22,41 +30,21 @@ def test_bool_field():
         'true', 'True', 'TRUE',
         'on', 'On', 'ON'
     ]
+
+    for value in true_values:
+        _check_bool_field(value, True)
+
     false_values = [
         'n', 'N', 'no', 'No', 'NO',
         'false', 'False', 'FALSE'
         'off', 'Off', 'OFF'
     ]
 
-    for value in true_values:
-        test = load(
-            'bool_field: {}'.format(value),
-            _BoolObject,
-        )
-
-        assert isinstance(test.bool_field, bool)
-        assert test.bool_field
-
     for value in false_values:
-        test = load(
-            'bool_field: {}'.format(value),
-            _BoolObject,
-        )
-
-        assert isinstance(test.bool_field, bool)
-        assert not test.bool_field
+        _check_bool_field(value, False)
 
 
 def test_bool_field_error_handling():
     """Test BoolField error handling behaves correctly."""
-    expect_field_error(
-        _BoolObject,
-        'bool_field', 'NotValidValue',
-        ErrorCode.VALUE_ERROR
-    )
-
-    expect_field_error(
-        _BoolObject,
-        'bool_field', '["a", "list"]',
-        ErrorCode.UNEXPECTED_NODE_TYPE
-    )
+    _check_bool_field_error('NotValidValue', ErrorCode.VALUE_ERROR)
+    _check_bool_field_error('["a", "list"]', ErrorCode.UNEXPECTED_NODE_TYPE)

@@ -1,4 +1,5 @@
 """Test fixtures & dummy classes."""
+from typing import Any
 from typing import IO
 from typing import List
 from typing import Optional
@@ -15,7 +16,22 @@ from pofy import TagHandler
 from pofy import load
 
 
-def expect_field_error(
+def check_field(
+    object_class: Type,
+    field_name: str,
+    field_value: str,
+    expected_value: Any
+):
+    """Checks a field correctly loads the given YAML value."""
+    result = load(
+        '{}: {}'.format(field_name, field_value),
+        object_class
+    )
+
+    assert getattr(result, field_name) == expected_value
+
+
+def check_field_error(
     object_class: Type,
     field_name: str,
     field_value: str,
