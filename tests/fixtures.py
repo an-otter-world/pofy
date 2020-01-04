@@ -9,10 +9,10 @@ from yaml import Node
 
 from pofy import BaseField
 from pofy import ErrorCode
+from pofy import LOADING_FAILED
 from pofy import LoadingContext
 from pofy import TagHandler
 from pofy import load
-from pofy.common import LOADING_FAILED
 
 
 def expect_load_error(
@@ -29,7 +29,7 @@ def expect_load_error(
         error_raised = True
         assert error == expected_error
 
-    load(
+    return load(
         source,
         object_class,
         error_handler=_on_error,
@@ -60,7 +60,8 @@ def load_node(
     expected_error: Optional[ErrorCode] = None,
     tag_handlers: Optional[List[TagHandler]] = None,
     node: Node = None,
-    location: Optional[str] = None
+    location: Optional[str] = None,
+    field: BaseField = None
 ):
     """Load the given object, expecting an error to be raised."""
     handler_called = False
@@ -80,6 +81,9 @@ def load_node(
     class _MockField(BaseField):
         def _load(self, context):
             return context.current_node().value
+
+    if field is None:
+        field = _MockField()
 
     context = LoadingContext(
         error_handler=_handler,

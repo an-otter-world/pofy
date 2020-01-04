@@ -1,7 +1,7 @@
 """String field tests."""
-from pofy import load
-from pofy import ErrorCode
 from pofy import BoolField
+from pofy import ErrorCode
+from pofy import load
 
 from tests.fixtures import expect_load_error
 

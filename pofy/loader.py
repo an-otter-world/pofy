@@ -3,10 +3,10 @@ from gettext import gettext as _
 from inspect import isclass
 from io import TextIOBase
 from pathlib import Path
+from typing import Any
 from typing import Callable
 from typing import IO
 from typing import List
-from typing import Optional
 from typing import Type
 from typing import Union
 
@@ -44,7 +44,7 @@ def load(
     tag_handlers: List[TagHandler] = None,
     error_handler: Callable = None,
     root_field: BaseField = None
-) -> Optional[object]:
+) -> Any:
     """Deserialize a YAML document into an object.
 
     Args:

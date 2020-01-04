@@ -4,6 +4,7 @@ from .common import BadTypeFormatError
 from .common import ErrorCode
 from .common import FieldNotDeclaredError
 from .common import ImportNotFoundError
+from .common import LOADING_FAILED
 from .common import MissingRequiredFieldError
 from .common import MultipleMatchingHandlersError
 from .common import PofyError
@@ -21,6 +22,7 @@ from .fields.float_field import FloatField
 from .fields.int_field import IntField
 from .fields.list_field import ListField
 from .fields.object_field import ObjectField
+from .fields.path_field import PathField
 from .fields.string_field import StringField
 
 from .loader import load
