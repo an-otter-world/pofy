@@ -2,10 +2,9 @@
 from pofy import ErrorCode
 from pofy import ListField
 from pofy import StringField
-from pofy import load
 
-from tests.fixtures import expect_load_error
-from tests.fixtures import load_with_fail_tag
+from tests.fixtures import check_field
+from tests.fixtures import check_field_error
 
 
 class _ListObject:
@@ -13,34 +12,26 @@ class _ListObject:
     class Schema:
         """Pofy fields."""
 
-        list_field = ListField(StringField())
+        field = ListField(StringField())
 
 
-def test_list_field():
-    """Test list field loading works."""
-    test = load('list_field: ["value_1", "value_2" ]', _ListObject)
-    assert test.list_field == ['value_1', 'value_2']
+def _check_field(yaml_value: str, expected_value: list) -> None:
+    check_field(_ListObject, 'field', yaml_value, expected_value)
 
 
-def test_list_field_error_on_bad_node():
-    """Test list field loading raises an error on bad node."""
-    result = expect_load_error(
-        ErrorCode.UNEXPECTED_NODE_TYPE,
-        'list_field:\n'
-        '  key_1: value_1\n'
-        '  key_2: value_2',
-        _ListObject,
-    )
-    assert not hasattr(result, 'list_field')
+def _check_field_error(yaml_value: str, expected_error: ErrorCode) -> None:
+    check_field_error(_ListObject, 'field', yaml_value, expected_error)
 
 
-def test_list_field_ignores_tag_handler_failure():
-    """Test dict field loading raises an error on bad node."""
-    test = load_with_fail_tag(
-        'list_field:\n'
-        '- !fail value_1\n'
-        '- value_2',
-        _ListObject
-    )
+def test_list_field() -> None:
+    """List field should load correct values."""
+    _check_field('[ item1, item2 ]', ['item1', 'item2'])
 
-    assert test.list_field == ['value_2']
+    # A loading failure on an item shouldn't be added to the list
+    _check_field('[ !fail item1, item2 ]', ['item2'])
+
+
+def test_list_field_error_handling() -> None:
+    """List field should correctly handle errors."""
+    _check_field_error('scalar_value', ErrorCode.UNEXPECTED_NODE_TYPE)
+    _check_field_error('{a, dict}', ErrorCode.UNEXPECTED_NODE_TYPE)
