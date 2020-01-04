@@ -7,7 +7,7 @@ from pofy import ObjectField
 from pofy import StringField
 from pofy import load
 
-from tests.fixtures import check_load
+from tests.helpers import check_load
 
 
 def test_resolve_root_works(datadir):

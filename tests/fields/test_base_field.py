@@ -3,7 +3,7 @@ from pofy import StringField
 from pofy import LoadingContext
 from pofy import ErrorCode
 
-from tests.fixtures import check_field_error
+from tests.helpers import check_field_error
 
 
 def test_field_validation():

@@ -4,9 +4,9 @@ from pathlib import Path
 from pofy import ErrorCode
 from pofy import PathField
 
-from tests.fixtures import check_field
-from tests.fixtures import check_field_error
-from tests.fixtures import check_load
+from tests.helpers import check_field
+from tests.helpers import check_field_error
+from tests.helpers import check_load
 
 
 class _PathObject:

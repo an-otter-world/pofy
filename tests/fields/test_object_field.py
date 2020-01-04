@@ -5,8 +5,8 @@ from pofy import ObjectField
 from pofy import StringField
 from pofy import BoolField
 
-from tests.fixtures import check_field_error
-from tests.fixtures import check_load
+from tests.helpers import check_field_error
+from tests.helpers import check_load
 
 
 class _Owned:

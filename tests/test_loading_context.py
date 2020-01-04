@@ -9,7 +9,7 @@ from pofy import PofyValueError
 from pofy import TagHandler
 from pofy.loading_context import LoadingContext
 
-from tests.fixtures import load_node
+from tests.helpers import load_node
 
 
 def test_loading_context_raises():

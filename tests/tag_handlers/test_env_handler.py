@@ -7,7 +7,7 @@ from pofy import EnvHandler
 from pofy import ErrorCode
 from pofy.common import LOADING_FAILED
 
-from tests.fixtures import load_node
+from tests.helpers import load_node
 
 
 def test_bad_node_for_env_raises():

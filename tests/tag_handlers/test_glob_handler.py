@@ -5,7 +5,7 @@ from yaml import ScalarNode
 from pofy import ErrorCode
 from pofy import GlobHandler
 
-from tests.fixtures import load_node
+from tests.helpers import load_node
 
 
 def test_bad_node_for_glob_raises():

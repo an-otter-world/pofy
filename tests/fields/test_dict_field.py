@@ -4,8 +4,8 @@ from pofy import DictField
 from pofy import ErrorCode
 from pofy import StringField
 
-from tests.fixtures import check_field
-from tests.fixtures import check_field_error
+from tests.helpers import check_field
+from tests.helpers import check_field_error
 
 
 class _DictObject:

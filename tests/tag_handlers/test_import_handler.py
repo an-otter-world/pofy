@@ -7,7 +7,7 @@ from pofy.common import LOADING_FAILED
 from pofy import ErrorCode
 from pofy import ImportHandler
 
-from tests.fixtures import load_node
+from tests.helpers import load_node
 
 
 def test_import_tag_works(datadir):
