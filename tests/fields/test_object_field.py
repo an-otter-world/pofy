@@ -75,7 +75,7 @@ class _ValidationError:
         """Pofy fields."""
 
         @classmethod
-        def validate(cls, context, obj):
+        def validate(cls, context, __):
             """Validate loaded objects."""
             context.error(ErrorCode.VALIDATION_ERROR, 'Error')
             return False
