@@ -1,11 +1,12 @@
 """Dictionary field class & utilities."""
 from gettext import gettext as _
 from typing import Optional
+
 from yaml import ScalarNode
 
-from pofy.loading_context import LoadingContext
-
-from .base_field import BaseField
+from pofy.common import LOADING_FAILED
+from pofy.fields.base_field import BaseField
+from pofy.interfaces import ILoadingContext
 
 
 class DictField(BaseField):
@@ -24,7 +25,7 @@ class DictField(BaseField):
             _('item_field must be an implementation of BaseField.')
         self._item_field = item_field
 
-    def _load(self, context: LoadingContext) -> Optional[dict]:
+    def _load(self, context: ILoadingContext) -> Optional[dict]:
         node = context.current_node()
         if not context.expect_mapping():
             return None
@@ -34,9 +35,10 @@ class DictField(BaseField):
             assert isinstance(key_node, ScalarNode)
             key = key_node.value
 
-            with context.load(value_node) as loaded:
-                if not loaded:
-                    continue
-                result[key] = self._item_field.load(context)
+            item = context.load(self._item_field, value_node)
+            if item is LOADING_FAILED:
+                continue
+
+            result[key] = item
 
         return result

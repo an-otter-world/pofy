@@ -1,8 +1,12 @@
-"""Error handling classes & utilities."""
+"""Pofy common definitions."""
 from enum import Enum
 from typing import AnyStr
 
 from yaml import Node
+
+# Unique symbol used to differentiate an error from a valid None return when
+# loading a field.
+LOADING_FAILED = object()
 
 
 class ErrorCode(Enum):

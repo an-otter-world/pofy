@@ -1,10 +1,10 @@
 """Loading context class & utilities."""
-from contextlib import contextmanager
 from gettext import gettext as _
 from typing import Any
 from typing import Callable
 from typing import List
 from typing import Optional
+from typing import Tuple
 from typing import Type
 
 from yaml import MappingNode
@@ -12,14 +12,17 @@ from yaml import Node
 from yaml import ScalarNode
 from yaml import SequenceNode
 
-from .errors import ErrorCode
-from .errors import get_exception_type
-from .tag_handlers.tag_handler import TagHandler
+from pofy.common import ErrorCode
+from pofy.common import get_exception_type
+from pofy.interfaces import IBaseField
+from pofy.interfaces import ILoadingContext
+from pofy.tag_handlers.tag_handler import TagHandler
 
 ErrorHandler = Optional[Callable[[Node, ErrorCode, str], Any]]
+NodeStack = List[Tuple[Node, Optional[str]]]
 
 
-class LoadingContext:
+class LoadingContext(ILoadingContext):
     """Context aggregating resolve & error reporting functions."""
 
     def __init__(
@@ -30,44 +33,59 @@ class LoadingContext:
         """Initialize context."""
         self._error_handler = error_handler
         self._tag_handlers = tag_handlers
-        self._node_stack: List[Node] = []
+        self._node_stack: NodeStack = []
 
-    @contextmanager
-    def load(self, node: Node):
+    def load(
+        self,
+        field: IBaseField,
+        node: Node,
+        location: Optional[str] = None
+    ) -> Any:
         """Push a node in the context.
 
         This is solely used to know which node is currently loaded when calling
         error function, to avoid having to pass around node objects.
 
         Args:
+            field: Field describing this node.
             node: Currently loaded node.
+            location: The path from which this node was loaded. Every node
+                       pushed subsequently will be considered having the
+                       same path, except until another child path is pushed.
 
         """
         if len(self._node_stack) > 0:
             assert self._node_stack[-1] != node
 
-        # The node returned by handle_tag can be different than the one passed
-        # as argument (for example, the given node is an !import node)
+        self._node_stack.append((node, location))
 
-        self._node_stack.append(node)
+        try:
+            tag_handler = self._get_tag_handler(node)
+            if tag_handler is not None:
+                result = tag_handler.load(self, field)
+            else:
+                result = field.load(self)
+        finally:
+            self._node_stack.pop()
 
-        transformed_node = self._handle_tag(node)
+        return result
 
-        if transformed_node is None:
-            yield False
-        elif transformed_node == node:
-            yield True
-        else:
-            with self.load(transformed_node) as loaded:
-                yield loaded
-
-        self._node_stack.pop()
-
-    def current_node(self):
+    def current_node(self) -> Node:
         """Return the currently loaded node."""
         nodes = self._node_stack
         assert len(nodes) > 0
-        return nodes[-1]
+        return nodes[-1][0]
+
+    def current_location(self) -> Optional[str]:
+        """Return the location of the document owning the current node.
+
+        If no path can be found, returs None.
+        """
+        for __, location in reversed(self._node_stack):
+            if location is not None:
+                return location
+
+        return None
 
     def expect_scalar(self, message: str = None):
         """Return false and raise an error if the current node isn't scalar."""
@@ -111,7 +129,7 @@ class LoadingContext:
 
         """
         assert len(self._node_stack) > 0
-        node = self._node_stack[-1]
+        node, __ = self._node_stack[-1]
         message = message_format.format(*args, **kwargs)
         if self._error_handler is not None:
             self._error_handler(node, code, message)
@@ -138,29 +156,23 @@ class LoadingContext:
 
         return True
 
-    def _handle_tag(self, node):
+    def _get_tag_handler(self, node: Node) -> Optional[TagHandler]:
         tag = node.tag
         if not tag.startswith('!'):
-            return node
+            return None
 
-        transformed_node = None
-        handler_found = False
+        found_handler = None
         for handler in self._tag_handlers:
             if not handler.match(node):
                 continue
 
-            handler_found = True
-
-            if transformed_node is not None:
+            if found_handler is not None:
                 self.error(
                     ErrorCode.MULTIPLE_MATCHING_HANDLERS,
                     _('Got multiple matching handlers for tag {}'), tag
                 )
                 continue
 
-            transformed_node = handler.transform(self)
+            found_handler = handler
 
-        if not handler_found:
-            return node
-
-        return transformed_node
+        return found_handler

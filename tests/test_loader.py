@@ -83,3 +83,26 @@ def test_load_handles_stream(datadir):
 
     test = load(StringIO('test_field: test_value'), dict)
     assert test == {'test_field': 'test_value'}
+
+
+def test_load_defines_node_path(datadir):
+    """Test calling load with a stream registers the path of the root object."""
+    file_path = datadir / 'object.yaml'
+    validate_called = False
+
+    class _TestObject:
+        class Schema:
+            """Pyfo fields."""
+
+            test_field = StringField()
+
+            @classmethod
+            def validate(cls, context, __):
+                """Validate that context as correct current_node_path."""
+                nonlocal validate_called
+                validate_called = True
+                assert context.current_location() == str(file_path)
+
+    with open(file_path) as yaml_file:
+        load(yaml_file, _TestObject)
+        assert validate_called

@@ -4,15 +4,19 @@ from inspect import getmembers
 from inspect import isclass
 from inspect import ismethod
 from typing import Any
+from typing import Callable
 from typing import Dict
+from typing import Iterable
 from typing import Optional
 from typing import Set
 from typing import Type
 
-from pofy.errors import ErrorCode
-from pofy.loading_context import LoadingContext
+from pofy.common import ErrorCode
+from pofy.common import LOADING_FAILED
+from pofy.fields.base_field import BaseField
+from pofy.fields.string_field import StringField
+from pofy.interfaces import ILoadingContext
 
-from .base_field import BaseField
 
 _TYPE_FORMAT_MSG = _("""\
 Type tag should be in the form !type:path.to.Type, got {}""")
@@ -34,17 +38,17 @@ class ObjectField(BaseField):
             _('object_class must be a type')
         self._object_class = object_class
 
-    def _load(self, context: LoadingContext):
+    def _load(self, context: ILoadingContext) -> Any:
         if not context.expect_mapping():
             return None
 
         object_class = self._resolve_type(context)
         if object_class is None:
-            return None
+            return LOADING_FAILED
 
         return _load(object_class, context)
 
-    def _resolve_type(self, context: LoadingContext):
+    def _resolve_type(self, context: ILoadingContext):
         node = context.current_node()
         tag = node.tag
         if not tag.startswith('!type'):
@@ -83,7 +87,7 @@ class ObjectField(BaseField):
 def _get_type(
     module_name: str,
     type_name: str,
-    context: LoadingContext
+    context: ILoadingContext
 ):
     full_name = r'{}.{}'.format(module_name, type_name)
     module = __import__(module_name, fromlist=type_name)
@@ -107,14 +111,14 @@ def _get_type(
     return resolved_type
 
 
-def _load(object_class: Type, context: LoadingContext):
+def _load(object_class: Type, context: ILoadingContext):
     fields = _get_fields(object_class, context)
 
     if fields is None:
         return None
 
     result, set_fields = _load_object(object_class, fields, context)
-    if _validate_object(object_class, result, fields, set_fields, context):
+    if _validate_object(result, fields, set_fields, context):
         return result
 
     return None
@@ -123,44 +127,45 @@ def _load(object_class: Type, context: LoadingContext):
 def _load_object(
     object_class: Type,
     fields: Dict[str, BaseField],
-    context: LoadingContext
+    context: ILoadingContext
 ):
     node = context.current_node()
     result = object_class()
     set_fields = set()
 
     for name_node, value_node in node.value:
-        with context.load(name_node) as loaded:
-            if not loaded:
-                continue
+        field_name = context.load(StringField(), name_node)
+        if field_name is LOADING_FAILED:
+            continue
 
-            field_name = name_node.value
-            set_fields.add(field_name)
-            if field_name not in fields:
-                context.error(
-                    ErrorCode.FIELD_NOT_DECLARED,
-                    _('Field {} is not declared.'), field_name
-                )
-                continue
+        field_name = name_node.value
+        set_fields.add(field_name)
+        if field_name not in fields:
+            context.error(
+                ErrorCode.FIELD_NOT_DECLARED,
+                _('Field {} is not declared.'), field_name
+            )
+            continue
 
-        with context.load(value_node) as loaded:
-            if not loaded:
-                continue
+        field = fields[field_name]
+        field_value = context.load(field, value_node)
+        if field_value is LOADING_FAILED:
+            continue
 
-            field = fields[field_name]
-            field_value = field.load(context)
-            setattr(result, field_name, field_value)
+        setattr(result, field_name, field_value)
+
+    _post_load(result)
 
     return (result, set_fields)
 
 
 def _validate_object(
-    object_class: Type,
     obj: Any,
     fields: Dict[str, BaseField],
     set_fields: Set[str],
-    context: LoadingContext
+    context: ILoadingContext
 ) -> bool:
+    object_class = obj.__class__
     valid_object = True
     for name, field in fields.items():
         if field.required and name not in set_fields:
@@ -170,11 +175,17 @@ def _validate_object(
                 _('Missing required field {}'), name
             )
 
-    for validate in _get_validation_methods(object_class):
+    for validate in _get_methods(object_class, 'validate'):
         if not validate(context, obj):
             valid_object = False
 
     return valid_object
+
+
+def _post_load(obj: Any) -> Any:
+    object_class = obj.__class__
+    for post_load_method in _get_methods(object_class, 'post_load'):
+        post_load_method(obj)
 
 
 def _is_schema_class(member):
@@ -183,10 +194,6 @@ def _is_schema_class(member):
 
 def _is_field(member):
     return isinstance(member, BaseField)
-
-
-def _is_validation_method(member):
-    return ismethod(member) and member.__name__ == 'validate'
 
 
 def _get_schema_classes(cls):
@@ -198,7 +205,8 @@ def _get_schema_classes(cls):
         yield schema_class
 
 
-def _get_fields(cls, context: LoadingContext) -> Optional[Dict[str, BaseField]]:
+def _get_fields(cls, context: ILoadingContext) \
+        -> Optional[Dict[str, BaseField]]:
     schema_classes = list(_get_schema_classes(cls))
 
     if len(schema_classes) == 0:
@@ -218,11 +226,14 @@ def _get_fields(cls, context: LoadingContext) -> Optional[Dict[str, BaseField]]:
     return fields
 
 
-def _get_validation_methods(cls):
-    for base in cls.__bases__:
-        for field in _get_validation_methods(base):
-            yield field
+def _get_methods(cls: Type, method_name: str) -> Iterable[Callable]:
+    def _is_validation_method(member):
+        return ismethod(member) and member.__name__ == method_name
 
-    for __, schemaclass in getmembers(cls, _is_schema_class):
-        for __, field in getmembers(schemaclass, _is_validation_method):
-            yield field
+    for base in cls.__bases__:
+        for method in _get_methods(base, method_name):
+            yield method
+
+    for __, schema_class in getmembers(cls, _is_schema_class):
+        for __, method in getmembers(schema_class, _is_validation_method):
+            yield method

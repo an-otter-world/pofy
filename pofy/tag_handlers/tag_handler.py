@@ -4,13 +4,17 @@ Resolvers are used when an !include tag is encountered, to load the included
 YAML documents.
 """
 from abc import abstractmethod
+from abc import ABC
 from re import compile as re_compile
-from typing import Optional
+from typing import Any
 
 from yaml import Node
 
+from pofy.interfaces import IBaseField
+from pofy.interfaces import ILoadingContext
 
-class TagHandler:
+
+class TagHandler(ABC):
     """Abstract class used to transform yaml node when a tag is encountered.
 
     Members:
@@ -39,13 +43,16 @@ class TagHandler:
         return pattern.match(tag) is not None
 
     @abstractmethod
-    def transform(self, context) -> Optional[Node]:
+    def load(self, context: ILoadingContext, field: IBaseField) -> Any:
         """Transform the given node.
 
         Args:
             context: The loading context.
+            field: The field descriptor to load.
 
         Return:
-            The transformed node (loaded yaml file, environment variable....)
+            A tuple of the transformed node (loaded yaml file, environment,
+            variable....) and a string representing it's location, if
+            applicable.
 
         """

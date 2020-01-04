@@ -1,19 +1,17 @@
 """Tag handler used to import files in YAML documents."""
 from gettext import gettext as _
 from pathlib import Path
-from typing import List
+from typing import Any
 from typing import Optional
-from yaml import Node
-from yaml import compose
-from yaml.parser import ParserError
 
-from pofy.errors import ErrorCode
-from pofy.loading_context import LoadingContext
-
-from .tag_handler import TagHandler
+from pofy.common import ErrorCode
+from pofy.common import LOADING_FAILED
+from pofy.interfaces import IBaseField
+from pofy.interfaces import ILoadingContext
+from pofy.tag_handlers.path_handler import PathHandler
 
 
-class ImportHandler(TagHandler):
+class ImportHandler(PathHandler):
     """Include a YAML document.
 
     Will replace the tagged node by the loaded document.
@@ -21,53 +19,42 @@ class ImportHandler(TagHandler):
 
     tag_pattern = '^(try-import|import)$'
 
-    def __init__(self, roots: List[Path]):
-        """Initialize Import Handler Base.
-
-        Args:
-            roots: Roots paths to use when resolving files.
-
-        """
-        for root_it in roots:
-            assert isinstance(root_it, Path), \
-                _('roots must be a list of Path objects')
-
-        super().__init__()
-        self._roots = roots
-
-    def transform(self, context: LoadingContext) -> Optional[Node]:
+    def load(self, context: ILoadingContext, field: IBaseField) -> Any:
         """See Resolver.resolve for usage."""
         if not context.expect_scalar(
             _('import / try-import must be set on a scalar node')
         ):
-            return None
+            return LOADING_FAILED
 
+        file_path = self._get_file(context)
+        if file_path is None:
+            node = context.current_node()
+            if node.tag == '!import':
+                context.error(
+                    ErrorCode.IMPORT_NOT_FOUND,
+                    _('Unable to find {} in any of the configured directories'),
+                    file_path
+                )
+
+            return LOADING_FAILED
+
+        file_yaml_node = self._load_file(context, file_path)
+
+        if file_yaml_node is None:
+            return LOADING_FAILED
+
+        return context.load(field, file_yaml_node, str(file_path))
+
+    def _get_file(self, context: ILoadingContext) -> Optional[Path]:
         node = context.current_node()
         file_path = Path(node.value)
 
-        for root in self._roots:
+        if file_path.is_absolute():
+            return file_path
+
+        for root in self._get_roots(context):
             path = root / file_path
-            if not path.is_file():
-                continue
-
-            with open(path, 'r') as yaml_file:
-                try:
-                    content = compose(yaml_file)
-                    return content
-                except ParserError as error:
-                    context.error(
-                        ErrorCode.VALUE_ERROR,
-                        _('Parse error while loading {} : {}'),
-                        path,
-                        error
-                    )
-                    return None
-
-        if node.tag == '!import':
-            context.error(
-                ErrorCode.IMPORT_NOT_FOUND,
-                _('Unable to find {} in any of the configured directories'),
-                path
-            )
+            if path.is_file():
+                return path
 
         return None

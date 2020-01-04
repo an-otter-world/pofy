@@ -2,9 +2,9 @@
 from gettext import gettext as _
 from typing import Optional
 
-from pofy.loading_context import LoadingContext
-
-from .base_field import BaseField
+from pofy.common import LOADING_FAILED
+from pofy.fields.base_field import BaseField
+from pofy.interfaces import ILoadingContext
 
 
 class ListField(BaseField):
@@ -23,18 +23,17 @@ class ListField(BaseField):
             _('item_field must be an implementation of BaseField.')
         self._item_field = item_field
 
-    def _load(self, context: LoadingContext) -> Optional[list]:
+    def _load(self, context: ILoadingContext) -> Optional[list]:
         if not context.expect_sequence():
             return None
 
         node = context.current_node()
         result = []
         for item_node in node.value:
-            with context.load(item_node) as loaded:
-                if not loaded:
-                    continue
+            item = context.load(self._item_field, item_node)
+            if item is LOADING_FAILED:
+                continue
 
-                item = self._item_field.load(context)
-                result.append(item)
+            result.append(item)
 
         return result

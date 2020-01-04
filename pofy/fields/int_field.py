@@ -3,9 +3,8 @@ from gettext import gettext as _
 from typing import Optional
 from typing import cast
 
-from pofy.errors import ErrorCode
-
-from .base_field import ScalarField
+from pofy.common import ErrorCode
+from pofy.fields.base_field import ScalarField
 
 
 class IntField(ScalarField):
