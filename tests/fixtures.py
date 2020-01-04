@@ -15,6 +15,21 @@ from pofy import TagHandler
 from pofy import load
 
 
+def expect_field_error(
+    object_class: Type,
+    field_name: str,
+    field_value: str,
+    expected_error: ErrorCode,
+):
+    """Check that loading a field raises an error and doesn't set the field."""
+    result = expect_load_error(
+        expected_error,
+        '{}: {}'.format(field_name, field_value),
+        object_class,
+    )
+    assert not hasattr(result, field_value)
+
+
 def expect_load_error(
     expected_error: ErrorCode,
     source: Union[str, IO[str]],

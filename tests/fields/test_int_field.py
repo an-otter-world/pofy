@@ -37,6 +37,7 @@ def test_int_field_bad_value_raises():
     )
     assert not hasattr(result, 'int_field')
 
+
 def test_int_field_base():
     """Test integer field base parameter works."""
     test = load('hex_int_field: F00D00FAFA', _IntObject)
