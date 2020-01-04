@@ -80,28 +80,6 @@ def check_load(
     return result
 
 
-def expect_load_error(
-    expected_error: ErrorCode,
-    source: Union[str, IO[str]],
-    object_class: Type,
-    tag_handlers: List[TagHandler] = None
-):
-    """Load the given object, expecting an error to be raised."""
-    error_raised = False
-
-    def _on_error(__: Node, error: ErrorCode, ___: str):
-        nonlocal error_raised
-        error_raised = True
-        assert error == expected_error
-
-    return load(
-        source,
-        object_class,
-        error_handler=_on_error,
-        tag_handlers=tag_handlers
-    )
-
-
 def load_node(
     expected_error: Optional[ErrorCode] = None,
     tag_handlers: Optional[List[TagHandler]] = None,
