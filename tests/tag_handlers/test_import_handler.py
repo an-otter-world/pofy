@@ -74,7 +74,7 @@ def test_import_on_parse_error(datadir):
     ]
 
     load_node(
-        node=ScalarNode('!import', 'corrupted.yaml', None, None),
+        node=ScalarNode('!import', 'yaml_error.yaml', None, None),
         expected_error=ErrorCode.VALUE_ERROR,
         tag_handlers=handlers
     )
