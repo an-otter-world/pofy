@@ -90,7 +90,14 @@ def _get_type(
     context: ILoadingContext
 ):
     full_name = r'{}.{}'.format(module_name, type_name)
-    module = __import__(module_name, fromlist=type_name)
+    try:
+        module = __import__(module_name, fromlist=type_name)
+    except ModuleNotFoundError:
+        context.error(
+            ErrorCode.TYPE_RESOLVE_ERROR,
+            _('Can\'t find python module for type {}'), full_name
+        )
+        return None
 
     if not hasattr(module, type_name):
         context.error(

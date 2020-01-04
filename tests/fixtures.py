@@ -121,25 +121,6 @@ def expect_load_error(
     )
 
 
-def load_with_fail_tag(
-    source: Union[str, IO[str]],
-    object_class: Type,
-) -> Optional[object]:
-    """Load the given object, expecting an error to be raised."""
-    class _FailTagHandler(TagHandler):
-        tag_pattern = '^fail$'
-
-        def load(self, __, ___):
-            """TagHandler.transform implementation."""
-            return LOADING_FAILED
-
-    return load(
-        source,
-        object_class,
-        tag_handlers=[_FailTagHandler()]
-    )
-
-
 def load_node(
     expected_error: Optional[ErrorCode] = None,
     tag_handlers: Optional[List[TagHandler]] = None,
