@@ -3,7 +3,7 @@ from pofy import BoolField
 from pofy import ErrorCode
 from pofy import load
 
-from tests.fixtures import expect_load_error
+from tests.fixtures import expect_field_error
 
 
 class _BoolObject:
@@ -16,7 +16,7 @@ class _BoolObject:
 
 
 def test_bool_field():
-    """Test bool field loading works."""
+    """Test bool field loads correct values."""
     true_values = [
         'y', 'Y', 'yes', 'Yes', 'YES',
         'true', 'True', 'TRUE',
@@ -47,18 +47,16 @@ def test_bool_field():
         assert not test.bool_field
 
 
-def test_bad_value_raises():
-    """Test not-scalar node for a string field raise an error."""
-    result = expect_load_error(
-        ErrorCode.VALUE_ERROR,
-        'bool_field: NotValid',
+def test_bool_field_error_handling():
+    """Test BoolField error handling behaves correctly."""
+    expect_field_error(
         _BoolObject,
+        'bool_field', 'NotValidValue',
+        ErrorCode.VALUE_ERROR
     )
-    assert not hasattr(result, 'bool_field')
 
-    expect_load_error(
-        ErrorCode.UNEXPECTED_NODE_TYPE,
-        'bool_field: ["a", "list"]',
+    expect_field_error(
         _BoolObject,
+        'bool_field', '["a", "list"]',
+        ErrorCode.UNEXPECTED_NODE_TYPE
     )
-    assert not hasattr(result, 'bool_field')
