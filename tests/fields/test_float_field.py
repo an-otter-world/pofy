@@ -23,26 +23,29 @@ def test_float_field():
 
 def test_float_field_bad_value_raises():
     """Test bad value on a float field raises an error."""
-    expect_load_error(
+    result = expect_load_error(
         ErrorCode.VALUE_ERROR,
         'float_field: not_convertible',
         _FloatObject,
     )
+    assert not hasattr(result, 'float_field')
 
 
 def test_float_field_min_max():
     """Test float field minimum / maximum parameter works."""
-    expect_load_error(
+    result = expect_load_error(
         ErrorCode.VALIDATION_ERROR,
         'bound_float_field: 0.0',
         _FloatObject,
     )
+    assert not hasattr(result, 'bound_float_field')
 
-    expect_load_error(
+    result = expect_load_error(
         ErrorCode.VALIDATION_ERROR,
         'bound_float_field: 100.0',
         _FloatObject,
     )
+    assert not hasattr(result, 'bound_float_field')
 
-    test = load('bound_float_field: 17.2', _FloatObject)
-    assert test.bound_float_field == 17.2
+    result = load('bound_float_field: 17.2', _FloatObject)
+    assert result.bound_float_field == 17.2

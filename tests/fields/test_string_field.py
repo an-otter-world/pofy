@@ -23,11 +23,12 @@ def test_string_field():
 
 def test_bad_value_raises():
     """Test not-scalar node for a string field raise an error."""
-    expect_load_error(
+    result = expect_load_error(
         ErrorCode.UNEXPECTED_NODE_TYPE,
         'string_field: ["a", "list"]',
         _StringObject
     )
+    assert not hasattr(result, 'string_field')
 
 
 def test_pattern():
@@ -38,8 +39,9 @@ def test_pattern():
     )
     assert test.match_string_field == 'Matching'
 
-    expect_load_error(
+    result = expect_load_error(
         ErrorCode.VALIDATION_ERROR,
         'match_string_field: NotMatching',
         _StringObject,
     )
+    assert not hasattr(result, 'match_string_field')

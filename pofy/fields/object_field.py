@@ -40,7 +40,7 @@ class ObjectField(BaseField):
 
     def _load(self, context: ILoadingContext) -> Any:
         if not context.expect_mapping():
-            return None
+            return LOADING_FAILED
 
         object_class = self._resolve_type(context)
         if object_class is None:
@@ -115,13 +115,13 @@ def _load(object_class: Type, context: ILoadingContext):
     fields = _get_fields(object_class, context)
 
     if fields is None:
-        return None
+        return LOADING_FAILED
 
     result, set_fields = _load_object(object_class, fields, context)
     if _validate_object(result, fields, set_fields, context):
         return result
 
-    return None
+    return LOADING_FAILED
 
 
 def _load_object(

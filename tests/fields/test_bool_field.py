@@ -49,14 +49,16 @@ def test_bool_field():
 
 def test_bad_value_raises():
     """Test not-scalar node for a string field raise an error."""
-    expect_load_error(
+    result = expect_load_error(
         ErrorCode.VALUE_ERROR,
         'bool_field: NotValid',
         _BoolObject,
     )
+    assert not hasattr(result, 'bool_field')
 
     expect_load_error(
         ErrorCode.UNEXPECTED_NODE_TYPE,
         'bool_field: ["a", "list"]',
         _BoolObject,
     )
+    assert not hasattr(result, 'bool_field')

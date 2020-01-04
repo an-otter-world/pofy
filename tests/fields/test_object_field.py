@@ -1,5 +1,6 @@
 """Object field tests."""
 from pofy import ErrorCode
+from pofy import LOADING_FAILED
 from pofy import ObjectField
 from pofy import StringField
 from pofy import load
@@ -45,13 +46,14 @@ def test_object_field():
 
 def test_object_field_error_on_bad_node():
     """Test object field loading raises an error on bad node."""
-    expect_load_error(
+    result = expect_load_error(
         ErrorCode.UNEXPECTED_NODE_TYPE,
         'object_field:\n'
         '  - item1\n'
         '  - item2',
         _SubObjectOwner,
     )
+    assert not hasattr(result, 'object_field')
 
 
 def test_type_tag():
@@ -69,45 +71,50 @@ def test_type_tag():
 
 def test_bad_type_raise_error():
     """Test a type tag not existing or not pointing to a type raises error."""
-    expect_load_error(
+    result = expect_load_error(
         ErrorCode.TYPE_RESOLVE_ERROR,
         'object_field: !type:tests.fixtures.IDontExist\n'
         '  test_field: test_value\n'
         '  child_field: child_value\n',
         _SubObjectOwner,
     )
+    assert not hasattr(result, 'object_field')
 
-    expect_load_error(
+    result = expect_load_error(
         ErrorCode.TYPE_RESOLVE_ERROR,
         'object_field: !type:tests.fixtures.expect_load_error\n'
         '  test_field: test_value\n'
         '  child_field: child_value\n',
         _SubObjectOwner,
     )
+    assert not hasattr(result, 'object_field')
 
 
 def test_bad_formatted_type_tag():
     """Test an error is raised for badly formatted type tags."""
-    expect_load_error(
+    result = expect_load_error(
         ErrorCode.BAD_TYPE_TAG_FORMAT,
         'object_field: !typetests.fixtures.SubObjectChild\n'
         '  test_field: test_value',
         _SubObjectOwner,
     )
+    assert not hasattr(result, 'object_field')
 
-    expect_load_error(
+    result = expect_load_error(
         ErrorCode.BAD_TYPE_TAG_FORMAT,
         'object_field: !type:tests:fixtures.SubObjectChild\n'
         '  test_field: test_value',
         _SubObjectOwner,
     )
+    assert not hasattr(result, 'object_field')
 
-    expect_load_error(
+    result = expect_load_error(
         ErrorCode.BAD_TYPE_TAG_FORMAT,
         'object_field: !type:tests\n'
         '  test_field: test_value',
         _SubObjectOwner,
     )
+    assert not hasattr(result, 'object_field')
 
 
 def test_object_field_load_subclass():
@@ -163,11 +170,12 @@ def test_object_validation_works():
                 """Validate loaded objects."""
                 return True
 
-    expect_load_error(
+    result = expect_load_error(
         ErrorCode.VALIDATION_ERROR,
         'dont_set_me: Wathever',
         _ValidatedObjectChild,
     )
+    assert result == LOADING_FAILED
 
 
 def test_unknown_field_raise_error():
@@ -192,19 +200,20 @@ def test_unset_required_field_raise_error():
             required = StringField(required=True)
             not_required = StringField()
 
-    expect_load_error(
+    result = expect_load_error(
         ErrorCode.MISSING_REQUIRED_FIELD,
         'not_required: some_value',
         _RequiredFieldObject,
     )
+    assert result == LOADING_FAILED
 
-    test = load(
+    result = load(
         'required: setted\n'
         'not_required: yodeldi',
         _RequiredFieldObject,
     )
-    assert test.required == 'setted'
-    assert test.not_required == 'yodeldi'
+    assert result.required == 'setted'
+    assert result.not_required == 'yodeldi'
 
 
 def test_object_field_ignores_tag_handler_failure():
@@ -234,11 +243,12 @@ def test_object_without_schema_raise_error():
     class _ObjectWithoutSchema:
         pass
 
-    expect_load_error(
+    result = expect_load_error(
         ErrorCode.SCHEMA_ERROR,
         'i_should: not_event_be_parsed',
         _ObjectWithoutSchema,
     )
+    assert result == LOADING_FAILED
 
 
 def test_post_load_called():

@@ -33,11 +33,12 @@ def test_path_field_load_relative_path(datadir: Path):
 
 def test_path_field_on_bad_node_error():
     """Test not-scalar node for a path field raise an error."""
-    expect_load_error(
+    result = expect_load_error(
         ErrorCode.UNEXPECTED_NODE_TYPE,
         'path_field: ["a", "list"]',
         _PathObject
     )
+    assert not hasattr(result, 'path_field')
 
 
 def test_path_field_must_exist():

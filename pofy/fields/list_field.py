@@ -25,7 +25,7 @@ class ListField(BaseField):
 
     def _load(self, context: ILoadingContext) -> Optional[list]:
         if not context.expect_sequence():
-            return None
+            return LOADING_FAILED
 
         node = context.current_node()
         result = []

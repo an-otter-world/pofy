@@ -30,12 +30,12 @@ def test_int_field():
 
 def test_int_field_bad_value_raises():
     """Test integer field bad value raises an error."""
-    expect_load_error(
+    result = expect_load_error(
         ErrorCode.VALUE_ERROR,
         'int_field: not_convertible',
         _IntObject,
     )
-
+    assert not hasattr(result, 'int_field')
 
 def test_int_field_base():
     """Test integer field base parameter works."""
@@ -45,14 +45,19 @@ def test_int_field_base():
 
 def test_int_field_min_max():
     """Test integer field minimum / maximum parameter works."""
-    expect_load_error(
+    result = expect_load_error(
         ErrorCode.VALIDATION_ERROR,
         'bounded_int_field: 0',
         _IntObject,
     )
+    assert not hasattr(result, 'int_field')
 
-    expect_load_error(
+    result = expect_load_error(
         ErrorCode.VALIDATION_ERROR,
         'bounded_int_field: 100',
         _IntObject,
     )
+    assert not hasattr(result, 'int_field')
+
+    test = load('bounded_int_field: 20', _IntObject)
+    assert test.bounded_int_field == 20

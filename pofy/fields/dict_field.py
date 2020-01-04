@@ -1,6 +1,6 @@
 """Dictionary field class & utilities."""
 from gettext import gettext as _
-from typing import Optional
+from typing import Any
 
 from yaml import ScalarNode
 
@@ -25,10 +25,10 @@ class DictField(BaseField):
             _('item_field must be an implementation of BaseField.')
         self._item_field = item_field
 
-    def _load(self, context: ILoadingContext) -> Optional[dict]:
+    def _load(self, context: ILoadingContext) -> Any:
         node = context.current_node()
         if not context.expect_mapping():
-            return None
+            return LOADING_FAILED
 
         result = {}
         for key_node, value_node in node.value:

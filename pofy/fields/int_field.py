@@ -1,9 +1,11 @@
 """Integer field class & utilities."""
 from gettext import gettext as _
+from typing import Any
 from typing import Optional
 from typing import cast
 
 from pofy.common import ErrorCode
+from pofy.common import LOADING_FAILED
 from pofy.fields.base_field import ScalarField
 
 
@@ -36,7 +38,7 @@ class IntField(ScalarField):
         self._minimum = minimum
         self._maximum = maximum
 
-    def _convert(self, context) -> Optional[int]:
+    def _convert(self, context) -> Any:
         node = context.current_node()
         value = node.value
         result: Optional[int] = None
@@ -48,7 +50,7 @@ class IntField(ScalarField):
                 ErrorCode.VALUE_ERROR,
                 _('Can\'t convert "{}" to an integer'), value
             )
-            return None
+            return LOADING_FAILED
 
         return cast(Optional[int], ScalarField._check_in_bounds(
             context,

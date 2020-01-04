@@ -54,7 +54,7 @@ class BaseField(IBaseField):
 
         validate = self._validate
         if validate is not None and not validate(context, field_value):
-            return None
+            return LOADING_FAILED
 
         return field_value
 

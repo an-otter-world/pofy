@@ -106,6 +106,6 @@ def load(
 
     result = context.load(root_field, node, node_path)
     if result is LOADING_FAILED:
-        return None
+        return LOADING_FAILED
 
     return result

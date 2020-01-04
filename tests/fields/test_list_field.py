@@ -24,13 +24,14 @@ def test_list_field():
 
 def test_list_field_error_on_bad_node():
     """Test list field loading raises an error on bad node."""
-    expect_load_error(
+    result = expect_load_error(
         ErrorCode.UNEXPECTED_NODE_TYPE,
         'list_field:\n'
         '  key_1: value_1\n'
         '  key_2: value_2',
         _ListObject,
     )
+    assert not hasattr(result, 'list_field')
 
 
 def test_list_field_ignores_tag_handler_failure():

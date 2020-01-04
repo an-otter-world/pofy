@@ -27,13 +27,14 @@ def test_dict_field():
 
 def test_dict_field_error_on_bad_node():
     """Test dict field loading raises an error on bad node."""
-    expect_load_error(
+    result = expect_load_error(
         ErrorCode.UNEXPECTED_NODE_TYPE,
         'dict_field:\n'
         '  - key_1\n'
         '  - key_2',
         _DictObject,
     )
+    assert not hasattr(result, 'dict_field')
 
 
 def test_dict_field_ignores_tag_handler_failure():
