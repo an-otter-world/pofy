@@ -7,7 +7,7 @@ from pofy import ObjectField
 from pofy import StringField
 from pofy import load
 
-from tests.fixtures import load_with_fail_tag
+from tests.fixtures import check_load
 
 
 def test_resolve_root_works(datadir):
@@ -73,7 +73,7 @@ def test_root_field_is_correctly_inferred():
 
 def test_tag_handler_fails_on_root_node_returns_none():
     """Test nothing is deserialized when handling root node fails."""
-    assert load_with_fail_tag('!fail some_value', str) is LOADING_FAILED
+    assert check_load('!fail some_value', str) is LOADING_FAILED
 
 
 def test_load_handles_stream(datadir):
