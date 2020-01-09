@@ -33,8 +33,9 @@ def test_path_field(datadir: Path) -> None:
     _check_field(str(file_path), file_path)
 
     # Relative path
-    with open(datadir / 'file.yaml', 'r') as yaml_file:
-        result = check_load(yaml_file, _PathObject)
+    file_path = datadir / 'file.yaml'
+    with open(file_path, 'r') as yaml_file:
+        result = check_load(yaml_file, _PathObject, location=str(file_path))
         assert result.field == datadir / 'some_file.txt'
 
     result = check_load('not_checked: doesnt_exists.txt', _PathObject)

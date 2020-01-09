@@ -7,13 +7,14 @@ from typing import Type
 from typing import Union
 
 from yaml import Node
+from yaml import compose
 
 from pofy import BaseField
 from pofy import ErrorCode
 from pofy import LOADING_FAILED
 from pofy import LoadingContext
+from pofy import ObjectField
 from pofy import TagHandler
-from pofy import load
 
 
 def check_field(
@@ -48,16 +49,24 @@ def check_field_error(
 
 def check_load(
     source: Union[str, IO[str]],
-    object_class: Type,
+    object_class: Type[Any] = None,
     expected_error: ErrorCode = None,
+    field: BaseField = None,
+    location: str = None,
+    tag_handlers: List[TagHandler] = None,
 ):
-    """Check than loading given source returns or not an error."""
+    """Load a yaml document, given the specified parameters."""
+    if tag_handlers is None:
+        tag_handlers = []
+
     class _FailTagHandler(TagHandler):
         tag_pattern = '^fail$'
 
         def load(self, __, ___):
             """TagHandler.transform implementation."""
             return LOADING_FAILED
+
+    tag_handlers.append(_FailTagHandler())
 
     handler_called = False
 
@@ -67,12 +76,14 @@ def check_load(
         assert expected_error is not None
         assert code == expected_error
 
-    result = load(
-        source,
-        object_class,
-        tag_handlers=[_FailTagHandler()],
-        error_handler=_handler
-    )
+    context = LoadingContext(_handler, tag_handlers)
+    node = compose(source)
+
+    if field is None:
+        assert object_class is not None
+        field = ObjectField(object_class=object_class)
+
+    result = context.load(field, node, str(location))
 
     if expected_error is not None:
         assert handler_called

@@ -1,58 +1,78 @@
 """Glob handler tests."""
-from yaml import SequenceNode
-from yaml import ScalarNode
+from pathlib import Path
+from typing import Iterable
 
 from pofy import ErrorCode
 from pofy import GlobHandler
+from pofy import ListField
+from pofy import StringField
 
-from tests.helpers import load_node
+from tests.helpers import check_load
 
 
-def test_bad_node_for_glob_raises():
-    """Test glob tag on a not-scalar node raise an error."""
-    load_node(
-        node=SequenceNode('!glob', '', None, None),
-        expected_error=ErrorCode.UNEXPECTED_NODE_TYPE,
-        tag_handlers=[GlobHandler()]
+def _check_tag(
+    yaml: str,
+    expected_value: Iterable[str],
+    allow_relative=True,
+    location: Path = None,
+    root: Path = None
+):
+    result = check_load(
+        yaml,
+        field=ListField(StringField()),
+        tag_handlers=[
+            GlobHandler(
+                roots=[] if root is None else [root],
+                allow_relative=allow_relative
+            )
+        ],
+        location=str(location)
+    )
+
+    assert sorted(result) == sorted(expected_value)
+
+
+def _check_tag_error(
+    yaml: str,
+    expected_error: ErrorCode,
+    root: Path = None
+):
+    check_load(
+        yaml,
+        field=ListField(StringField()),
+        expected_error=expected_error,
+        tag_handlers=[
+            GlobHandler(
+                roots=[] if root is None else [root],
+            )
+        ],
     )
 
 
-def test_glob_resolves_correctly(datadir):
-    """Test glob resolves correctly files."""
-    loaded_nodes = load_node(
-        node=ScalarNode('!glob', 'folder/**/*', None, None),
-        tag_handlers=[GlobHandler([datadir])]
+def test_glob_tag(datadir):
+    """Glob tag should load globbed files if set correctly."""
+    _check_tag(
+        '!glob folder/**/*',
+        ['file_1', 'file_2'],
+        root=datadir
     )
 
-    assert len(loaded_nodes) == 2
-    assert loaded_nodes[0].value in ['file2_content', 'file3_content']
-    assert loaded_nodes[1].value in ['file2_content', 'file3_content']
-
-
-def test_glob_raise_error_on_yaml_load_failure(datadir):
-    """Test glob raises a VALUE_ERROR if a file can't be deserialized."""
-    load_node(
-        node=ScalarNode('!glob', '**/*', None, None),
-        expected_error=ErrorCode.VALUE_ERROR,
-        tag_handlers=[GlobHandler([datadir])]
-    )
-
-
-def test_relative_glob(datadir):
-    """Test glob works with relative paths."""
-    value = load_node(
-        node=ScalarNode('!glob', 'folder/**/*', None, None),
-        tag_handlers=[GlobHandler(allow_relative=True)],
+    _check_tag(
+        '!glob folder/**/*',
+        ['file_1', 'file_2'],
         location=str(datadir / 'parent_file.yaml')
     )
 
-    assert len(value) == 2
-    assert value[0].value in ['file2_content', 'file3_content']
-    assert value[1].value in ['file2_content', 'file3_content']
-
-    value = load_node(
-        node=ScalarNode('!glob', 'folder/**/*', None, None),
-        tag_handlers=[GlobHandler(allow_relative=False)],
-        location=str(datadir / 'parent_file.yaml')
+    _check_tag(
+        '!glob folder/**/*',
+        [],
+        location=str(datadir / 'parent_file.yaml'),
+        allow_relative=False
     )
-    assert len(value) == 0
+
+
+def test_glob_tag_error_handling(datadir):
+    """Glob tag should correctly handle errors."""
+    _check_tag_error('!glob []', ErrorCode.UNEXPECTED_NODE_TYPE)
+    _check_tag_error('!glob {}', ErrorCode.UNEXPECTED_NODE_TYPE)
+    _check_tag_error('!glob yaml_error.yaml', ErrorCode.VALUE_ERROR, datadir)
