@@ -32,13 +32,13 @@ def _check_tag_error(
     assert result == LOADING_FAILED
 
 
-def test_env_tag():
+def test_env_tag_handler():
     """Env tag should correctly load environment variables."""
     environ['TEST_VARIABLE'] = 'test_value'
     _check_tag('!env TEST_VARIABLE', 'test_value')
 
 
-def test_env_tag_error_handling():
+def test_env_tag_handler_error_handling():
     """Env tag should handle errors correctly."""
     _check_tag_error('!env []', ErrorCode.UNEXPECTED_NODE_TYPE)
     _check_tag_error('!env {}', ErrorCode.UNEXPECTED_NODE_TYPE)
