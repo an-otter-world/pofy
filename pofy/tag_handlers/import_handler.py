@@ -33,7 +33,7 @@ class ImportHandler(PathHandler):
                 context.error(
                     ErrorCode.IMPORT_NOT_FOUND,
                     _('Unable to find {} in any of the configured directories'),
-                    file_path
+                    node.value
                 )
 
             return LOADING_FAILED

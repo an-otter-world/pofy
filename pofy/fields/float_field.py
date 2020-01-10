@@ -1,8 +1,10 @@
 """Float field class & utilities."""
 from gettext import gettext as _
+from typing import Any
 from typing import Optional
 
 from pofy.common import ErrorCode
+from pofy.common import LOADING_FAILED
 from pofy.fields.base_field import ScalarField
 from pofy.interfaces import ILoadingContext
 
@@ -31,7 +33,7 @@ class FloatField(ScalarField):
         self._minimum: Optional[float] = minimum
         self._maximum: Optional[float] = maximum
 
-    def _convert(self, context: ILoadingContext) -> Optional[float]:
+    def _convert(self, context: ILoadingContext) -> Any:
         node = context.current_node()
         value = node.value
         try:
@@ -41,7 +43,7 @@ class FloatField(ScalarField):
                 ErrorCode.VALUE_ERROR,
                 _('Can\'t convert "{}" to a float'), value
             )
-            return None
+            return LOADING_FAILED
 
         return ScalarField._check_in_bounds(
             context,

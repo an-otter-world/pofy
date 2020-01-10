@@ -1,9 +1,9 @@
 """Float field tests."""
 from pofy import ErrorCode
 from pofy import FloatField
-from pofy import load
 
-from tests.fixtures import expect_load_error
+from tests.helpers import check_field
+from tests.helpers import check_field_error
 
 
 class _FloatObject:
@@ -11,38 +11,29 @@ class _FloatObject:
     class Schema:
         """Pofy fields."""
 
-        float_field = FloatField()
-        bound_float_field = FloatField(minimum=10.0, maximum=20.0)
+        field = FloatField(minimum=10.0, maximum=20.0)
 
 
-def test_float_field():
-    """Test float field loading works."""
-    test = load('float_field: 42.2', _FloatObject)
-    assert test.float_field == 42.2
+def _check_field(yml_value: str, expected_value: float) -> None:
+    check_field(_FloatObject, 'field', yml_value, expected_value)
 
 
-def test_float_field_bad_value_raises():
-    """Test bad value on a float field raises an error."""
-    expect_load_error(
-        ErrorCode.VALUE_ERROR,
-        'float_field: not_convertible',
-        _FloatObject,
-    )
+def _check_field_error(yml_value: str, expected_error: ErrorCode) -> None:
+    check_field_error(_FloatObject, 'field', yml_value, expected_error)
 
 
-def test_float_field_min_max():
-    """Test float field minimum / maximum parameter works."""
-    expect_load_error(
-        ErrorCode.VALIDATION_ERROR,
-        'bound_float_field: 0.0',
-        _FloatObject,
-    )
+def test_float_field() -> None:
+    """Float field should load correct values."""
+    _check_field('17.2', 17.2)
 
-    expect_load_error(
-        ErrorCode.VALIDATION_ERROR,
-        'bound_float_field: 100.0',
-        _FloatObject,
-    )
 
-    test = load('bound_float_field: 17.2', _FloatObject)
-    assert test.bound_float_field == 17.2
+def test_float_field_error_handling() -> None:
+    """Float field should correctly handle errors."""
+    _check_field_error('[a, list]', ErrorCode.UNEXPECTED_NODE_TYPE)
+    _check_field_error('{a: dict}', ErrorCode.UNEXPECTED_NODE_TYPE)
+
+    _check_field_error('bad_value', ErrorCode.VALUE_ERROR)
+
+    # Out of bounds
+    _check_field_error('0.0', ErrorCode.VALIDATION_ERROR)
+    _check_field_error('100.0', ErrorCode.VALIDATION_ERROR)

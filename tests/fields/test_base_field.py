@@ -3,11 +3,11 @@ from pofy import StringField
 from pofy import LoadingContext
 from pofy import ErrorCode
 
-from tests.fixtures import expect_load_error
+from tests.helpers import check_field_error
 
 
 def test_field_validation():
-    """Test custom field validaton works."""
+    """Custom field validation should behave correctly."""
     def _validate(context: LoadingContext, _: str):
         context.error(ErrorCode.VALIDATION_ERROR, 'Test')
         return False
@@ -19,8 +19,9 @@ def test_field_validation():
 
             validated_field = StringField(validate=_validate)
 
-    expect_load_error(
-        ErrorCode.VALIDATION_ERROR,
-        'validated_field: error_is_always_raised',
+    check_field_error(
         _ValidateFieldObject,
+        'validated_field',
+        'value',
+        ErrorCode.VALIDATION_ERROR
     )

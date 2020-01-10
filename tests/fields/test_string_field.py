@@ -1,9 +1,9 @@
 """String field tests."""
 from pofy import ErrorCode
 from pofy import StringField
-from pofy import load
 
-from tests.fixtures import expect_load_error
+from tests.helpers import check_field
+from tests.helpers import check_field_error
 
 
 class _StringObject:
@@ -11,35 +11,25 @@ class _StringObject:
     class Schema:
         """Pofy fields."""
 
-        string_field = StringField()
-        match_string_field = StringField(pattern='^Matching$')
+        field = StringField(pattern='^matching$')
 
 
-def test_string_field():
-    """Test string field loading works."""
-    test = load('string_field: test_value', _StringObject)
-    assert test.string_field == 'test_value'
+def _check_field(yml_value: str, expected_value: str) -> None:
+    check_field(_StringObject, 'field', yml_value, expected_value)
 
 
-def test_bad_value_raises():
-    """Test not-scalar node for a string field raise an error."""
-    expect_load_error(
-        ErrorCode.UNEXPECTED_NODE_TYPE,
-        'string_field: ["a", "list"]',
-        _StringObject
-    )
+def _check_field_error(yml_value: str, expected_error: ErrorCode) -> None:
+    check_field_error(_StringObject, 'field', yml_value, expected_error)
 
 
-def test_pattern():
-    """Test string validates pattern when given."""
-    test = load(
-        'match_string_field: Matching',
-        _StringObject,
-    )
-    assert test.match_string_field == 'Matching'
+def test_string_field() -> None:
+    """String field should load correct values."""
+    _check_field('matching', 'matching')
 
-    expect_load_error(
-        ErrorCode.VALIDATION_ERROR,
-        'match_string_field: NotMatching',
-        _StringObject,
-    )
+
+def test_string_field_error_handling() -> None:
+    """String field should correctly handle errors."""
+    _check_field_error('[a, list]', ErrorCode.UNEXPECTED_NODE_TYPE)
+    _check_field_error('{a: dict}', ErrorCode.UNEXPECTED_NODE_TYPE)
+
+    _check_field_error('not_matching', ErrorCode.VALIDATION_ERROR)

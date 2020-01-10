@@ -7,6 +7,7 @@ from typing import Optional
 from typing import Union
 
 from pofy.common import ErrorCode
+from pofy.common import LOADING_FAILED
 from pofy.interfaces import IBaseField
 from pofy.interfaces import ILoadingContext
 
@@ -53,7 +54,7 @@ class BaseField(IBaseField):
 
         validate = self._validate
         if validate is not None and not validate(context, field_value):
-            return None
+            return LOADING_FAILED
 
         return field_value
 
@@ -78,7 +79,7 @@ class ScalarField(BaseField):
 
     def _load(self, context: ILoadingContext):
         if not context.expect_scalar():
-            return None
+            return LOADING_FAILED
 
         return self._convert(context)
 
@@ -101,19 +102,19 @@ class ScalarField(BaseField):
         value: Union[int, float],
         minimum: Optional[Union[int, float]],
         maximum: Optional[Union[int, float]]
-    ) -> Optional[Union[int, float]]:
+    ) -> Any:
         if minimum is not None and value < minimum:
             context.error(
                 ErrorCode.VALIDATION_ERROR,
                 _('Value is too small (minimum : {})'), minimum
             )
-            return None
+            return LOADING_FAILED
 
         if maximum is not None and value > maximum:
             context.error(
                 ErrorCode.VALIDATION_ERROR,
                 _('Value is too big (maximum : {})'), maximum
             )
-            return None
+            return LOADING_FAILED
 
         return value

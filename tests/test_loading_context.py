@@ -9,11 +9,11 @@ from pofy import PofyValueError
 from pofy import TagHandler
 from pofy.loading_context import LoadingContext
 
-from tests.fixtures import load_node
+from tests.helpers import load_node
 
 
 def test_loading_context_raises():
-    """Test loading context raises an error when no error_handler is set."""
+    """Loading context should raise on error when no error_handler is set."""
     context = LoadingContext(error_handler=None, tag_handlers=[])
 
     class _RaisingField(BaseField):
@@ -25,7 +25,7 @@ def test_loading_context_raises():
 
 
 def test_loading_context_raises_on_multiple_tag_match():
-    """Test loading context raises an error a tag is ambigous."""
+    """Loading context should emit an error a tag is ambigous."""
     class _DummyHandler(TagHandler):
         tag_pattern = '^dummy$'
 
@@ -43,7 +43,7 @@ def test_loading_context_raises_on_multiple_tag_match():
 
 
 def test_loading_context_returns_node_location():
-    """Test loading context stores the last given location for a node."""
+    """Loading context should store the last given location for a node."""
     def _check(location):
         class _ChildField(BaseField):
             def _load(self, context):

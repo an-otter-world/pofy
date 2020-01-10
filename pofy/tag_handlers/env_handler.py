@@ -3,7 +3,7 @@ from gettext import gettext as _
 from os import environ
 from typing import Any
 
-from yaml import Node
+from yaml import ScalarNode
 
 from pofy.common import LOADING_FAILED
 from pofy.interfaces import IBaseField
@@ -32,6 +32,11 @@ class EnvHandler(TagHandler):
         if var_name not in environ:
             return LOADING_FAILED
 
-        fake_node = Node('', environ[var_name], node.start_mark, node.end_mark)
+        fake_node = ScalarNode(
+            '',
+            environ[var_name],
+            node.start_mark,
+            node.end_mark
+        )
 
         return context.load(field, fake_node)

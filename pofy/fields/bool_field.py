@@ -1,14 +1,16 @@
 """Boolean field class & utilities."""
 from gettext import gettext as _
+from typing import Any
 
 from pofy.common import ErrorCode
+from pofy.common import LOADING_FAILED
 from pofy.fields.base_field import ScalarField
 
 
 class BoolField(ScalarField):
     """Boolean YAML object field."""
 
-    def _convert(self, context):
+    def _convert(self, context) -> Any:
         node = context.current_node()
         true_values = [
             'y', 'Y', 'yes', 'Yes', 'YES',
@@ -34,4 +36,4 @@ class BoolField(ScalarField):
             ', '.join(true_values + false_values)
         )
 
-        return None
+        return LOADING_FAILED

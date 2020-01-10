@@ -3,7 +3,7 @@ from gettext import gettext as _
 from inspect import isclass
 from io import TextIOBase
 from pathlib import Path
-from typing import Callable
+from typing import Any
 from typing import IO
 from typing import List
 from typing import Optional
@@ -12,6 +12,7 @@ from typing import Union
 
 from yaml import compose
 
+from pofy.common import ErrorHandler
 from pofy.common import LOADING_FAILED
 from pofy.fields.base_field import BaseField
 from pofy.fields.bool_field import BoolField
@@ -39,12 +40,12 @@ _ROOT_FIELDS_MAPPING = {
 
 def load(
     source: Union[str, IO[str]],
-    object_class: Type = None,
-    resolve_roots: List[Path] = None,
-    tag_handlers: List[TagHandler] = None,
-    error_handler: Callable = None,
-    root_field: BaseField = None
-) -> Optional[object]:
+    object_class: Optional[Type[Any]] = None,
+    resolve_roots: Optional[List[Path]] = None,
+    tag_handlers: Optional[List[TagHandler]] = None,
+    error_handler: Optional[ErrorHandler] = None,
+    root_field: Optional[BaseField] = None
+) -> Any:
     """Deserialize a YAML document into an object.
 
     Args:
@@ -106,6 +107,6 @@ def load(
 
     result = context.load(root_field, node, node_path)
     if result is LOADING_FAILED:
-        return None
+        return LOADING_FAILED
 
     return result

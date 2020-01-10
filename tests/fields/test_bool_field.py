@@ -1,9 +1,9 @@
 """String field tests."""
-from pofy import load
-from pofy import ErrorCode
 from pofy import BoolField
+from pofy import ErrorCode
 
-from tests.fixtures import expect_load_error
+from tests.helpers import check_field
+from tests.helpers import check_field_error
 
 
 class _BoolObject:
@@ -12,51 +12,41 @@ class _BoolObject:
     class Schema:
         """Pofy fields."""
 
-        bool_field = BoolField()
+        field = BoolField()
 
 
-def test_bool_field():
-    """Test bool field loading works."""
+def _check_field(yaml_value: str, expected_value: bool):
+    check_field(_BoolObject, 'field', yaml_value, expected_value)
+
+
+def _check_field_error(yaml_value: str, expected_error: ErrorCode):
+    check_field_error(_BoolObject, 'field', yaml_value, expected_error)
+
+
+def test_bool_field() -> None:
+    """Bool field should load correct values."""
     true_values = [
         'y', 'Y', 'yes', 'Yes', 'YES',
         'true', 'True', 'TRUE',
         'on', 'On', 'ON'
     ]
+
+    for value in true_values:
+        _check_field(value, True)
+
     false_values = [
         'n', 'N', 'no', 'No', 'NO',
         'false', 'False', 'FALSE'
         'off', 'Off', 'OFF'
     ]
 
-    for value in true_values:
-        test = load(
-            'bool_field: {}'.format(value),
-            _BoolObject,
-        )
-
-        assert isinstance(test.bool_field, bool)
-        assert test.bool_field
-
     for value in false_values:
-        test = load(
-            'bool_field: {}'.format(value),
-            _BoolObject,
-        )
-
-        assert isinstance(test.bool_field, bool)
-        assert not test.bool_field
+        _check_field(value, False)
 
 
-def test_bad_value_raises():
-    """Test not-scalar node for a string field raise an error."""
-    expect_load_error(
-        ErrorCode.VALUE_ERROR,
-        'bool_field: NotValid',
-        _BoolObject,
-    )
+def test_bool_field_error_handling() -> None:
+    """Bool field should correctly handle errors."""
+    _check_field_error('[a, list]', ErrorCode.UNEXPECTED_NODE_TYPE)
+    _check_field_error('{a: dict}', ErrorCode.UNEXPECTED_NODE_TYPE)
 
-    expect_load_error(
-        ErrorCode.UNEXPECTED_NODE_TYPE,
-        'bool_field: ["a", "list"]',
-        _BoolObject,
-    )
+    _check_field_error('bad_value', ErrorCode.VALUE_ERROR)

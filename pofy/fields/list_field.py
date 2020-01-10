@@ -1,6 +1,6 @@
 """List field class & utilities."""
 from gettext import gettext as _
-from typing import Optional
+from typing import Any
 
 from pofy.common import LOADING_FAILED
 from pofy.fields.base_field import BaseField
@@ -23,9 +23,9 @@ class ListField(BaseField):
             _('item_field must be an implementation of BaseField.')
         self._item_field = item_field
 
-    def _load(self, context: ILoadingContext) -> Optional[list]:
+    def _load(self, context: ILoadingContext) -> Any:
         if not context.expect_sequence():
-            return None
+            return LOADING_FAILED
 
         node = context.current_node()
         result = []
