@@ -2,7 +2,6 @@
 from typing import Any
 from typing import IO
 from typing import List
-from typing import Optional
 from typing import Type
 from typing import Union
 
@@ -77,48 +76,6 @@ def check_load(
         field = ObjectField(object_class=object_class)
 
     result = context.load(field, node, str(location))
-
-    if expected_error is not None:
-        assert handler_called
-
-    return result
-
-
-def load_node(
-    expected_error: Optional[ErrorCode] = None,
-    tag_handlers: Optional[List[TagHandler]] = None,
-    node: Node = None,
-    location: Optional[str] = None,
-    field: BaseField = None
-):
-    """Load the given object, expecting an error to be raised."""
-    handler_called = False
-
-    def _handler(__: Node, code: ErrorCode, ___: str):
-        nonlocal handler_called
-        handler_called = True
-        assert expected_error is not None
-        assert code == expected_error
-
-    if tag_handlers is None:
-        tag_handlers = []
-
-    if node is None:
-        node = Node('', '', None, None)
-
-    class _MockField(BaseField):
-        def _load(self, context):
-            return context.current_node().value
-
-    if field is None:
-        field = _MockField()
-
-    context = LoadingContext(
-        error_handler=_handler,
-        tag_handlers=tag_handlers
-    )
-
-    result = context.load(_MockField(), node, location)
 
     if expected_error is not None:
         assert handler_called

@@ -9,7 +9,7 @@ from pofy import PofyValueError
 from pofy import TagHandler
 from pofy.loading_context import LoadingContext
 
-from tests.helpers import load_node
+from tests.helpers import check_load
 
 
 def test_loading_context_raises():
@@ -32,8 +32,9 @@ def test_loading_context_raises_on_multiple_tag_match():
         def load(self, context, field):
             return context.current_node()
 
-    load_node(
-        node=Node('!dummy', '', None, None),
+    check_load(
+        '!dummy value',
+        str,
         expected_error=ErrorCode.MULTIPLE_MATCHING_HANDLERS,
         tag_handlers=[
             _DummyHandler(),
