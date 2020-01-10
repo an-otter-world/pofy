@@ -7,11 +7,11 @@ from pofy import ObjectField
 from pofy import StringField
 from pofy import load
 
-from tests.helpers import check_load
+from tests.helpers import FailTagHandler
 
 
 def test_resolve_root_works(datadir):
-    """Test giving a path as resolve_root instanciates default tag handlers."""
+    """Resolve root should be forwarded to glob and import tag handler."""
     class _Owned:
         class Schema:
             """Pyfo fields."""
@@ -50,7 +50,7 @@ def test_resolve_root_works(datadir):
 
 
 def test_root_field_is_correctly_inferred():
-    """Test that the root field is correctly inferred from object_class."""
+    """Root field should be inferred from object_class."""
     assert load('on', bool)
     assert load('10', int) == 10
     assert load('10.0', float) == 10.0
@@ -72,12 +72,17 @@ def test_root_field_is_correctly_inferred():
 
 
 def test_tag_handler_fails_on_root_node_returns_none():
-    """Test nothing is deserialized when handling root node fails."""
-    assert check_load('!fail some_value', str) is LOADING_FAILED
+    """Nothing shoud be deserialized when loading root node fails."""
+    result = load(
+        '!fail some_value',
+        str,
+        tag_handlers=[FailTagHandler()]
+    )
+    assert result is LOADING_FAILED
 
 
 def test_load_handles_stream(datadir):
-    """Test that stream can be given as source parameter for load."""
+    """It should be correct to give a stream as source parameter for load."""
     with open(datadir / 'object.yaml') as yaml_file:
         test = load(yaml_file, dict)
         assert test == {'test_field': 'test_value'}
@@ -87,7 +92,7 @@ def test_load_handles_stream(datadir):
 
 
 def test_load_defines_node_path(datadir):
-    """Test calling load with a stream registers the path of the root object."""
+    """Calling load with a stream should set the location of the root node."""
     file_path = datadir / 'object.yaml'
     validate_called = False
 
@@ -107,3 +112,15 @@ def test_load_defines_node_path(datadir):
     with open(file_path) as yaml_file:
         load(yaml_file, _TestObject)
         assert validate_called
+
+
+def test_error_hanlder_is_called():
+    """The given error_handler should be called when defined."""
+    handler_called = False
+
+    def _handler(_, __, ___):
+        nonlocal handler_called
+        handler_called = True
+
+    load('[a, list]', str, error_handler=_handler)
+    assert handler_called

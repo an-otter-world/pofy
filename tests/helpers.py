@@ -59,14 +59,7 @@ def check_load(
     if tag_handlers is None:
         tag_handlers = []
 
-    class _FailTagHandler(TagHandler):
-        tag_pattern = '^fail$'
-
-        def load(self, __, ___):
-            """TagHandler.transform implementation."""
-            return LOADING_FAILED
-
-    tag_handlers.append(_FailTagHandler())
+    tag_handlers.append(FailTagHandler())
 
     handler_called = False
 
@@ -131,3 +124,12 @@ def load_node(
         assert handler_called
 
     return result
+
+
+class FailTagHandler(TagHandler):
+    """Tag handlers that returns LOADING_FAILED."""
+
+    tag_pattern = '^fail$'
+
+    def load(self, __, ___):
+        return LOADING_FAILED
