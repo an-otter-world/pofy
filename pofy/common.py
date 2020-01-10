@@ -1,6 +1,6 @@
 """Pofy common definitions."""
 from enum import Enum
-from typing import AnyStr
+from typing import Callable
 
 from yaml import Node
 
@@ -43,10 +43,13 @@ class ErrorCode(Enum):
     SCHEMA_ERROR = 10
 
 
+ErrorHandler = Callable[[Node, ErrorCode, str], None]
+
+
 class PofyError(Exception):
     """Exception raised when errors occurs during object loading."""
 
-    def __init__(self, node: Node, message: AnyStr):
+    def __init__(self, node: Node, message: str):
         """Initialize the error.
 
         Arg:
@@ -59,7 +62,7 @@ class PofyError(Exception):
         self.node = node
 
     @staticmethod
-    def _get_message(node, message):
+    def _get_message(node: Node, message: str) -> str:
         start = node.start_mark
         file_name = getattr(start, 'name', '<Unkwnown>')
         return '{file}:{line}:{column} : {message}'.format(

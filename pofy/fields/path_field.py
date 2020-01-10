@@ -1,6 +1,7 @@
 """Path field class & utilities."""
 from gettext import gettext as _
 from pathlib import Path
+from typing import Any
 
 from pofy.common import ErrorCode
 from pofy.common import LOADING_FAILED
@@ -22,7 +23,7 @@ class PathField(ScalarField):
         super().__init__(*args, **kwargs)
         self._must_exist = must_exist
 
-    def _convert(self, context: ILoadingContext):
+    def _convert(self, context: ILoadingContext) -> Any:
         node = context.current_node()
         value = node.value
         path = Path(value)

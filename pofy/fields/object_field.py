@@ -10,6 +10,7 @@ from typing import Iterable
 from typing import Optional
 from typing import Set
 from typing import Type
+from typing import cast
 
 from pofy.common import ErrorCode
 from pofy.common import LOADING_FAILED
@@ -21,11 +22,14 @@ from pofy.interfaces import ILoadingContext
 _TYPE_FORMAT_MSG = _("""\
 Type tag should be in the form !type:path.to.Type, got {}""")
 
+ValidateCallback = Callable[[ILoadingContext, Any], bool]
+PostLoadCallback = Callable[[Any], None]
+
 
 class ObjectField(BaseField):
     """Object YAML object field."""
 
-    def __init__(self, *args, object_class: Type = object, **kwargs):
+    def __init__(self, *args, object_class: Type[Any] = object, **kwargs):
         """Initialize object field.
 
         Arg:
@@ -48,9 +52,9 @@ class ObjectField(BaseField):
 
         return _load(object_class, context)
 
-    def _resolve_type(self, context: ILoadingContext):
+    def _resolve_type(self, context: ILoadingContext) -> Optional[Type[Any]]:
         node = context.current_node()
-        tag = node.tag
+        tag = str(node.tag)
         if not tag.startswith('!type'):
             return self._object_class
 
@@ -88,7 +92,7 @@ def _get_type(
     module_name: str,
     type_name: str,
     context: ILoadingContext
-):
+) -> Optional[Type[Any]]:
     full_name = r'{}.{}'.format(module_name, type_name)
     try:
         module = __import__(module_name, fromlist=type_name)
@@ -115,10 +119,10 @@ def _get_type(
         )
         return None
 
-    return resolved_type
+    return cast(Type[Any], resolved_type)
 
 
-def _load(object_class: Type, context: ILoadingContext):
+def _load(object_class: Type[Any], context: ILoadingContext) -> Any:
     fields = _get_fields(object_class, context)
 
     if fields is None:
@@ -132,10 +136,10 @@ def _load(object_class: Type, context: ILoadingContext):
 
 
 def _load_object(
-    object_class: Type,
+    object_class: Type[Any],
     fields: Dict[str, BaseField],
     context: ILoadingContext
-):
+) -> Any:
     node = context.current_node()
     result = object_class()
     set_fields = set()
@@ -195,15 +199,15 @@ def _post_load(obj: Any) -> Any:
         post_load_method(obj)
 
 
-def _is_schema_class(member):
+def _is_schema_class(member: Any) -> bool:
     return isclass(member) and member.__name__ == 'Schema'
 
 
-def _is_field(member):
+def _is_field(member: Any) -> bool:
     return isinstance(member, BaseField)
 
 
-def _get_schema_classes(cls):
+def _get_schema_classes(cls: Type[Any]) -> Iterable[Callable[..., Any]]:
     for base in cls.__bases__:
         for schema_class in _get_schema_classes(base):
             yield schema_class
@@ -212,7 +216,7 @@ def _get_schema_classes(cls):
         yield schema_class
 
 
-def _get_fields(cls, context: ILoadingContext) \
+def _get_fields(cls: Type[Any], context: ILoadingContext) \
         -> Optional[Dict[str, BaseField]]:
     schema_classes = list(_get_schema_classes(cls))
 
@@ -233,8 +237,9 @@ def _get_fields(cls, context: ILoadingContext) \
     return fields
 
 
-def _get_methods(cls: Type, method_name: str) -> Iterable[Callable]:
-    def _is_validation_method(member):
+def _get_methods(cls: Type[Any], method_name: str) \
+        -> Iterable[Callable[..., Any]]:
+    def _is_validation_method(member: Any) -> bool:
         return ismethod(member) and member.__name__ == method_name
 
     for base in cls.__bases__:

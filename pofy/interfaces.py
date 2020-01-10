@@ -62,15 +62,15 @@ class ILoadingContext:
         """
 
     @abstractmethod
-    def expect_scalar(self, message: str = None):
+    def expect_scalar(self, message: str = None) -> None:
         """Return false and raise an error if the current node isn't scalar."""
 
     @abstractmethod
-    def expect_sequence(self):
+    def expect_sequence(self) -> None:
         """Return false and raise if the current node isn't a sequence."""
 
     @abstractmethod
-    def expect_mapping(self):
+    def expect_mapping(self) -> None:
         """Return false and raise if the current node isn't a mapping."""
 
     @abstractmethod
@@ -80,7 +80,7 @@ class ILoadingContext:
         message_format: str,
         *args,
         **kwargs
-    ):
+    ) -> None:
         """Register an error in the current loading context.
 
         If errors occured in the scope of a context, an error will be raised
