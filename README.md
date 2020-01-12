@@ -102,7 +102,19 @@ that whole loaded objects can also be validated.
 BoolField loads a boolean from YAML. No additional parameter is available. The following values are accepted when loading a YAML object :
 
 - For true : y, Y, yes, Yes, YES, true, True, TRUE, on, On, ON
-- For false : y, Y, yes, Yes, YES, true, True, TRUE, on, On, ON
+- For false : n, N, no, No, NO, false, False, FALSE, off, Off, OFF
 
 Any other value will raise a ValidationError, or call the defined error_handler
 with VALIDATION_ERROR as the error_code parameter.
+
+```python
+  from pofy import BoolField, load
+
+  class Test:
+    class Schema:
+      some_flag = BoolField()
+
+  test = load('some_flag: on', Test)
+  assert test.some_flag
+  test = load('some_flag: NotValid', Test) # Raises ValidationError
+```
