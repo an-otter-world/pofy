@@ -101,8 +101,8 @@ that whole loaded objects can also be validated.
 
 BoolField loads a boolean from YAML. No additional parameter is available. The following values are accepted when loading a YAML object :
 
-- For true : y, Y, yes, Yes, YES true, True, TRUE, on, On, ON
-- For false : y, Y, yes, Yes, YES true, True, TRUE, on, On, ON
+- For true : y, Y, yes, Yes, YES, true, True, TRUE, on, On, ON
+- For false : y, Y, yes, Yes, YES, true, True, TRUE, on, On, ON
 
 Any other value will raise a ValidationError, or call the defined error_handler
 with VALIDATION_ERROR as the error_code parameter.
