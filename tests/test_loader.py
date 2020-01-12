@@ -1,22 +1,32 @@
 """Yaml object loading tests."""
 from io import StringIO
+from pathlib import Path
+from typing import Any
+from typing import Optional
+from typing import Type
 
-from pofy import LOADING_FAILED
-from pofy import ListField
-from pofy import ObjectField
-from pofy import StringField
-from pofy import load
+from yaml import Node
+
+from pofy.common import ErrorCode
+from pofy.common import LOADING_FAILED
+from pofy.fields.list_field import ListField
+from pofy.fields.object_field import ObjectField
+from pofy.fields.string_field import StringField
+from pofy.interfaces import ILoadingContext
+from pofy.loader import load
 
 from tests.helpers import FailTagHandler
 
 
-def test_resolve_root_works(datadir):
+def test_resolve_root_works(datadir: Path) -> None:
     """Resolve root should be forwarded to glob and import tag handler."""
     class _Owned:
         class Schema:
             """Pyfo fields."""
 
             test_field = StringField()
+
+        test_field: Optional[str] = None
 
     class _Owner:
         class Schema:
@@ -49,7 +59,7 @@ def test_resolve_root_works(datadir):
     assert test.object_list[1].test_field == 'test_value'
 
 
-def test_root_field_is_correctly_inferred():
+def test_root_field_is_correctly_inferred() -> None:
     """Root field should be inferred from object_class."""
     assert load('on', bool)
     assert load('10', int) == 10
@@ -71,7 +81,7 @@ def test_root_field_is_correctly_inferred():
     assert test_dict == {'key_1': 'value_1', 'key_2': 'value_2'}
 
 
-def test_tag_handler_fails_on_root_node_returns_none():
+def test_tag_handler_fails_on_root_node_returns_none() -> None:
     """Nothing shoud be deserialized when loading root node fails."""
     result = load(
         '!fail some_value',
@@ -81,7 +91,7 @@ def test_tag_handler_fails_on_root_node_returns_none():
     assert result is LOADING_FAILED
 
 
-def test_load_handles_stream(datadir):
+def test_load_handles_stream(datadir: Path) -> None:
     """It should be correct to give a stream as source parameter for load."""
     with open(datadir / 'object.yaml') as yaml_file:
         test = load(yaml_file, dict)
@@ -91,7 +101,7 @@ def test_load_handles_stream(datadir):
     assert test == {'test_field': 'test_value'}
 
 
-def test_load_defines_node_path(datadir):
+def test_load_defines_node_path(datadir: Path) -> None:
     """Calling load with a stream should set the location of the root node."""
     file_path = datadir / 'object.yaml'
     validate_called = False
@@ -103,7 +113,8 @@ def test_load_defines_node_path(datadir):
             test_field = StringField()
 
             @classmethod
-            def validate(cls, context, __):
+            def validate(cls: Type[Any], context: ILoadingContext, __: Any) \
+                    -> None:
                 """Validate that context as correct current_node_path."""
                 nonlocal validate_called
                 validate_called = True
@@ -114,11 +125,11 @@ def test_load_defines_node_path(datadir):
         assert validate_called
 
 
-def test_error_hanlder_is_called():
+def test_error_hanlder_is_called() -> None:
     """The given error_handler should be called when defined."""
     handler_called = False
 
-    def _handler(_, __, ___):
+    def _handler(_: Node, __: ErrorCode, ___: str) -> None:
         nonlocal handler_called
         handler_called = True
 

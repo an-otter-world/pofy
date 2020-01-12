@@ -2,13 +2,14 @@
 from pathlib import Path
 from typing import Any
 from typing import List
+from typing import Optional
 from typing import Type
 
-from pofy import ErrorCode
-from pofy import LOADING_FAILED
-from pofy import StringField
-from pofy import ListField
-from pofy import PathHandler
+from pofy.common import ErrorCode
+from pofy.common import LOADING_FAILED
+from pofy.fields.list_field import ListField
+from pofy.fields.string_field import StringField
+from pofy.tag_handlers.path_handler import PathHandler
 
 from tests.helpers import check_load
 
@@ -17,10 +18,10 @@ def check_path_tag(
     handler_type: Type[PathHandler],
     yaml: str,
     expected_value: Any,
-    allow_relative=True,
-    location: Path = None,
-    roots: List[Path] = None
-):
+    allow_relative: bool = True,
+    location: Optional[Path] = None,
+    roots: Optional[List[Path]] = None
+) -> None:
     """Path tag hanhler inherited tags test helper."""
     result = check_load(
         yaml,
@@ -45,11 +46,11 @@ def check_path_tag_error(
     handler_type: Type[PathHandler],
     yaml: str,
     expected_error: ErrorCode,
-    location: str = None,
-    allow_relative=True,
-    roots: List[Path] = None,
-    expected_value=LOADING_FAILED
-):
+    location: Optional[str] = None,
+    allow_relative: bool = True,
+    roots: Optional[List[Path]] = None,
+    expected_value: Any = LOADING_FAILED
+) -> None:
     """Path tag hanhler inherited tags error test helper."""
     result = check_load(
         yaml,

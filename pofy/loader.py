@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 from typing import IO
 from typing import List
+from typing import Iterable
 from typing import Optional
 from typing import Type
 from typing import Union
@@ -41,8 +42,8 @@ _ROOT_FIELDS_MAPPING = {
 def load(
     source: Union[str, IO[str]],
     object_class: Optional[Type[Any]] = None,
-    resolve_roots: Optional[List[Path]] = None,
-    tag_handlers: Optional[List[TagHandler]] = None,
+    resolve_roots: Optional[Iterable[Path]] = None,
+    tag_handlers: Optional[Iterable[TagHandler]] = None,
     error_handler: Optional[ErrorHandler] = None,
     root_field: Optional[BaseField] = None
 ) -> Any:
@@ -67,12 +68,9 @@ def load(
     assert isinstance(source, (str, TextIOBase)), \
         _('source parameter must be a string or Text I/O.')
 
-    all_tag_handlers = []
+    all_tag_handlers: List[TagHandler] = []
 
     if tag_handlers is not None:
-        assert isinstance(tag_handlers, list), \
-            _('tag_handlers must be a list of TagHandlers implementations.')
-
         for handler_it in tag_handlers:
             assert isinstance(handler_it, TagHandler), \
                 _('tag_handlers items should be subclass of TagHandler')
@@ -100,7 +98,7 @@ def load(
         assert object_class is not None
         root_field = ObjectField(object_class=object_class)
 
-    node = compose(source)
+    node = compose(source) # type: ignore
     node_path = None
     if isinstance(source, TextIOBase) and hasattr(source, 'name'):
         node_path = source.name

@@ -6,6 +6,7 @@ from typing import Optional
 from pofy.common import ErrorCode
 from pofy.common import LOADING_FAILED
 from pofy.fields.base_field import ScalarField
+from pofy.fields.base_field import ValidateCallback
 from pofy.interfaces import ILoadingContext
 
 
@@ -14,10 +15,10 @@ class FloatField(ScalarField):
 
     def __init__(
         self,
-        *args,
         minimum: Optional[float] = None,
         maximum: Optional[float] = None,
-        **kwargs
+        required: bool = False,
+        validate: Optional[ValidateCallback] = None,
     ):
         """Initialize float field.
 
@@ -26,10 +27,11 @@ class FloatField(ScalarField):
                      a VALIDATION_ERROR will be raised.
             maximum: Maximum value for the field. If the value is out of bound,
                      a VALIDATION_ERROR will be raised.
-            *args, **kwargs : Arguments forwarded to ScalarField.
+            required: See BaseField constructor.
+            validate: See BaseField constructor.
 
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(required=required, validate=validate)
         self._minimum: Optional[float] = minimum
         self._maximum: Optional[float] = maximum
 

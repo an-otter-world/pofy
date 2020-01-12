@@ -1,7 +1,10 @@
 """List field tests."""
-from pofy import ErrorCode
-from pofy import ListField
-from pofy import StringField
+from typing import List
+from typing import Optional
+
+from pofy.common import ErrorCode
+from pofy.fields.list_field import ListField
+from pofy.fields.string_field import StringField
 
 from tests.helpers import check_field
 from tests.helpers import check_field_error
@@ -14,8 +17,12 @@ class _ListObject:
 
         field = ListField(StringField())
 
+    def __init__(self) -> None:
+        """Initialize _ListObject."""
+        self.field: Optional[List[str]] = None
 
-def _check_field(yaml_value: str, expected_value: list) -> None:
+
+def _check_field(yaml_value: str, expected_value: List[str]) -> None:
     check_field(_ListObject, 'field', yaml_value, expected_value)
 
 

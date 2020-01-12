@@ -12,14 +12,18 @@ from pofy.interfaces import IBaseField
 from pofy.interfaces import ILoadingContext
 
 
+ValidateCallback = Callable[[ILoadingContext, Any], bool]
+PostLoadCallback = Callable[[Any], None]
+
+
 class BaseField(IBaseField):
     """Base class for YAML object fields."""
 
     def __init__(
         self,
         required: bool = False,
-        validate: Callable = None
-    ):
+        validate: Optional[ValidateCallback] = None
+    ) -> None:
         """Initialize the field.
 
         Args:
@@ -77,7 +81,7 @@ class BaseField(IBaseField):
 class ScalarField(BaseField):
     """Base class for scalar value fields."""
 
-    def _load(self, context: ILoadingContext):
+    def _load(self, context: ILoadingContext) -> Any:
         if not context.expect_scalar():
             return LOADING_FAILED
 

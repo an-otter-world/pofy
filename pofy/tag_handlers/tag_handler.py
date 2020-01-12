@@ -23,7 +23,7 @@ class TagHandler(ABC):
 
     tag_pattern: str
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize TagHandler."""
         self._compiled_pattern = re_compile(self.tag_pattern)
 

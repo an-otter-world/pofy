@@ -1,9 +1,13 @@
 """Object field tests."""
-from pofy import ErrorCode
-from pofy import LOADING_FAILED
-from pofy import ObjectField
-from pofy import StringField
-from pofy import BoolField
+from typing import Any
+from typing import Optional
+
+from pofy.common import ErrorCode
+from pofy.common import LOADING_FAILED
+from pofy.fields.bool_field import BoolField
+from pofy.fields.object_field import ObjectField
+from pofy.fields.string_field import StringField
+from pofy.interfaces import ILoadingContext
 
 from tests.helpers import check_field_error
 from tests.helpers import check_load
@@ -18,7 +22,7 @@ class _Owned:
         error = BoolField()
 
         @classmethod
-        def validate(cls, context, obj):
+        def validate(cls, context: ILoadingContext, obj: Any) -> bool:
             """Validate."""
             if getattr(obj, 'error', False):
                 context.error(ErrorCode.VALIDATION_ERROR, 'Error')
@@ -27,9 +31,15 @@ class _Owned:
             return True
 
         @classmethod
-        def post_load(cls, obj):
+        def post_load(cls, obj: Any) -> None:
             """Postload."""
             obj.parent_post_load_called = True
+
+    def __init__(self) -> None:
+        """Initialize object."""
+        self.required_field: Optional[str] = None
+        self.parent_validate_called = False
+        self.parent_post_load_called = False
 
 
 class _OwnedChild(_Owned):
@@ -40,15 +50,22 @@ class _OwnedChild(_Owned):
         child_field = StringField()
 
         @classmethod
-        def validate(cls, _, obj):
+        def validate(cls, _: ILoadingContext, obj: Any) -> bool:
             """Validate."""
             obj.child_validate_called = True
             return True
 
         @classmethod
-        def post_load(cls, obj):
+        def post_load(cls, obj: Any) -> None:
             """Postload."""
             obj.child_post_load_called = True
+
+    def __init__(self) -> None:
+        """Initialize object."""
+        super().__init__()
+        self.child_field: Optional[str] = None
+        self.child_validate_called = False
+        self.child_post_load_called = False
 
 
 class _Owner:
@@ -59,15 +76,19 @@ class _Owner:
         field = ObjectField(object_class=_Owned)
 
         @classmethod
-        def validate(cls, __, obj):
+        def validate(cls, __: ILoadingContext, obj: Any) -> bool:
             """Validate loaded objects."""
             obj.validate_called = True
             return True
 
         @classmethod
-        def post_load(cls, obj):
+        def post_load(cls, obj: Any) -> None:
             """Post load."""
             obj.post_load_called = True
+
+    def __init__(self) -> None:
+        """Initialize _Owner."""
+        self.field: Optional[_Owned] = None
 
 
 class _ValidationError:
@@ -75,7 +96,7 @@ class _ValidationError:
         """Pofy fields."""
 
         @classmethod
-        def validate(cls, context, __):
+        def validate(cls, context: ILoadingContext, __: Any) -> bool:
             """Validate loaded objects."""
             context.error(ErrorCode.VALIDATION_ERROR, 'Error')
             return False
@@ -96,7 +117,7 @@ def _check_field_error(yaml_value: str, expected_error: ErrorCode) -> None:
     check_field_error(_Owner, 'field', yaml_value, expected_error)
 
 
-def test_object_field():
+def test_object_field() -> None:
     """Object field should load correct values."""
     result = check_load(
         'field: !type:tests.fields.test_object_field._OwnedChild\n'

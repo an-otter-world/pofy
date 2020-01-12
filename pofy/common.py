@@ -1,6 +1,7 @@
 """Pofy common definitions."""
 from enum import Enum
 from typing import Callable
+from typing import Type
 
 from yaml import Node
 
@@ -53,7 +54,7 @@ class PofyError(Exception):
         """Initialize the error.
 
         Arg:
-            node : The node on which the error occured.
+            node : The node on which the errTypeor occured.
             code : The error code of the error.
             message : The error description message.
 
@@ -127,7 +128,7 @@ _CODE_TO_EXCEPTION_TYPE_MAPPING = {
 }
 
 
-def get_exception_type(error_code: ErrorCode):
+def get_exception_type(error_code: ErrorCode) -> Type[PofyError]:
     """Get exception type that should be raised for a given error code.
 
     Args:

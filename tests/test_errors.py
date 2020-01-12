@@ -1,25 +1,27 @@
 """Error handling tests."""
+from typing import Type
+
 from yaml import Node
 from yaml.error import Mark
 
-from pofy import BadTypeFormatError
-from pofy import ErrorCode
-from pofy import FieldNotDeclaredError
-from pofy import ImportNotFoundError
-from pofy import MissingRequiredFieldError
-from pofy import MultipleMatchingHandlersError
-from pofy import PofyError
-from pofy import PofyValueError
-from pofy import SchemaError
-from pofy import TypeResolveError
-from pofy import UnexpectedNodeTypeError
-from pofy import ValidationError
-from pofy import get_exception_type
+from pofy.common import BadTypeFormatError
+from pofy.common import ErrorCode
+from pofy.common import FieldNotDeclaredError
+from pofy.common import ImportNotFoundError
+from pofy.common import MissingRequiredFieldError
+from pofy.common import MultipleMatchingHandlersError
+from pofy.common import PofyError
+from pofy.common import PofyValueError
+from pofy.common import SchemaError
+from pofy.common import TypeResolveError
+from pofy.common import UnexpectedNodeTypeError
+from pofy.common import ValidationError
+from pofy.common import get_exception_type
 
 
-def test_get_exception_type_is_correct():
+def test_get_exception_type_is_correct() -> None:
     """Test exception type returned by get_exception_type is correct."""
-    def _check(code, exception):
+    def _check(code: ErrorCode, exception: Type[PofyError]) -> None:
         assert get_exception_type(code) == exception
 
     _check(ErrorCode.BAD_TYPE_TAG_FORMAT, BadTypeFormatError)
@@ -34,7 +36,7 @@ def test_get_exception_type_is_correct():
     _check(ErrorCode.SCHEMA_ERROR, SchemaError)
 
 
-def test_exception_format():
+def test_exception_format() -> None:
     """Test exception __str__ method gives usefull informations."""
     node = Node(
         'tag',

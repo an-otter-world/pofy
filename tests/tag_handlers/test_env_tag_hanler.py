@@ -1,16 +1,17 @@
 """Env handler tests."""
 from os import environ
 from typing import Any
+from typing import Optional
 
-from pofy import EnvHandler
-from pofy import ErrorCode
-from pofy import StringField
+from pofy.common import ErrorCode
 from pofy.common import LOADING_FAILED
+from pofy.fields.string_field import StringField
+from pofy.tag_handlers.env_handler import EnvHandler
 
 from tests.helpers import check_load
 
 
-def _check_tag(yaml: str, expected: Any):
+def _check_tag(yaml: str, expected: Any) -> None:
     result = check_load(
         yaml,
         field=StringField(),
@@ -21,8 +22,8 @@ def _check_tag(yaml: str, expected: Any):
 
 def _check_tag_error(
     yaml: str,
-    expected_error: ErrorCode = None
-):
+    expected_error: Optional[ErrorCode] = None
+) -> None:
     result = check_load(
         yaml,
         field=StringField(),
@@ -32,13 +33,13 @@ def _check_tag_error(
     assert result == LOADING_FAILED
 
 
-def test_env_tag_handler():
+def test_env_tag_handler() -> None:
     """Env tag should correctly load environment variables."""
     environ['TEST_VARIABLE'] = 'test_value'
     _check_tag('!env TEST_VARIABLE', 'test_value')
 
 
-def test_env_tag_handler_error_handling():
+def test_env_tag_handler_error_handling() -> None:
     """Env tag should handle errors correctly."""
     _check_tag_error('!env []', ErrorCode.UNEXPECTED_NODE_TYPE)
     _check_tag_error('!env {}', ErrorCode.UNEXPECTED_NODE_TYPE)

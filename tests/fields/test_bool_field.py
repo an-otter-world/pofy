@@ -1,6 +1,8 @@
 """String field tests."""
-from pofy import BoolField
-from pofy import ErrorCode
+from typing import Optional
+
+from pofy.common import ErrorCode
+from pofy.fields.bool_field import BoolField
 
 from tests.helpers import check_field
 from tests.helpers import check_field_error
@@ -14,12 +16,16 @@ class _BoolObject:
 
         field = BoolField()
 
+    def __init__(self) -> None:
+        """Initialize _BoolObject."""
+        self.field: Optional[bool] = None
 
-def _check_field(yaml_value: str, expected_value: bool):
+
+def _check_field(yaml_value: str, expected_value: bool) -> None:
     check_field(_BoolObject, 'field', yaml_value, expected_value)
 
 
-def _check_field_error(yaml_value: str, expected_error: ErrorCode):
+def _check_field_error(yaml_value: str, expected_error: ErrorCode) -> None:
     check_field_error(_BoolObject, 'field', yaml_value, expected_error)
 
 
