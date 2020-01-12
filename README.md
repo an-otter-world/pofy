@@ -37,12 +37,12 @@ To use Pofy, you must declare a schema in the class you want to deserialize :
   ```python
       from pofy import StringField, load
 
-      class SomeObject:
+      class Test:
           class Schema:
               field = StringField()
 
-      deserialized_object = load(SomeObject, 'field: value')
-      assert deserialized_object.field == 'value`
+      test = load(SomeObject, 'field: value')
+      assert test.field == 'value`
   ```
 
 ## Reference
@@ -65,12 +65,12 @@ error_code parameter :
 ```python
   from pofy import StringField, load
 
-  class Sample:
+  class Test:
     class Schema:
       required_field = StringField(required=True)
       optional_field = StringField()
 
-  load('optional_field: some_value', Sample) # Raises MissingRequiredFieldError
+  load('optional_field: some_value', Test) # Raises MissingRequiredFieldError
 ```
 
 All field types accept a 'validate' parameter. It's meant to be a python
@@ -89,12 +89,12 @@ that whole loaded objects can also be validated.
 
     return True
 
-  class Sample:
+  class Test:
     class Schema:
       color = StringField()
 
-  load('color: yellow', Sample) # Raises ValidationError
-  load('color: blue', Sample) # Raises ValidationError
+  load('color: yellow', Test) # Raises ValidationError
+  load('color: blue', Test) # Raises ValidationError
 ```
 
 #### BoolField
