@@ -1,8 +1,10 @@
 """Dictionary field tests."""
+from typing import Dict
+from typing import Optional
 
-from pofy import DictField
-from pofy import ErrorCode
-from pofy import StringField
+from pofy.common import ErrorCode
+from pofy.fields.dict_field import DictField
+from pofy.fields.string_field import StringField
 
 from tests.helpers import check_field
 from tests.helpers import check_field_error
@@ -14,8 +16,12 @@ class _DictObject:
 
         field = DictField(StringField())
 
+    def __init__(self) -> None:
+        """Initialize _DictObject."""
+        self.field: Optional[Dict[str, str]] = None
 
-def _check_field(yaml_value: str, expected_value: dict) -> None:
+
+def _check_field(yaml_value: str, expected_value: Dict[str, str]) -> None:
     check_field(_DictObject, 'field', yaml_value, expected_value)
 
 

@@ -100,7 +100,7 @@ def load(
         assert object_class is not None
         root_field = ObjectField(object_class=object_class)
 
-    node = compose(source)
+    node = compose(source) # type: ignore
     node_path = None
     if isinstance(source, TextIOBase) and hasattr(source, 'name'):
         node_path = source.name

@@ -87,7 +87,7 @@ class LoadingContext(ILoadingContext):
 
         return None
 
-    def expect_scalar(self, message: str = None):
+    def expect_scalar(self, message: Optional[str] = None) -> bool:
         """Return false and raise an error if the current node isn't scalar."""
         if message is None:
             message = _('Expected a scalar value.')
@@ -96,14 +96,14 @@ class LoadingContext(ILoadingContext):
             message
         )
 
-    def expect_sequence(self):
+    def expect_sequence(self) -> bool:
         """Return false and raise if the current node isn't a sequence."""
         return self._expect_node(
             SequenceNode,
             _('Expected a sequence value.')
         )
 
-    def expect_mapping(self):
+    def expect_mapping(self) -> bool:
         """Return false and raise if the current node isn't a mapping."""
         return self._expect_node(
             MappingNode,
@@ -114,9 +114,9 @@ class LoadingContext(ILoadingContext):
         self,
         code: ErrorCode,
         message_format: str,
-        *args,
-        **kwargs
-    ):
+        *args: Any,
+        **kwargs: Any
+    ) -> None:
         """Register an error in the current loading context.
 
         If errors occured in the scope of a context, an error will be raised
@@ -141,9 +141,9 @@ class LoadingContext(ILoadingContext):
         self,
         node_type: Type[Node],
         error_format: str,
-        *args,
-        **kwargs
-    ):
+        *args: Any,
+        **kwargs: Any
+    ) -> bool:
         current_node = self.current_node()
         if not isinstance(current_node, node_type):
             self.error(

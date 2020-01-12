@@ -5,12 +5,13 @@ from typing import Any
 from pofy.common import ErrorCode
 from pofy.common import LOADING_FAILED
 from pofy.fields.base_field import ScalarField
+from pofy.interfaces import ILoadingContext
 
 
 class BoolField(ScalarField):
     """Boolean YAML object field."""
 
-    def _convert(self, context) -> Any:
+    def _convert(self, context: ILoadingContext) -> Any:
         node = context.current_node()
         true_values = [
             'y', 'Y', 'yes', 'Yes', 'YES',

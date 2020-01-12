@@ -1,15 +1,15 @@
 """Glob handler tests."""
 from pathlib import Path
 
-from pofy import ErrorCode
-from pofy import LOADING_FAILED
-from pofy import ImportHandler
+from pofy.common import ErrorCode
+from pofy.common import LOADING_FAILED
+from pofy.tag_handlers.import_handler import ImportHandler
 
 from tests.tag_handlers.path_handler_helpers import check_path_tag
 from tests.tag_handlers.path_handler_helpers import check_path_tag_error
 
 
-def test_import_tag_handler(datadir: Path):
+def test_import_tag_handler(datadir: Path) -> None:
     """Import tag should load file if set correctly."""
     check_path_tag(
         ImportHandler,
@@ -60,7 +60,7 @@ def test_import_tag_handler(datadir: Path):
     )
 
 
-def test_import_tag_handler_error_handling(datadir: Path):
+def test_import_tag_handler_error_handling(datadir: Path) -> None:
     """Import tag handler shoud correctly handle errors."""
     check_path_tag_error(
         ImportHandler,

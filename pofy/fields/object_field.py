@@ -15,6 +15,7 @@ from typing import cast
 from pofy.common import ErrorCode
 from pofy.common import LOADING_FAILED
 from pofy.fields.base_field import BaseField
+from pofy.fields.base_field import ValidateCallback
 from pofy.fields.string_field import StringField
 from pofy.interfaces import ILoadingContext
 
@@ -22,22 +23,26 @@ from pofy.interfaces import ILoadingContext
 _TYPE_FORMAT_MSG = _("""\
 Type tag should be in the form !type:path.to.Type, got {}""")
 
-ValidateCallback = Callable[[ILoadingContext, Any], bool]
-PostLoadCallback = Callable[[Any], None]
-
 
 class ObjectField(BaseField):
     """Object YAML object field."""
 
-    def __init__(self, *args, object_class: Type[Any] = object, **kwargs):
+    def __init__(
+        self,
+        object_class: Type[Any] = object,
+        required: bool = False,
+        validate: Optional[ValidateCallback] = None,
+    ):
         """Initialize object field.
 
         Arg:
+            required: See BaseField constructor.
+            validate: See BaseField constructor.
             object_class: The class of the object to create.
             *args, **kwargs: Arguments forwarded to BaseField.
 
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(required=required, validate=validate)
         assert isclass(object_class), \
             _('object_class must be a type')
         self._object_class = object_class

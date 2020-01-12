@@ -1,8 +1,8 @@
 """Path field tests."""
 from pathlib import Path
 
-from pofy import ErrorCode
-from pofy import PathField
+from pofy.common import ErrorCode
+from pofy.fields.path_field import PathField
 
 from tests.helpers import check_field
 from tests.helpers import check_field_error
@@ -18,11 +18,11 @@ class _PathObject:
         not_checked = PathField(must_exist=False)
 
 
-def _check_field(yaml_value: str, expected_value: Path):
+def _check_field(yaml_value: str, expected_value: Path) -> None:
     check_field(_PathObject, 'field', yaml_value, expected_value)
 
 
-def _check_field_error(yaml_value: str, expected_error: ErrorCode):
+def _check_field_error(yaml_value: str, expected_error: ErrorCode) -> None:
     check_field_error(_PathObject, 'field', yaml_value, expected_error)
 
 

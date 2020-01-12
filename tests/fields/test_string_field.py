@@ -1,6 +1,6 @@
 """String field tests."""
-from pofy import ErrorCode
-from pofy import StringField
+from pofy.common import ErrorCode
+from pofy.fields.string_field import StringField
 
 from tests.helpers import check_field
 from tests.helpers import check_field_error

@@ -1,6 +1,6 @@
 """Float field tests."""
-from pofy import ErrorCode
-from pofy import FloatField
+from pofy.common import ErrorCode
+from pofy.fields.float_field import FloatField
 
 from tests.helpers import check_field
 from tests.helpers import check_field_error

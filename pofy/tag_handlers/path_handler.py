@@ -6,6 +6,7 @@ from typing import Any
 from typing import Iterator
 from typing import List
 from typing import Optional
+from typing import cast
 
 from yaml import Node
 from yaml import compose
@@ -69,7 +70,7 @@ class PathHandler(TagHandler):
         """Load a YAML document, emit a PofyError on ParseError."""
         with open(path, 'r') as yaml_file:
             try:
-                return compose(yaml_file)
+                return cast(Node, compose(yaml_file)) # type: ignore
             except ParserError as error:
                 context.error(
                     ErrorCode.VALUE_ERROR,
