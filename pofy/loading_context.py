@@ -2,6 +2,7 @@
 from gettext import gettext as _
 from typing import Any
 from typing import Callable
+from typing import Iterable
 from typing import List
 from typing import Optional
 from typing import Tuple
@@ -28,11 +29,11 @@ class LoadingContext(ILoadingContext):
     def __init__(
         self,
         error_handler: ErrorHandler,
-        tag_handlers: List[TagHandler]
+        tag_handlers: Iterable[TagHandler]
     ):
         """Initialize context."""
         self._error_handler = error_handler
-        self._tag_handlers = tag_handlers
+        self._tag_handlers = list(tag_handlers)
         self._node_stack: NodeStack = []
 
     def load(

@@ -3,8 +3,8 @@ from abc import abstractmethod
 from gettext import gettext as _
 from pathlib import Path
 from typing import Any
+from typing import Iterable
 from typing import Iterator
-from typing import List
 from typing import Optional
 from typing import cast
 
@@ -27,7 +27,7 @@ class PathHandler(TagHandler):
 
     def __init__(
         self,
-        roots: Optional[List[Path]] = None,
+        roots: Optional[Iterable[Path]] = None,
         allow_relative: bool = True
     ):
         """Initialize the PathHandler.
@@ -38,13 +38,17 @@ class PathHandler(TagHandler):
                             relative to the current YAML file, if applicable.
 
         """
+        super().__init__()
+
+        self._roots = None
+
         if roots is not None:
             for root_it in roots:
                 assert isinstance(root_it, Path), \
                     _('roots must be a list of Path objects')
 
-        super().__init__()
-        self._roots = roots
+            self._roots = list(roots)
+
         self._allow_relative = allow_relative
 
     @abstractmethod
