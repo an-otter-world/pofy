@@ -123,7 +123,7 @@ with VALIDATION_ERROR as the error_code parameter.
 #### StringField
 
 StringField loads a string from YAML. The field constructor accept a 'pattern'
-parameter, that is meant to be a regular expression of deserialized values
+parameter, that is meant to be a regular expression that deserialized values
 should match. If pattern is defined and the deserialized values doesn't match
 it, a ValidationError will be raised or the [error handler](#error-handler) you
 defined will be called with ErrorCode.VALIDATION_ERROR as the error_code
