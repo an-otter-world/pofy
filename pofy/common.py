@@ -2,12 +2,21 @@
 from enum import Enum
 from typing import Callable
 from typing import Type
+from typing import TypeVar
+from typing import Union
 
 from yaml import Node
 
+
+class LoadingFailed:
+    """Dummy type representing a failed loading, used for type hints."""
+
+
 # Unique symbol used to differentiate an error from a valid None return when
 # loading a field.
-LOADING_FAILED = object()
+LOADING_FAILED = LoadingFailed()
+ObjectType = TypeVar('ObjectType')
+LoadResult = Union[ObjectType, LoadingFailed]
 
 
 class ErrorCode(Enum):
