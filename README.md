@@ -23,6 +23,7 @@ improvements. Feel free to join [the Pofy channel on Matrix](https://matrix.to/#
     - [Fields](#fields)
       - [Common Parameters](#common-parameters)
       - [BoolField](#boolfield)
+      - [StringField](#stringfield)
 
 ## Installation
 
@@ -117,4 +118,28 @@ with VALIDATION_ERROR as the error_code parameter.
   test = load('some_flag: on', Test)
   assert test.some_flag
   test = load('some_flag: NotValid', Test) # Raises ValidationError
+```
+
+#### StringField
+
+StringField loads a string from YAML. The field constructor accept a 'pattern'
+parameter, that is meant to be a regular expression that deserialized values
+should match. If pattern is defined and the deserialized values doesn't match
+it, a ValidationError will be raised or the [error handler](#error-handler) you
+defined will be called with ErrorCode.VALIDATION_ERROR as the error_code
+parameter.
+
+```python
+  from pofy import StringField, load
+
+  class Test:
+    class Schema:
+      string_field = StringField()
+      pattern_field = StringField(pattern='[0-9]*')
+
+  test = load('string_field: "foo bar"', Test)
+  assert test.string_field == 'foo bar'
+  test = load('pattern_field: NotValid', Test) # Raises ValidationError
+  test = load('pattern_field: 10', Test)
+  assert test.pattern_field == '10'
 ```
