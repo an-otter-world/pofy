@@ -3,18 +3,20 @@ from gettext import gettext as _
 from inspect import isclass
 from io import TextIOBase
 from pathlib import Path
-from typing import Any
 from typing import IO
-from typing import List
 from typing import Iterable
+from typing import List
 from typing import Optional
 from typing import Type
+from typing import TypeVar
 from typing import Union
+from typing import cast
 
 from yaml import compose
 
 from pofy.common import ErrorHandler
 from pofy.common import LOADING_FAILED
+from pofy.common import LoadResult
 from pofy.fields.base_field import BaseField
 from pofy.fields.bool_field import BoolField
 from pofy.fields.dict_field import DictField
@@ -38,15 +40,17 @@ _ROOT_FIELDS_MAPPING = {
     str: StringField()
 }
 
+ObjectType = TypeVar('ObjectType')
+
 
 def load(
     source: Union[str, IO[str]],
-    object_class: Optional[Type[Any]] = None,
+    object_class: Optional[Type[ObjectType]] = None,
     resolve_roots: Optional[Iterable[Path]] = None,
     tag_handlers: Optional[Iterable[TagHandler]] = None,
     error_handler: Optional[ErrorHandler] = None,
     root_field: Optional[BaseField] = None
-) -> Any:
+) -> LoadResult[ObjectType]:
     """Deserialize a YAML document into an object.
 
     Args:
@@ -107,4 +111,4 @@ def load(
     if result is LOADING_FAILED:
         return LOADING_FAILED
 
-    return result
+    return cast(ObjectType, result)

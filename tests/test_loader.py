@@ -37,12 +37,16 @@ def test_resolve_root_works(datadir: Path) -> None:
                 ObjectField(object_class=_Owned)
             )
 
+        def __init__(self) -> None:
+            self.object_field = None
+            self.object_list = None
+
     test = load(
         'object_field: !import object.yaml\n',
         _Owner,
         resolve_roots=[datadir]
     )
-
+    assert isinstance(test, _Owner)
     assert isinstance(test.object_field, _Owned)
     assert test.object_field.test_field == 'test_value'
 
@@ -52,6 +56,7 @@ def test_resolve_root_works(datadir: Path) -> None:
         resolve_roots=[datadir]
     )
 
+    assert isinstance(test, _Owner)
     assert len(test.object_list) == 2
     assert isinstance(test.object_list[0], _Owned)
     assert isinstance(test.object_list[1], _Owned)
