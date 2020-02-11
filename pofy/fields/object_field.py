@@ -39,7 +39,6 @@ class ObjectField(BaseField):
             required: See BaseField constructor.
             validate: See BaseField constructor.
             object_class: The class of the object to create.
-            *args, **kwargs: Arguments forwarded to BaseField.
 
         """
         super().__init__(required=required, validate=validate)
