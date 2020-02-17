@@ -143,3 +143,31 @@ parameter.
   test = load('pattern_field: 10', Test)
   assert test.pattern_field == '10'
 ```
+
+#### IntField
+
+IntField loads an int from YAML. In addition to the common fields parameters,
+it accept several parameters :
+
+- base: An integer, giving the base to use when loading the integer. IntField
+  uses the int(...) python function to get the integer, so even without this
+  parameter, hexadecimal and octal notation are taken into account. Use this
+  parameter if you don't want to have the 0x or 0o prefix in front of the
+  number, or if you want to use an exotic base.
+- minumum, maximum : Acceptable boundaries for the loaded value. If the value
+  is out of bounds, a ValidationError will be raised, or the defined
+  error_handler will be called with ErrorCode.VALIDATION_ERROR as the error_code
+  parameter.
+
+```python
+  class Test:
+    class Schema:
+      int_field = IntField(minimum=0, maximum=16)
+      hex_field = IntField(base=16)
+
+  assert load('int_field: 10', Test).int_field == 10
+  assert load('int_field: 0xF', Test).int_field == 15
+  assert load('int_field: 0o12', Test).int_field == 12
+  assert load('int_field: 100', Test) # Raises ValidationError
+  assert load('hex_field: F', Test).hex_field == 15
+```
