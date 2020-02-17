@@ -24,6 +24,7 @@ improvements. Feel free to join [the Pofy channel on Matrix](https://matrix.to/#
       - [Common Parameters](#common-parameters)
       - [BoolField](#boolfield)
       - [StringField](#stringfield)
+    - [TagHandlers](#tag-handlers)
 
 ## Installation
 
@@ -171,3 +172,64 @@ it accept several parameters :
   assert load('int_field: 100', Test) # Raises ValidationError
   assert load('hex_field: F', Test).hex_field == 15
 ```
+
+### Tag Handlers
+
+Pofy allows you to plug custom deserialization behavior when encountering yaml
+tags. These custom behaviors are called tag handlers. Pofy comes with some
+predefined tag handlers, described below. Custom tag handlers are defined the
+following way :
+
+```python
+from pofy import TagHandler
+from pofy import ILoadingContext
+from pofy import IBaseField
+
+class ReverseHandler(TagHandler):
+    tag_pattern = '^reverse$' # Regex pattern that this tag handler matches
+
+    def load(self, context: ILoadingContext, field: IBaseField) \
+            -> Any:
+        # Check that the type of the node is correct, and fail if not :
+        if not context.expect_scalar(
+            _('!reverse must be set on a string node.')
+        ):
+            return LOADING_FAILED
+
+        # Return the value of the current yaml node reversed.
+        node = context.current_node()
+        return node.value.reverse()
+```
+
+Check the API reference to see the methods available on ILoadingContext, 
+containing the current YAML document loading state, and IBaseField,
+representing the currently deserialized field.
+
+To use it, the handler should be passed to the pofy 'load' methods through the
+'tag_handlers' arguments :
+
+```python
+
+  class Test:
+    class Schema:
+      string_field = StringField()
+
+  test = load(
+    'string_field: !reverse Hello world',
+    Test,
+    tag_handlers=[ReverseHandler()]
+  )
+  assert test.string_field == 'dlrow olleH'
+```
+
+Pofy comes with some predefined tag handlers that are automatically registered
+when calling load, so the following tags are usable out of the box :
+
+#### env
+
+#### glob
+
+#### import / try-import
+
+The import and try import tags allows to import another YAML file as a field of
+the currently deserialized object :
