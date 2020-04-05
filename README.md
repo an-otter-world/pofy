@@ -24,7 +24,23 @@ improvements. Feel free to join [the Pofy channel on Matrix](https://matrix.to/#
       - [Common Parameters](#common-parameters)
       - [BoolField](#boolfield)
       - [StringField](#stringfield)
-    - [TagHandlers](#tag-handlers)
+      - [IntField](#intfield)
+      - [FloatField](#floatfield)
+      - [EnumField](#enumfield)
+      - [PathField](#pathfield)
+      - [ListField](#listfield)
+      - [DictField](#dictfield)
+      - [ObjectField](#objectfield)
+    - [Tag Handlers](#tag-handlers)
+      - [env](#env)
+      - [glob](#glob)
+      - [import / try-import](#import--try-import)
+    - [Hooks](#hooks)
+      - [Field validation](#field-validation)
+      - [Oject validation](#oject-validation)
+      - [Post-load hook](#post-load-hook)
+      - [Error handling](#error-handling)
+    - [Creating Custom Fields](#creating-custom-fields)
 
 ## Installation
 
@@ -173,6 +189,18 @@ it accept several parameters :
   assert load('hex_field: F', Test).hex_field == 15
 ```
 
+#### FloatField
+
+#### EnumField
+
+#### PathField
+
+#### ListField
+
+#### DictField
+
+#### ObjectField
+
 ### Tag Handlers
 
 Pofy allows you to plug custom deserialization behavior when encountering yaml
@@ -233,3 +261,15 @@ when calling load, so the following tags are usable out of the box :
 
 The import and try import tags allows to import another YAML file as a field of
 the currently deserialized object :
+
+### Hooks
+
+#### Field validation
+
+#### Oject validation
+
+#### Post-load hook
+
+#### Error handling
+
+### Creating Custom Fields
