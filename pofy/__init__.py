@@ -19,6 +19,7 @@ from .common import get_exception_type
 from .fields.base_field import BaseField
 from .fields.bool_field import BoolField
 from .fields.dict_field import DictField
+from .fields.enum_field import EnumField
 from .fields.float_field import FloatField
 from .fields.int_field import IntField
 from .fields.list_field import ListField
