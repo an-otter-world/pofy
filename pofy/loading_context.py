@@ -56,7 +56,7 @@ class LoadingContext(ILoadingContext):
 
         """
         if len(self._node_stack) > 0:
-            assert self._node_stack[-1] != node # type: ignore
+            assert self._node_stack[-1] != node
 
         self._node_stack.append((node, location))
 
