@@ -250,7 +250,7 @@ class ReverseHandler(TagHandler):
         return node.value.reverse()
 ```
 
-Check the API reference to see the methods available on ILoadingContext, 
+Check the API reference to see the methods available on ILoadingContext,
 containing the current YAML document loading state, and IBaseField,
 representing the currently deserialized field.
 
