@@ -177,6 +177,8 @@ it accept several parameters :
   parameter.
 
 ```python
+  from pofy import IntField, load
+
   class Test:
     class Schema:
       int_field = IntField(minimum=0, maximum=16)
