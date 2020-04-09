@@ -191,6 +191,25 @@ it accept several parameters :
 
 #### FloatField
 
+Float Field loads a float from YAML. In addition to the common fields
+parameters, it accept several specific ones :
+
+- minumum, maximum : Acceptable boundaries for the loaded value. If the value
+  is out of bounds, a ValidationError will be raised, or the defined
+  error_handler will be called with ErrorCode.VALIDATION_ERROR as the error_code
+  parameter.
+
+```python
+  from pofy import FloatField, load
+
+  class Test:
+    class Schema:
+      float_field = FloatField(minimum=.0, maximum=10.0)
+
+  assert load('float_field: 10.0', Test).float_field == 10
+  assert load('int_field: 100.0', Test) # Raises ValidationError
+```
+
 #### EnumField
 
 #### PathField
