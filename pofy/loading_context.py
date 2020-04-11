@@ -5,6 +5,7 @@ from typing import Callable
 from typing import Iterable
 from typing import List
 from typing import Optional
+from typing import Set
 from typing import Tuple
 from typing import Type
 
@@ -29,12 +30,14 @@ class LoadingContext(ILoadingContext):
     def __init__(
         self,
         error_handler: ErrorHandler,
-        tag_handlers: Iterable[TagHandler]
+        tag_handlers: Iterable[TagHandler],
+        flags: Optional[Set[str]] = None
     ):
         """Initialize context."""
         self._error_handler = error_handler
         self._tag_handlers = list(tag_handlers)
         self._node_stack: NodeStack = []
+        self._flags = flags if flags is not None else set()
 
     def load(
         self,
@@ -70,6 +73,9 @@ class LoadingContext(ILoadingContext):
             self._node_stack.pop()
 
         return result
+
+    def is_defined(self, flag: str) -> bool:
+        return flag in self._flags
 
     def current_node(self) -> Node:
         """Return the currently loaded node."""

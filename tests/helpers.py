@@ -3,6 +3,7 @@ from typing import Any
 from typing import IO
 from typing import List
 from typing import Optional
+from typing import Set
 from typing import Type
 from typing import Union
 
@@ -56,6 +57,7 @@ def check_load(
     field: Optional[BaseField] = None,
     location: Optional[str] = None,
     tag_handlers: Optional[List[TagHandler]] = None,
+    flags: Optional[Set[str]] = None
 ) -> Any:
     """Load a yaml document, given the specified parameters."""
     if tag_handlers is None:
@@ -71,7 +73,7 @@ def check_load(
         assert expected_error is not None
         assert code == expected_error
 
-    context = LoadingContext(_handler, tag_handlers)
+    context = LoadingContext(_handler, tag_handlers, flags)
     node = compose(source) # type: ignore
 
     if field is None:

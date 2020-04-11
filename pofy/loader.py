@@ -7,6 +7,7 @@ from typing import IO
 from typing import Iterable
 from typing import List
 from typing import Optional
+from typing import Set
 from typing import Type
 from typing import TypeVar
 from typing import Union
@@ -28,6 +29,7 @@ from pofy.fields.string_field import StringField
 from pofy.loading_context import LoadingContext
 from pofy.tag_handlers.env_handler import EnvHandler
 from pofy.tag_handlers.glob_handler import GlobHandler
+from pofy.tag_handlers.if_handler import IfHandler
 from pofy.tag_handlers.import_handler import ImportHandler
 from pofy.tag_handlers.tag_handler import TagHandler
 
@@ -49,7 +51,8 @@ def load(
     resolve_roots: Optional[Iterable[Path]] = None,
     tag_handlers: Optional[Iterable[TagHandler]] = None,
     error_handler: Optional[ErrorHandler] = None,
-    root_field: Optional[BaseField] = None
+    root_field: Optional[BaseField] = None,
+    flags: Optional[Set[str]] = None,
 ) -> LoadResult[ObjectType]:
     """Deserialize a YAML document into an object.
 
@@ -67,6 +70,8 @@ def load(
         root_field: The field to use to load the root node. You can specify a
                     type (list, dict, one of the scalar types or an objec type
                     as cls parameter to get it infered.)
+        flags: Flags to define during loading. Those can be used during
+               deserialization to customize the loaded objects.
 
     """
     assert isinstance(source, (str, TextIOBase)), \
@@ -83,6 +88,7 @@ def load(
     all_tag_handlers.append(ImportHandler(resolve_roots))
     all_tag_handlers.append(GlobHandler(resolve_roots))
     all_tag_handlers.append(EnvHandler())
+    all_tag_handlers.append(IfHandler())
 
     if error_handler is not None:
         assert callable(error_handler), \
@@ -90,7 +96,8 @@ def load(
 
     context = LoadingContext(
         error_handler=error_handler,
-        tag_handlers=all_tag_handlers
+        tag_handlers=all_tag_handlers,
+        flags=flags
     )
 
     assert isclass(object_class), _('object_class must be a type')

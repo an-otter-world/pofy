@@ -51,6 +51,10 @@ class ILoadingContext:
         """
 
     @abstractmethod
+    def is_defined(self, flag: str) -> bool:
+        """Return true if the given flag was defined when calling load."""
+
+    @abstractmethod
     def current_node(self) -> Node:
         """Return the currently loaded node."""
 
