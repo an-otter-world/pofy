@@ -42,6 +42,7 @@ def test_if_tag_handler() -> None:
         LOADING_FAILED
     )
 
+
 def test_switch_tag_handler_error_handling() -> None:
     """Switch tag should correctly handle errors."""
     _check_switch_tag(
