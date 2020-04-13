@@ -214,6 +214,32 @@ parameters, it accept several specific ones :
 
 #### EnumField
 
+Enum Field loads a python Enum from yaml. Values of the enum are refered to by
+their name In addition to the common fields parameters, it accept the following
+specific one :
+
+- enum_class : The class of the python enum to deserialize.
+
+If the value in Yaml does not match any declared value, a ValidationError will
+be raised, or the defined error_handler will be called with
+ErrorCode.VALIDATION_ERROR as the error_code parameter.
+
+```python
+  from enum import Enum
+  from pofy import EnumField, load
+
+  class TestEnum(Enum):
+    VALUE_1 = 1
+    VALUE_2 = 2
+
+  class Test:
+    class Schema:
+      enum_field = EnumField(TestEnum)
+
+  assert load('enum_field: VALUE_1', Test).enum_field == TestEnum.VALUE_1
+  assert load('enum_field: UNKNOWN_VALUE', Test) # Raises ValidationError
+```
+
 #### PathField
 
 #### ListField
