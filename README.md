@@ -294,3 +294,5 @@ the currently deserialized object :
 #### Error handling
 
 ### Creating Custom Fields
+
+A field should always return object of the same type (MergeHandler expects this)
