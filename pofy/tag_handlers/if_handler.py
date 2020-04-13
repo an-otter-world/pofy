@@ -6,7 +6,7 @@ from yaml import Node
 from yaml import ScalarNode
 from yaml import SequenceNode
 
-from pofy.common import LOADING_FAILED
+from pofy.common import UNDEFINED
 from pofy.interfaces import IBaseField
 from pofy.interfaces import ILoadingContext
 from pofy.tag_handlers.tag_handler import TagHandler
@@ -32,7 +32,7 @@ class IfHandler(TagHandler):
         flag = match.group('flag')
 
         if not context.is_defined(flag):
-            return LOADING_FAILED
+            return UNDEFINED
 
         # We need to return a copy of the node to avoid infinite recursion
         # that would happen if we return a node with an if tag defined on it

@@ -13,7 +13,7 @@ from typing import Type
 from typing import cast
 
 from pofy.common import ErrorCode
-from pofy.common import LOADING_FAILED
+from pofy.common import UNDEFINED
 from pofy.fields.base_field import BaseField
 from pofy.fields.base_field import ValidateCallback
 from pofy.fields.string_field import StringField
@@ -48,11 +48,11 @@ class ObjectField(BaseField):
 
     def _load(self, context: ILoadingContext) -> Any:
         if not context.expect_mapping():
-            return LOADING_FAILED
+            return UNDEFINED
 
         object_class = self._resolve_type(context)
         if object_class is None:
-            return LOADING_FAILED
+            return UNDEFINED
 
         return _load(object_class, context)
 
@@ -130,13 +130,13 @@ def _load(object_class: Type[Any], context: ILoadingContext) -> Any:
     fields = _get_fields(object_class, context)
 
     if fields is None:
-        return LOADING_FAILED
+        return UNDEFINED
 
     result, set_fields = _load_object(object_class, fields, context)
     if _validate_object(result, fields, set_fields, context):
         return result
 
-    return LOADING_FAILED
+    return UNDEFINED
 
 
 def _load_object(
@@ -150,7 +150,7 @@ def _load_object(
 
     for name_node, value_node in node.value:
         field_name = context.load(StringField(), name_node)
-        if field_name is LOADING_FAILED:
+        if field_name is UNDEFINED:
             continue
 
         field_name = name_node.value
@@ -164,7 +164,7 @@ def _load_object(
 
         field = fields[field_name]
         field_value = context.load(field, value_node)
-        if field_value is LOADING_FAILED:
+        if field_value is UNDEFINED:
             continue
 
         setattr(result, field_name, field_value)

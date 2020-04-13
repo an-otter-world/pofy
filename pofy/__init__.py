@@ -5,7 +5,7 @@ from .common import ErrorCode
 from .common import ErrorHandler
 from .common import FieldNotDeclaredError
 from .common import ImportNotFoundError
-from .common import LOADING_FAILED
+from .common import UNDEFINED
 from .common import MissingRequiredFieldError
 from .common import MultipleMatchingHandlersError
 from .common import PofyError

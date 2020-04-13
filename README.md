@@ -243,7 +243,7 @@ class ReverseHandler(TagHandler):
         if not context.expect_scalar(
             _('!reverse must be set on a string node.')
         ):
-            return LOADING_FAILED
+            return UNDEFINED
 
         # Return the value of the current yaml node reversed.
         node = context.current_node()

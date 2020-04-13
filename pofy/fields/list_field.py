@@ -3,7 +3,7 @@ from gettext import gettext as _
 from typing import Any
 from typing import Optional
 
-from pofy.common import LOADING_FAILED
+from pofy.common import UNDEFINED
 from pofy.fields.base_field import BaseField
 from pofy.fields.base_field import ValidateCallback
 from pofy.interfaces import ILoadingContext
@@ -33,13 +33,13 @@ class ListField(BaseField):
 
     def _load(self, context: ILoadingContext) -> Any:
         if not context.expect_sequence():
-            return LOADING_FAILED
+            return UNDEFINED
 
         node = context.current_node()
         result = []
         for item_node in node.value:
             item = context.load(self._item_field, item_node)
-            if item is LOADING_FAILED:
+            if item is UNDEFINED:
                 continue
 
             result.append(item)

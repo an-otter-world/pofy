@@ -16,7 +16,7 @@ from typing import cast
 from yaml import compose
 
 from pofy.common import ErrorHandler
-from pofy.common import LOADING_FAILED
+from pofy.common import UNDEFINED
 from pofy.common import LoadResult
 from pofy.fields.base_field import BaseField
 from pofy.fields.bool_field import BoolField
@@ -115,7 +115,7 @@ def load(
         node_path = source.name
 
     result = context.load(root_field, node, node_path)
-    if result is LOADING_FAILED:
-        return LOADING_FAILED
+    if result is UNDEFINED:
+        return UNDEFINED
 
     return cast(ObjectType, result)

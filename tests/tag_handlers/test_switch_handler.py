@@ -2,7 +2,7 @@
 from typing import Any
 from typing import Optional
 
-from pofy.common import LOADING_FAILED
+from pofy.common import UNDEFINED
 from pofy.fields.string_field import StringField
 from pofy.tag_handlers.switch_handler import SwitchHandler
 from pofy.common import ErrorCode
@@ -16,7 +16,7 @@ def _check_switch_tag(
     expected_error: Optional[ErrorCode] = None
 ) -> None:
     if expected_error is not None:
-        expected_value = LOADING_FAILED
+        expected_value = UNDEFINED
 
     result = check_load(
         yaml,
@@ -39,7 +39,7 @@ def test_if_tag_handler() -> None:
 
     _check_switch_tag(
         '!switch [!fail value_1, !fail value_2, !fail value_3]',
-        LOADING_FAILED
+        UNDEFINED
     )
 
 

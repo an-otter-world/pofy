@@ -5,7 +5,7 @@ from typing import Any
 
 from yaml import ScalarNode
 
-from pofy.common import LOADING_FAILED
+from pofy.common import UNDEFINED
 from pofy.interfaces import IBaseField
 from pofy.interfaces import ILoadingContext
 from pofy.tag_handlers.tag_handler import TagHandler
@@ -24,13 +24,13 @@ class EnvHandler(TagHandler):
         if not context.expect_scalar(
             _('!env must be set on a string node containing the variable name.')
         ):
-            return LOADING_FAILED
+            return UNDEFINED
 
         node = context.current_node()
         var_name = node.value
 
         if var_name not in environ:
-            return LOADING_FAILED
+            return UNDEFINED
 
         fake_node = ScalarNode(
             '',

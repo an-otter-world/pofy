@@ -1,5 +1,5 @@
 """If handler tests."""
-from pofy.common import LOADING_FAILED
+from pofy.common import UNDEFINED
 from pofy.fields.dict_field import DictField
 from pofy.fields.list_field import ListField
 from pofy.fields.string_field import StringField
@@ -24,7 +24,7 @@ def test_if_tag_handler() -> None:
         tag_handlers=[IfHandler()],
         flags={'FLAG'}
     )
-    assert result == LOADING_FAILED
+    assert result == UNDEFINED
 
     result = check_load(
         '!if(FLAG) {key: value}',

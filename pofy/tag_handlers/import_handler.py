@@ -5,7 +5,7 @@ from typing import Any
 from typing import Optional
 
 from pofy.common import ErrorCode
-from pofy.common import LOADING_FAILED
+from pofy.common import UNDEFINED
 from pofy.interfaces import IBaseField
 from pofy.interfaces import ILoadingContext
 from pofy.tag_handlers.path_handler import PathHandler
@@ -24,7 +24,7 @@ class ImportHandler(PathHandler):
         if not context.expect_scalar(
             _('import / try-import must be set on a scalar node')
         ):
-            return LOADING_FAILED
+            return UNDEFINED
 
         file_path = self._get_file(context)
         if file_path is None:
@@ -36,12 +36,12 @@ class ImportHandler(PathHandler):
                     node.value
                 )
 
-            return LOADING_FAILED
+            return UNDEFINED
 
         file_yaml_node = self._load_file(context, file_path)
 
         if file_yaml_node is None:
-            return LOADING_FAILED
+            return UNDEFINED
 
         return context.load(field, file_yaml_node, str(file_path))
 

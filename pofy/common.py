@@ -8,15 +8,15 @@ from typing import Union
 from yaml import Node
 
 
-class LoadingFailed:
+class Undefined:
     """Dummy type representing a failed loading, used for type hints."""
 
 
 # Unique symbol used to differentiate an error from a valid None return when
 # loading a field.
-LOADING_FAILED = LoadingFailed()
+UNDEFINED = Undefined()
 ObjectType = TypeVar('ObjectType')
-LoadResult = Union[ObjectType, LoadingFailed]
+LoadResult = Union[ObjectType, Undefined]
 
 
 class ErrorCode(Enum):

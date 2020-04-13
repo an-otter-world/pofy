@@ -6,7 +6,7 @@ from typing import Optional
 from typing import Type
 
 from pofy.common import ErrorCode
-from pofy.common import LOADING_FAILED
+from pofy.common import UNDEFINED
 from pofy.fields.base_field import ScalarField
 from pofy.fields.base_field import ValidateCallback
 from pofy.interfaces import ILoadingContext
@@ -45,4 +45,4 @@ class EnumField(ScalarField):
             string_value,
             self._enum_class
         )
-        return LOADING_FAILED
+        return UNDEFINED

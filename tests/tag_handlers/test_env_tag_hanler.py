@@ -4,7 +4,7 @@ from typing import Any
 from typing import Optional
 
 from pofy.common import ErrorCode
-from pofy.common import LOADING_FAILED
+from pofy.common import UNDEFINED
 from pofy.fields.string_field import StringField
 from pofy.tag_handlers.env_handler import EnvHandler
 
@@ -30,7 +30,7 @@ def _check_tag_error(
         expected_error=expected_error,
         tag_handlers=[EnvHandler()]
     )
-    assert result == LOADING_FAILED
+    assert result == UNDEFINED
 
 
 def test_env_tag_handler() -> None:
@@ -45,4 +45,4 @@ def test_env_tag_handler_error_handling() -> None:
     _check_tag_error('!env {}', ErrorCode.UNEXPECTED_NODE_TYPE)
 
     # Shouldn't emit an error
-    _check_tag('!env I_HOPE_YOU_DIDNT_SET_THIS_ONE', LOADING_FAILED)
+    _check_tag('!env I_HOPE_YOU_DIDNT_SET_THIS_ONE', UNDEFINED)

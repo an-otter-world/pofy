@@ -11,7 +11,7 @@ from yaml import Node
 from yaml import compose
 
 from pofy.common import ErrorCode
-from pofy.common import LOADING_FAILED
+from pofy.common import UNDEFINED
 from pofy.fields.base_field import BaseField
 from pofy.fields.object_field import ObjectField
 from pofy.interfaces import IBaseField
@@ -89,9 +89,9 @@ def check_load(
 
 
 class FailTagHandler(TagHandler):
-    """Tag handlers that returns LOADING_FAILED."""
+    """Tag handlers that returns UNDEFINED."""
 
     tag_pattern = '^fail$'
 
     def load(self, __: ILoadingContext, ___: IBaseField) -> Any:
-        return LOADING_FAILED
+        return UNDEFINED

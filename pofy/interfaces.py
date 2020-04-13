@@ -21,7 +21,7 @@ class IBaseField:
                      management.
 
         Return:
-            Deserialized field value, or LOADING_FAILED if loading failed.
+            Deserialized field value, or UNDEFINED if loading failed.
 
         """
 

@@ -7,7 +7,7 @@ from typing import Optional
 from typing import Union
 
 from pofy.common import ErrorCode
-from pofy.common import LOADING_FAILED
+from pofy.common import UNDEFINED
 from pofy.interfaces import IBaseField
 from pofy.interfaces import ILoadingContext
 from pofy.tag_handlers.tag_handler import TagHandler
@@ -21,14 +21,14 @@ class MergeHandler(TagHandler):
     def load(self, context: ILoadingContext, field: IBaseField) \
             -> Any:
         if not context.expect_sequence():
-            return LOADING_FAILED
+            return UNDEFINED
 
         node = context.current_node()
 
         result: Optional[Union[Dict[str, Any], List[Any]]] = None
         for child in node.value:
             child_result = context.load(field, child)
-            if child_result is LOADING_FAILED:
+            if child_result is UNDEFINED:
                 continue
 
             if isinstance(child_result, dict):
@@ -52,6 +52,6 @@ class MergeHandler(TagHandler):
 
         # If nothing it's to merge, return UNDEFINED
         if result is None:
-            return LOADING_FAILED
+            return UNDEFINED
 
         return result

@@ -3,7 +3,7 @@ from typing import Any
 from typing import Optional
 
 from pofy.common import ErrorCode
-from pofy.common import LOADING_FAILED
+from pofy.common import UNDEFINED
 from pofy.fields.base_field import BaseField
 from pofy.fields.dict_field import DictField
 from pofy.fields.list_field import ListField
@@ -20,7 +20,7 @@ def _check_merge_tag(
     expected_error: Optional[ErrorCode] = None
 ) -> None:
     if expected_error is not None:
-        expected_value = LOADING_FAILED
+        expected_value = UNDEFINED
 
     result = check_load(
         yaml,
@@ -61,7 +61,7 @@ def test_if_tag_handler() -> None:
     _check_merge_tag(
         ListField(StringField()),
         '!merge []',
-        LOADING_FAILED
+        UNDEFINED
     )
 
 

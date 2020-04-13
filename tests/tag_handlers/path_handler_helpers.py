@@ -6,7 +6,7 @@ from typing import Optional
 from typing import Type
 
 from pofy.common import ErrorCode
-from pofy.common import LOADING_FAILED
+from pofy.common import UNDEFINED
 from pofy.fields.list_field import ListField
 from pofy.fields.string_field import StringField
 from pofy.tag_handlers.path_handler import PathHandler
@@ -49,7 +49,7 @@ def check_path_tag_error(
     location: Optional[str] = None,
     allow_relative: bool = True,
     roots: Optional[List[Path]] = None,
-    expected_value: Any = LOADING_FAILED
+    expected_value: Any = UNDEFINED
 ) -> None:
     """Path tag hanhler inherited tags error test helper."""
     result = check_load(
