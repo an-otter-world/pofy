@@ -3,7 +3,7 @@ from gettext import gettext as _
 from typing import Any
 
 from pofy.common import ErrorCode
-from pofy.common import LOADING_FAILED
+from pofy.common import UNDEFINED
 from pofy.fields.base_field import ScalarField
 from pofy.interfaces import ILoadingContext
 
@@ -37,4 +37,4 @@ class BoolField(ScalarField):
             ', '.join(true_values + false_values)
         )
 
-        return LOADING_FAILED
+        return UNDEFINED

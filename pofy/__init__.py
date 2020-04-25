@@ -5,7 +5,7 @@ from .common import ErrorCode
 from .common import ErrorHandler
 from .common import FieldNotDeclaredError
 from .common import ImportNotFoundError
-from .common import LOADING_FAILED
+from .common import UNDEFINED
 from .common import MissingRequiredFieldError
 from .common import MultipleMatchingHandlersError
 from .common import PofyError
@@ -35,3 +35,4 @@ from .tag_handlers.glob_handler import GlobHandler
 from .tag_handlers.import_handler import ImportHandler
 from .tag_handlers.path_handler import PathHandler
 from .tag_handlers.tag_handler import TagHandler
+from .tag_handlers.if_handler import IfHandler

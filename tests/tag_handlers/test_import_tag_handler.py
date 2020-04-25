@@ -2,7 +2,7 @@
 from pathlib import Path
 
 from pofy.common import ErrorCode
-from pofy.common import LOADING_FAILED
+from pofy.common import UNDEFINED
 from pofy.tag_handlers.import_handler import ImportHandler
 
 from tests.tag_handlers.path_handler_helpers import check_path_tag
@@ -35,7 +35,7 @@ def test_import_tag_handler(datadir: Path) -> None:
     )
 
     # Shouldn't emit an error
-    check_path_tag(ImportHandler, '!try-import doesnt_exists', LOADING_FAILED)
+    check_path_tag(ImportHandler, '!try-import doesnt_exists', UNDEFINED)
 
     check_path_tag(
         ImportHandler,

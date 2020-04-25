@@ -4,7 +4,7 @@ from typing import Any
 from typing import Optional
 
 from pofy.common import ErrorCode
-from pofy.common import LOADING_FAILED
+from pofy.common import UNDEFINED
 from pofy.fields.base_field import ScalarField
 from pofy.fields.base_field import ValidateCallback
 from pofy.interfaces import ILoadingContext
@@ -45,7 +45,7 @@ class FloatField(ScalarField):
                 ErrorCode.VALUE_ERROR,
                 _('Can\'t convert "{}" to a float'), value
             )
-            return LOADING_FAILED
+            return UNDEFINED
 
         return ScalarField._check_in_bounds(
             context,

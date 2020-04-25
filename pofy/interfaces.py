@@ -21,7 +21,7 @@ class IBaseField:
                      management.
 
         Return:
-            Deserialized field value, or LOADING_FAILED if loading failed.
+            Deserialized field value, or UNDEFINED if loading failed.
 
         """
 
@@ -49,6 +49,10 @@ class ILoadingContext:
                        same path, except until another child path is pushed.
 
         """
+
+    @abstractmethod
+    def is_defined(self, flag: str) -> bool:
+        """Return true if the given flag was defined when calling load."""
 
     @abstractmethod
     def current_node(self) -> Node:

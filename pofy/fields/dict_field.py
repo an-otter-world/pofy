@@ -5,7 +5,7 @@ from typing import Optional
 
 from yaml import ScalarNode
 
-from pofy.common import LOADING_FAILED
+from pofy.common import UNDEFINED
 from pofy.fields.base_field import BaseField
 from pofy.fields.base_field import ValidateCallback
 from pofy.interfaces import ILoadingContext
@@ -36,7 +36,7 @@ class DictField(BaseField):
     def _load(self, context: ILoadingContext) -> Any:
         node = context.current_node()
         if not context.expect_mapping():
-            return LOADING_FAILED
+            return UNDEFINED
 
         result = {}
         for key_node, value_node in node.value:
@@ -44,7 +44,7 @@ class DictField(BaseField):
             key = key_node.value
 
             item = context.load(self._item_field, value_node)
-            if item is LOADING_FAILED:
+            if item is UNDEFINED:
                 continue
 
             result[key] = item

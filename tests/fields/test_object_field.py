@@ -3,7 +3,7 @@ from typing import Any
 from typing import Optional
 
 from pofy.common import ErrorCode
-from pofy.common import LOADING_FAILED
+from pofy.common import UNDEFINED
 from pofy.fields.bool_field import BoolField
 from pofy.fields.object_field import ObjectField
 from pofy.fields.string_field import StringField
@@ -172,4 +172,4 @@ def test_object_field_error_handling() -> None:
     _check_field_error('{ }', ErrorCode.MISSING_REQUIRED_FIELD)
 
     obj = check_load('{ }', _NoSchema, ErrorCode.SCHEMA_ERROR)
-    assert obj == LOADING_FAILED
+    assert obj == UNDEFINED

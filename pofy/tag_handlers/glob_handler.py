@@ -3,7 +3,7 @@ from gettext import gettext as _
 from typing import Any
 from yaml import SequenceNode
 
-from pofy.common import LOADING_FAILED
+from pofy.common import UNDEFINED
 from pofy.interfaces import ILoadingContext
 from pofy.interfaces import IBaseField
 from pofy.tag_handlers.path_handler import PathHandler
@@ -20,7 +20,7 @@ class GlobHandler(PathHandler):
         if not context.expect_scalar(
             _('glob must be set on a scalar node')
         ):
-            return LOADING_FAILED
+            return UNDEFINED
 
         node = context.current_node()
         glob = node.value
