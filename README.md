@@ -40,6 +40,7 @@ improvements. Feel free to join [the Pofy channel on Matrix](https://matrix.to/#
       - [Oject validation](#oject-validation)
       - [Post-load hook](#post-load-hook)
       - [Error handling](#error-handling)
+      - [Schema resolver](#schema-resolver)
     - [Creating Custom Fields](#creating-custom-fields)
 
 ## Installation

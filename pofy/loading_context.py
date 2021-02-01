@@ -15,6 +15,8 @@ from yaml import ScalarNode
 from yaml import SequenceNode
 
 from pofy.common import ErrorCode
+from pofy.common import SchemaResolver
+from pofy.common import default_schema_resolver
 from pofy.common import get_exception_type
 from pofy.interfaces import IBaseField
 from pofy.interfaces import ILoadingContext
@@ -31,13 +33,18 @@ class LoadingContext(ILoadingContext):
         self,
         error_handler: ErrorHandler,
         tag_handlers: Iterable[TagHandler],
-        flags: Optional[Set[str]] = None
+        flags: Optional[Set[str]] = None,
+        schema_resolver: Optional[SchemaResolver] = None
     ):
         """Initialize context."""
         self._error_handler = error_handler
         self._tag_handlers = list(tag_handlers)
         self._node_stack: NodeStack = []
         self._flags = flags if flags is not None else set()
+        if schema_resolver is not None:
+            self._schema_resolver = schema_resolver
+        else:
+            self._schema_resolver = default_schema_resolver
 
     def load(
         self,
@@ -76,6 +83,9 @@ class LoadingContext(ILoadingContext):
 
     def is_defined(self, flag: str) -> bool:
         return flag in self._flags
+
+    def get_schema_resolver(self) -> SchemaResolver:
+        return self._schema_resolver
 
     def current_node(self) -> Node:
         """Return the currently loaded node."""

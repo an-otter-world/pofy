@@ -1,9 +1,14 @@
 """Pofy common definitions."""
 from enum import Enum
+from inspect import getmembers
+from inspect import isclass
+from typing import Any
 from typing import Callable
+from typing import Optional
 from typing import Type
 from typing import TypeVar
 from typing import Union
+from typing import cast
 
 from yaml import Node
 
@@ -17,6 +22,18 @@ class Undefined:
 UNDEFINED = Undefined()
 ObjectType = TypeVar('ObjectType')
 LoadResult = Union[ObjectType, Undefined]
+SchemaResolver = Callable[[Type[Any]], Optional[Type[Any]]]
+
+
+def default_schema_resolver(cls: Type[Any]) -> Optional[Type[Any]]:
+    """Return the first inner class named 'Schema' found in given type."""
+    def _filter(member: Any) -> bool:
+        return isclass(member) and member.__name__ == 'Schema'
+
+    for _, member_it in getmembers(cls, _filter):
+        return cast(Type[Any], member_it)
+
+    return None
 
 
 class ErrorCode(Enum):

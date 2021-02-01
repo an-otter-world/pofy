@@ -6,6 +6,7 @@ from typing import Optional
 from yaml import Node
 
 from pofy.common import ErrorCode
+from pofy.common import SchemaResolver
 
 
 class IBaseField:
@@ -53,6 +54,10 @@ class ILoadingContext:
     @abstractmethod
     def is_defined(self, flag: str) -> bool:
         """Return true if the given flag was defined when calling load."""
+
+    @abstractmethod
+    def get_schema_resolver(self) -> SchemaResolver:
+        """Return a function returning the schema for the given type."""
 
     @abstractmethod
     def current_node(self) -> Node:
