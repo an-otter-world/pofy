@@ -243,7 +243,7 @@ def _get_fields(cls: Type[Any], context: ILoadingContext) \
 
 def _get_methods(cls: Type[Any], method_name: str) \
         -> Iterable[Callable[..., Any]]:
-    def _is_validation_method(member: Any) -> bool:
+    def _method_filter(member: Any) -> bool:
         return ismethod(member) and member.__name__ == method_name
 
     for base in cls.__bases__:
@@ -251,5 +251,5 @@ def _get_methods(cls: Type[Any], method_name: str) \
             yield method
 
     for __, schema_class in getmembers(cls, _is_schema_class):
-        for __, method in getmembers(schema_class, _is_validation_method):
+        for __, method in getmembers(schema_class, _method_filter):
             yield method
