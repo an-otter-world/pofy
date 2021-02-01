@@ -5,7 +5,7 @@ from typing import Optional
 from typing import cast
 
 from pofy.common import ErrorCode
-from pofy.common import LOADING_FAILED
+from pofy.common import UNDEFINED
 from pofy.fields.base_field import ScalarField
 from pofy.fields.base_field import ValidateCallback
 from pofy.interfaces import ILoadingContext
@@ -53,7 +53,7 @@ class IntField(ScalarField):
                 ErrorCode.VALUE_ERROR,
                 _('Can\'t convert "{}" to an integer'), value
             )
-            return LOADING_FAILED
+            return UNDEFINED
 
         return cast(Optional[int], ScalarField._check_in_bounds(
             context,

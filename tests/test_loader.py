@@ -8,7 +8,7 @@ from typing import Type
 from yaml import Node
 
 from pofy.common import ErrorCode
-from pofy.common import LOADING_FAILED
+from pofy.common import UNDEFINED
 from pofy.fields.list_field import ListField
 from pofy.fields.object_field import ObjectField
 from pofy.fields.string_field import StringField
@@ -93,7 +93,7 @@ def test_tag_handler_fails_on_root_node_returns_none() -> None:
         str,
         tag_handlers=[FailTagHandler()]
     )
-    assert result is LOADING_FAILED
+    assert result is UNDEFINED
 
 
 def test_load_handles_stream(datadir: Path) -> None:

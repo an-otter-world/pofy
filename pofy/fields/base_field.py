@@ -7,7 +7,7 @@ from typing import Optional
 from typing import Union
 
 from pofy.common import ErrorCode
-from pofy.common import LOADING_FAILED
+from pofy.common import UNDEFINED
 from pofy.interfaces import IBaseField
 from pofy.interfaces import ILoadingContext
 
@@ -51,14 +51,14 @@ class BaseField(IBaseField):
                      management.
 
         Return:
-            Deserialized field value, or LOADING_FAILED if loading failed.
+            Deserialized field value, or UNDEFINED if loading failed.
 
         """
         field_value = self._load(context)
 
         validate = self._validate
         if validate is not None and not validate(context, field_value):
-            return LOADING_FAILED
+            return UNDEFINED
 
         return field_value
 
@@ -83,7 +83,7 @@ class ScalarField(BaseField):
 
     def _load(self, context: ILoadingContext) -> Any:
         if not context.expect_scalar():
-            return LOADING_FAILED
+            return UNDEFINED
 
         return self._convert(context)
 
@@ -112,13 +112,13 @@ class ScalarField(BaseField):
                 ErrorCode.VALIDATION_ERROR,
                 _('Value is too small (minimum : {})'), minimum
             )
-            return LOADING_FAILED
+            return UNDEFINED
 
         if maximum is not None and value > maximum:
             context.error(
                 ErrorCode.VALIDATION_ERROR,
                 _('Value is too big (maximum : {})'), maximum
             )
-            return LOADING_FAILED
+            return UNDEFINED
 
         return value

@@ -6,7 +6,7 @@ from typing import Optional
 from typing import Pattern
 
 from pofy.common import ErrorCode
-from pofy.common import LOADING_FAILED
+from pofy.common import UNDEFINED
 from pofy.fields.base_field import ScalarField
 from pofy.fields.base_field import ValidateCallback
 from pofy.interfaces import ILoadingContext
@@ -51,6 +51,6 @@ class StringField(ScalarField):
                 value,
                 self._pattern_str
             )
-            return LOADING_FAILED
+            return UNDEFINED
 
         return value
